@@ -5,11 +5,10 @@
 #include <numeric>
 
 int main () {
-  std::vector<int> v = {1, 2, 3, 4};
-  auto sum = std::accumulate(std::begin(v),
-                             std::end(v),
-                             1,
-                             std::multiplies<>());
-  std::cout << sum << std::endl;
-  return 0;
+  std::vector v = {1, 2, 3, 4, 5};
+  auto prod = std::accumulate(std::begin(v),
+                              std::end(v),
+                              1,
+                              std::multiplies());
+  std::cout << prod << std::endl;
 }
