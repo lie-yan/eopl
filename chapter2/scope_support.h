@@ -16,10 +16,8 @@ using Value = std::variant<bool,
                            int,
                            double,
                            boost::recursive_wrapper<std::string>,
-                           boost::recursive_wrapper<struct Vector>>;
+                           boost::recursive_wrapper<struct ValueList>>;
 
-struct Vector {
-  std::vector<Value> data;
-};
+struct ValueList : std::vector<Value> { };
 
 }
