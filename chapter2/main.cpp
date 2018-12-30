@@ -8,12 +8,13 @@ int main () {
   std::cout << "sizeof(Value): " << sizeof(Value) << std::endl;
 
   Value v = ValueList{
+      {},
       false,
       1,
       2.0,
       String("three"),
       Symbol("four"),
-      ValueList{}
+      ValueList{5, 6, 7}
   };
 
   std::cout << v.index() << std::endl;
@@ -22,7 +23,7 @@ int main () {
 
   std::for_each(std::begin(vlist), std::end(vlist),
                 [] (const Value& x) {
-                  std::cout << x.index() << std::endl;
+                  std::cout << x << std::endl;
                 });
 
 }
