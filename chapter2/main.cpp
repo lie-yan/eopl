@@ -14,7 +14,8 @@ int main () {
       2.0,
       String("three"),
       Symbol("four"),
-      ValueList{5, 6, 7}
+      Pair{5, Symbol("sechs")},
+      ValueList{String("sept"), 8, Symbol("neun")}
   };
 
   std::cout << v.index() << std::endl;
@@ -23,7 +24,7 @@ int main () {
 
   std::for_each(std::begin(vlist), std::end(vlist),
                 [] (const Value& x) {
-                  std::cout << x << std::endl;
+                  std::cout << x.index() << ": " << x << std::endl;
                 });
 
 }
