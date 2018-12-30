@@ -4,12 +4,13 @@
 
 int main () {
   using namespace std::string_literals;
+  using eopl::Symbol, eopl::String, eopl::Value, eopl::ValueList;
 
   std::cout << "sizeof(eopl::Value): " << sizeof(eopl::Value) << std::endl;
 
-  eopl::Value v = eopl::ValueList{{false, 2, 3.0, "w"s}};
+  Value v = ValueList{{false, 2, 3.0, Symbol("w"s)}};
   std::cout << v.index() << std::endl;
-  eopl::ValueList& vlist = std::get<4>(v).get();
+  ValueList& vlist = std::get<5>(v).get();
   for (auto& x : vlist) {
     std::cout << x.index() << std::endl;
   }

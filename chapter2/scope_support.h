@@ -10,12 +10,14 @@
 
 namespace eopl {
 
-using Variable = std::string;
+struct Symbol : std::string { using std::string::string; };
+struct String : std::string { using std::string::string; };
 
 using Value = std::variant<bool,
                            int,
                            double,
-                           boost::recursive_wrapper<std::string>,
+                           boost::recursive_wrapper<String>,
+                           boost::recursive_wrapper<Symbol>,
                            boost::recursive_wrapper<struct ValueList>>;
 
 struct ValueList : std::vector<Value> { };
