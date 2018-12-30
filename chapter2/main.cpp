@@ -1,6 +1,5 @@
 #include <iostream>
 #include "scope_support.h"
-#include <string>
 
 int main () {
   using namespace std::string_literals;
@@ -11,9 +10,10 @@ int main () {
   Value v = ValueList{{false, 1, 2.0, String("three"s), Symbol("four"s), ValueList{}}};
 
   std::cout << v.index() << std::endl;
-  if (v.index() != 5) return 0;
+  const int index_vlist = 5;
+  if (v.index() != index_vlist) return 0;
 
-  const ValueList& vlist = std::get<5>(v).get();
+  const ValueList& vlist = std::get<index_vlist>(v).get();
   for (const auto& x : vlist) {
     std::cout << x.index() << std::endl;
   }
