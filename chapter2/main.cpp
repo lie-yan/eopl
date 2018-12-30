@@ -3,17 +3,26 @@
 
 int main () {
   using namespace std::string_literals;
-  using eopl::Symbol, eopl::String, eopl::Value, eopl::ValueList;
-  using eopl::RwValueList;
+  using namespace eopl;
 
-  std::cout << "sizeof(eopl::Value): " << sizeof(eopl::Value) << std::endl;
+  std::cout << "sizeof(Value): " << sizeof(Value) << std::endl;
 
-  Value v = ValueList{false, 1, 2.0, String("three"s), Symbol("four"s), ValueList{}};
+  Value v = ValueList{
+      false,
+      1,
+      2.0,
+      String("three"),
+      Symbol("four"),
+      ValueList{}
+  };
 
   std::cout << v.index() << std::endl;
-  
+
   const ValueList& vlist = std::get<RwValueList>(v).get();
-  for (const auto& x : vlist) {
-    std::cout << x.index() << std::endl;
-  }
+
+  std::for_each(std::begin(vlist), std::end(vlist),
+                [] (const Value& x) {
+                  std::cout << x.index() << std::endl;
+                });
+
 }

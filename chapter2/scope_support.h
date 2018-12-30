@@ -10,11 +10,8 @@
 
 namespace eopl {
 
-struct Symbol : std::string { using std::string::string; };
-struct String : std::string { using std::string::string; };
-
-using RwString = boost::recursive_wrapper<String>;
-using RwSymbol = boost::recursive_wrapper<Symbol>;
+using RwString = boost::recursive_wrapper<struct String>;
+using RwSymbol = boost::recursive_wrapper<struct Symbol>;
 using RwValueList = boost::recursive_wrapper<struct ValueList>;
 
 using Value = std::variant<bool,
@@ -23,6 +20,10 @@ using Value = std::variant<bool,
                            RwString,
                            RwSymbol,
                            RwValueList>;
+
+struct String : std::string { using std::string::string; };
+
+struct Symbol : std::string { using std::string::string; };
 
 struct ValueList : std::vector<Value> { using std::vector<Value>::vector; };
 
