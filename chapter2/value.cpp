@@ -16,7 +16,7 @@ ValueType type_of (const Value& v) {
     ValueType operator () (const RwString& str) { return ValueType::STRING; }
     ValueType operator () (const RwSymbol& sym) { return ValueType::SYMBOL; }
     ValueType operator () (const RwPair& p) { return ValueType::PAIR; }
-    ValueType operator () (const RwValueList& d) { return ValueType::VALUE_LIST; }
+    ValueType operator () (const RwValueList& vlist) { return ValueType::VALUE_LIST; }
   };
 
   return std::visit(TypeVisitor{}, v);
@@ -53,17 +53,17 @@ std::ostream& operator << (std::ostream& os, const Value& v) {
       }
     }
 
-    void operator () (const RwValueList& d) {
-      os << "[";
-      interleave(std::begin(d.get()),
-                 std::end(d.get()),
+    void operator () (const RwValueList& vlist) {
+      os << '[';
+      interleave(std::begin(vlist.get()),
+                 std::end(vlist.get()),
                  [this] (const auto& x) {
                    std::visit(OutputVisitor{os}, x);
                  },
                  [this] () {
                    os << ", ";
                  });
-      os << "]";
+      os << ']';
     }
   };
 
