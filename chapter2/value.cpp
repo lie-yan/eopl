@@ -25,11 +25,7 @@ ValueType type_of (const Value& v) {
 std::ostream& operator << (std::ostream& os, const Value& v) {
   struct OutputVisitor {
     std::ostream& os;
-    std::stack<bool> context;
-
-    OutputVisitor (std::ostream& os) : os(os) {
-      context.push(false);
-    }
+    bool open_paren = false;
 
     void operator () (Nil) { os << "nil"; }
     void operator () (bool b) { os << std::boolalpha << b; }
@@ -38,24 +34,22 @@ std::ostream& operator << (std::ostream& os, const Value& v) {
     void operator () (const RwString& str) { os << std::quoted(str.get()); }
     void operator () (const RwSymbol& sym) { os << sym.get(); }
     void operator () (const RwPair& p) {
-      if (!context.top()) {
-        os << "(";
-        context.top() = true;
+      if (!open_paren) {
+        os << '(';
+        open_paren = true;
       }
 
       std::visit(*this, p.get().first);
 
       if (auto type = type_of(p.get().second); type == ValueType::PAIR) {
-        os << " ";
+        os << ' ';
         std::visit(*this, p.get().second);
       } else if (type == ValueType::NIL) {
-        os << ")";
-        context.pop();
+        os << ')';
       } else {
         os << " . ";
         std::visit(*this, p.get().second);
-        os << ")";
-        context.pop();
+        os << ')';
       }
     }
 
@@ -64,9 +58,7 @@ std::ostream& operator << (std::ostream& os, const Value& v) {
       interleave(std::begin(d.get()),
                  std::end(d.get()),
                  [this] (const auto& x) {
-                   context.push(false);
-                   std::visit(*this, x);
-                   context.pop();
+                   std::visit(OutputVisitor{os}, x);
                  },
                  [this] () {
                    os << ", ";

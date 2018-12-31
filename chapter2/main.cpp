@@ -9,12 +9,12 @@ int main () {
 
   Value v = ValueList{
       {},
-      false,
-      1,
-      2.0,
-      String("three"),
-      Symbol("four"),
-      Pair{5, Pair{Symbol("sechs"), Pair{6.5, {}}}},
+      true,
+      2,
+      3.0,
+      String("vier"),
+      Symbol("fünf"),
+      Pair{6, Pair{Symbol("sechs"), Pair{6.5, {}}}},
       ValueList{String("sept"), 8, Symbol("neun"), Pair{10, 10.3}}
   };
 
@@ -26,5 +26,7 @@ int main () {
                 [] (const Value& x) {
                   std::cout << x.index() << ": " << x << std::endl;
                 });
+
+  std::cout << v << std::endl;
 
 }
