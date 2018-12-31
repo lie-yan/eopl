@@ -7,20 +7,20 @@ int main () {
 
   std::cout << "sizeof(Value): " << sizeof(Value) << std::endl;
 
-  Value v = ValueList{
+  Value v = ValueArray{
       {},
       true,
       2,
       3.0,
       String("vier"),
       Symbol("fünf"),
-      Pair{6, Pair{Symbol("sechs"), Pair{6.5, {}}}},
-      ValueList{String("sept"), 8, Symbol("neun"), Pair{10, 10.3}}
+      Pair{6, Pair{Symbol("sechs"), Pair{String("six"), {}}}},
+      ValueArray{7, String("huit"), Symbol("neuf"), Pair{10, 11.11}}
   };
 
   std::cout << v.index() << std::endl;
 
-  const ValueList& vlist = std::get<RwValueList>(v).get();
+  const ValueArray& vlist = std::get<RwValueArray>(v).get();
 
   std::for_each(std::begin(vlist), std::end(vlist),
                 [] (const Value& x) {

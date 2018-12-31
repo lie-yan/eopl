@@ -15,7 +15,7 @@ namespace eopl {
 
 using RwString = boost::recursive_wrapper<struct String>;
 using RwSymbol = boost::recursive_wrapper<struct Symbol>;
-using RwValueList = boost::recursive_wrapper<struct ValueList>;
+using RwValueArray = boost::recursive_wrapper<struct ValueArray>;
 using RwPair = boost::recursive_wrapper<struct Pair>;
 
 struct Nil { };
@@ -29,14 +29,14 @@ using Value = std::variant<Nil,
                            RwString,
                            RwSymbol,
                            RwPair,
-                           RwValueList>;
+                           RwValueArray>;
 
 struct Pair {
   Value first;
   Value second;
 };
 
-struct ValueList : std::vector<Value> { using std::vector<Value>::vector; };
+struct ValueArray : std::vector<Value> { using std::vector<Value>::vector; };
 
 enum class ValueType {
   NIL,
@@ -46,7 +46,7 @@ enum class ValueType {
   STRING,
   SYMBOL,
   PAIR,
-  VALUE_LIST,
+  VALUE_ARRAY,
 };
 
 ValueType type_of (const Value& v);
