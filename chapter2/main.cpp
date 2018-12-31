@@ -7,7 +7,7 @@ int main () {
 
   std::cout << "sizeof(Value): " << sizeof(Value) << std::endl;
 
-  Value v = ValueArray{
+  Value value = Array{
       {},
       true,
       2,
@@ -15,18 +15,18 @@ int main () {
       String("vier"),
       Symbol("fünf"),
       Pair{6, Pair{Symbol("sechs"), Pair{String("six"), {}}}},
-      ValueArray{7, String("huit"), Symbol("neuf"), Pair{10, 11.11}}
+      Array{7, String("huit"), Symbol("neuf"), Pair{10, 11.11}}
   };
 
-  std::cout << v.index() << std::endl;
+  std::cout << value.index() << std::endl;
 
-  const ValueArray& vlist = std::get<RwValueArray>(v).get();
+  const Array& array = std::get<RwArray>(value).get();
 
-  std::for_each(std::begin(vlist), std::end(vlist),
-                [] (const Value& x) {
-                  std::cout << x.index() << ": " << x << std::endl;
+  std::for_each(std::begin(array), std::end(array),
+                [] (const auto& item) {
+                  std::cout << item.index() << ": " << item << std::endl;
                 });
 
-  std::cout << v << std::endl;
+  std::cout << value << std::endl;
 
 }
