@@ -40,6 +40,32 @@ struct Pair {
 
 struct ValueList : std::vector<Value> { using std::vector<Value>::vector; };
 
+enum class ValueType {
+  NIL,
+  BOOL,
+  INT,
+  DOUBLE,
+  STRING,
+  SYMBOL,
+  PAIR,
+  VALUE_LIST,
+};
+
+ValueType type_of (const Value& v) {
+  struct TypeVisitor {
+    ValueType operator () (Nil) { return ValueType::NIL; }
+    ValueType operator () (bool b) { return ValueType::BOOL; }
+    ValueType operator () (int i) { return ValueType::INT; }
+    ValueType operator () (double d) { return ValueType::DOUBLE; }
+    ValueType operator () (const RwString& str) { return ValueType::STRING; }
+    ValueType operator () (const RwSymbol& sym) { return ValueType::SYMBOL; }
+    ValueType operator () (const RwPair& p) { return ValueType::PAIR; }
+    ValueType operator () (const RwValueList& d) { return ValueType::VALUE_LIST; }
+  };
+
+  return std::visit(TypeVisitor{}, v);
+}
+
 std::ostream& operator << (std::ostream& os, const Value& v) {
   struct OutputVisitor {
     std::ostream& os;
