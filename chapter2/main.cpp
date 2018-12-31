@@ -14,7 +14,7 @@ int main () {
       2.0,
       String("three"),
       Symbol("four"),
-      Pair{5, Symbol("sechs")},
+      Pair{5, Pair{Symbol("sechs"), 6.5}},
       ValueList{String("sept"), 8, Symbol("neun")}
   };
 
