@@ -3,6 +3,7 @@
 //
 
 #include "value.h"
+#include <stack>
 
 namespace eopl {
 
@@ -24,7 +25,11 @@ ValueType type_of (const Value& v) {
 std::ostream& operator << (std::ostream& os, const Value& v) {
   struct OutputVisitor {
     std::ostream& os;
-    bool lparen = false;
+    std::stack<bool> context;
+
+    OutputVisitor (std::ostream& os) : os(os) {
+      context.push(false);
+    }
 
     void operator () (Nil) { os << "nil"; }
     void operator () (bool b) { os << std::boolalpha << b; }
@@ -33,9 +38,9 @@ std::ostream& operator << (std::ostream& os, const Value& v) {
     void operator () (const RwString& str) { os << std::quoted(str.get()); }
     void operator () (const RwSymbol& sym) { os << sym.get(); }
     void operator () (const RwPair& p) {
-      if (!lparen) {
+      if (!context.top()) {
         os << "(";
-        lparen = true;
+        context.top() = true;
       }
 
       std::visit(*this, p.get().first);
@@ -45,10 +50,12 @@ std::ostream& operator << (std::ostream& os, const Value& v) {
         std::visit(*this, p.get().second);
       } else if (type == ValueType::NIL) {
         os << ")";
+        context.pop();
       } else {
         os << " . ";
         std::visit(*this, p.get().second);
         os << ")";
+        context.pop();
       }
     }
 
@@ -57,7 +64,9 @@ std::ostream& operator << (std::ostream& os, const Value& v) {
       interleave(std::begin(d.get()),
                  std::end(d.get()),
                  [this] (const auto& x) {
+                   context.push(false);
                    std::visit(*this, x);
+                   context.pop();
                  },
                  [this] () {
                    os << ", ";

@@ -14,8 +14,8 @@ int main () {
       2.0,
       String("three"),
       Symbol("four"),
-      Pair{5, Pair{Symbol("sechs"), 6.5}},
-      ValueList{String("sept"), 8, Symbol("neun")}
+      Pair{5, Pair{Symbol("sechs"), Pair{6.5, {}}}},
+      ValueList{String("sept"), 8, Symbol("neun"), Pair{10, 10.3}}
   };
 
   std::cout << v.index() << std::endl;
