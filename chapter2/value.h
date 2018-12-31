@@ -19,6 +19,8 @@ using RwValueList = boost::recursive_wrapper<struct ValueList>;
 using RwPair = boost::recursive_wrapper<struct Pair>;
 
 struct Nil { };
+struct String : std::string { using std::string::string; };
+struct Symbol : std::string { using std::string::string; };
 
 using Value = std::variant<Nil,
                            bool,
@@ -29,9 +31,6 @@ using Value = std::variant<Nil,
                            RwPair,
                            RwValueList>;
 
-struct String : std::string { using std::string::string; };
-
-struct Symbol : std::string { using std::string::string; };
 
 struct Pair {
   Value first;
