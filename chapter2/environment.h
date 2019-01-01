@@ -1,5 +1,3 @@
-#include <utility>
-
 //
 // Created by robin on 2019-01-01.
 //
@@ -7,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 #include "value.h"
 
 namespace eopl {
@@ -28,8 +27,8 @@ public:
   Environment (SpEnv parent, std::pair<Symbol, Value> pair);
 
   static SpEnv make_empty ();
-  const Value& apply (const Symbol& sym);
-  SpEnv extend (Symbol sym, Value value);
+  static SpEnv extend (SpEnv parent, Symbol sym, Value value);
+  static const Value& apply(SpEnv env, const Symbol& sym);
 
 private:
   SpEnv parent_;
