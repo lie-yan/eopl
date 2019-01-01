@@ -10,7 +10,7 @@
 
 namespace eopl {
 
-class Env : public std::enable_shared_from_this<Env> {
+class Env {
 public:
   using SpEnv = std::shared_ptr<Env>;
 
