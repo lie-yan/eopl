@@ -6,10 +6,10 @@ int main () {
 
   std::cout << "sizeof(Env): " << sizeof(Env) << std::endl;
 
-  Env::SpEnv env = Env::make_empty();
+  Env::SpEnv env0 = Env::make_empty();
 
   auto x = Symbol("x");
-  auto env1 = Env::extend(env, x, 1);
+  auto env1 = Env::extend(env0, x, 1);
   std::cout << x << ": " << Env::apply(env1, x) << std::endl;
   auto y = Symbol("y");
 
@@ -20,7 +20,7 @@ int main () {
   }
 
   try {
-    Env::apply(env, y);
+    Env::apply(env1, y);
   } catch (const Env::SymbolNotFoundError& e) {
     std::cout << e.what() << std::endl;
   }
