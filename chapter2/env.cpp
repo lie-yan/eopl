@@ -14,13 +14,14 @@ Env::SpEnv Env::make_empty () { return Env::SpEnv(); }
 
 Env::SpEnv Env::extend (Env::SpEnv parent, Symbol sym, Value value) {
   return std::make_shared<Env>(std::move(parent),
-                                       std::pair(std::move(sym), std::move(value)));
+                               std::pair(std::move(sym), std::move(value)));
 }
 
 const Value& Env::apply (Env::SpEnv env, const Symbol& sym) {
-  if (!env) throw SymbolNotFoundError(fmt::format("Symbol {} not found.", sym));
-  else if (env->pair_.first == sym) return env->pair_.second;
-  else return apply(env->parent_, sym);
+  for (; env; env = env->parent_) {
+    if (env->pair_.first == sym) return env->pair_.second;
+  }
+  throw SymbolNotFoundError(fmt::format("Symbol {} not found.", sym));
 }
 
 }
