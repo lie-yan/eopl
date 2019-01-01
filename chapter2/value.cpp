@@ -17,6 +17,10 @@ ValueType type_of (const Value& value) {
     ValueType operator () (const RwSymbol&) { return ValueType::SYMBOL; }
     ValueType operator () (const RwPair&) { return ValueType::PAIR; }
     ValueType operator () (const RwArray&) { return ValueType::ARRAY; }
+    ValueType operator () (const String&) { return ValueType::STRING; }
+    ValueType operator () (const Symbol&) { return ValueType::SYMBOL; }
+    ValueType operator () (const Pair&) { return ValueType::PAIR; }
+    ValueType operator () (const Array&) { return ValueType::ARRAY; }
   };
 
   return std::visit(TypeVisitor{}, value);
