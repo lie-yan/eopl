@@ -7,7 +7,8 @@
 namespace eopl {
 
 class Environment {
-
+public:
+  Environment () = default;
 };
 
 }
