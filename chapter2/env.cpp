@@ -2,22 +2,22 @@
 // Created by robin on 2019-01-01.
 //
 
-#include "environment.h"
+#include "env.h"
 #include <fmt/format.h>
 
 namespace eopl {
 
-Environment::Environment (Environment::SpEnv parent, std::pair<Symbol, Value> pair)
+Env::Env (Env::SpEnv parent, std::pair<Symbol, Value> pair)
     : parent_(std::move(parent)), pair_(std::move(pair)) { }
 
-Environment::SpEnv Environment::make_empty () { return Environment::SpEnv(); }
+Env::SpEnv Env::make_empty () { return Env::SpEnv(); }
 
-Environment::SpEnv Environment::extend (Environment::SpEnv parent, Symbol sym, Value value) {
-  return std::make_shared<Environment>(std::move(parent),
+Env::SpEnv Env::extend (Env::SpEnv parent, Symbol sym, Value value) {
+  return std::make_shared<Env>(std::move(parent),
                                        std::pair(std::move(sym), std::move(value)));
 }
 
-const Value& Environment::apply (Environment::SpEnv env, const Symbol& sym) {
+const Value& Env::apply (Env::SpEnv env, const Symbol& sym) {
   if (!env) throw SymbolNotFoundError(fmt::format("Symbol {} not found.", sym));
   else if (env->pair_.first == sym) return env->pair_.second;
   else return apply(env->parent_, sym);
