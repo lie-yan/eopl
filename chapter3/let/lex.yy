@@ -23,7 +23,11 @@ whitespace  [ \t]+
 %%
 {whitespace}  /* skip whitespace */
 
-"%"           {
+"\n"          {
+                std::cout << std::setw(common_width) << "newline  " << std::endl;
+              }
+
+"%"           { // skip comment
                 for (int c = yyinput(); c != '\n'; c = yyinput());
               }
 {number}      {
