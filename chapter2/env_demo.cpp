@@ -1,8 +1,11 @@
 #include <iostream>
 #include "env.h"
+#include "value.h"
 
 int main () {
-  using namespace eopl;
+  using eopl::Symbol, eopl::Value, eopl::String;
+
+  using Env = eopl::Env<Symbol, Value>;
 
   std::cout << "sizeof(Env): " << sizeof(Env) << std::endl;
 

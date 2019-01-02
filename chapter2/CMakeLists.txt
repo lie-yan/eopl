@@ -9,5 +9,5 @@ link_directories(/usr/local/lib)
 
 add_executable(chapter2-value-demo value_demo.cpp value.cpp)
 
-add_executable(chapter2-env-demo env_demo.cpp value.cpp env.cpp)
+add_executable(chapter2-env-demo env_demo.cpp value.cpp)
 target_link_libraries(chapter2-env-demo fmt)
