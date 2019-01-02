@@ -14,7 +14,7 @@ const int common_width = 12;
 letters     [a-zA-Z]
 digits      [0-9]
 
-string      \"[^\n"]+\"
+string      \"([^\\\"]|\\.)*\"
 
 identifier  {letters}({letters}|{digits}|[_.\-/$])*
 number      {digits}+
