@@ -47,7 +47,7 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
 %type <std::vector<std::string>> list nlist
 
 %%
-result  : QUOTE '(' list ')' { result = std::move($3); }
+result  : list { result = std::move($1); }
         ;
 
 list  : %empty { $$ = std::vector<std::string>(); }

@@ -1,10 +1,8 @@
 %option noyywrap
 
 %top {
-
 #include "parser.tab.hh"
 #include "location.hh"
-
 %}
 
 %class {
@@ -46,20 +44,16 @@ integer [-+]?[[:digit:]]+
 
 
 "%"             {
-                  for (int c = yyinput(); c != '\n' && c != 0; c = yyinput()) 
+                  for (int c = yyinput(); c != '\n' && c != 0; c = yyinput())
                     ;
-                  
-                  loc.lines();
-                  std::cout << loc << std::endl;
-                }
 
-"'"             return yy::parser::token::QUOTE;
+                  loc.lines();
+                }
 
 {blank}         loc.step();
 {newline}       loc.lines();
                 
 {integer}       {
-                  std::cout << "integer: " << yytext << " " << loc << std::endl;      
                   yylval.emplace<int>(std::stoi(yytext));            
                   return yy::parser::token::INT;
                 }
@@ -69,12 +63,11 @@ integer [-+]?[[:digit:]]+
                 }
 
 {string}        {
-                  std::cout << "string: " << yytext << " " << loc << std::endl;
                   yylval.emplace<std::string>(yytext);
                   return yy::parser::token::STRING;
                 }
                 
-{arbitrary}     std::cout << "arbitrary: " << yytext << std::endl; return yytext[0];
+{arbitrary}     return yytext[0];
                 
 
 %%
