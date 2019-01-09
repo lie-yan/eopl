@@ -1,12 +1,11 @@
 #include <algorithm>
 #include "lex.yy.h"
-#include "expr.h"
 
 int main () {
   yy::Lexer lexer(std::cin);
   eopl::Program result;
   yy::parser p(lexer, result);
-  p.set_debug_level(!!getenv("YYDEBUG"));
+  p.set_debug_level(getenv("YYDEBUG") != nullptr);
 
   try {
     p.parse();
