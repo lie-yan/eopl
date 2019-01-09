@@ -8,7 +8,6 @@ include_directories(../../third-party/GSL/include)
 link_directories(/usr/local/lib)
 
 set(SOURCE_DIR src)
-set(GEN_DIR src/gen)
 
 find_package(FLEX)
 find_package(BISON)
