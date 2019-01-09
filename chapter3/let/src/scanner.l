@@ -1,7 +1,10 @@
 %option noyywrap
+%option flex bison-cc bison-locations
+%option namespace=yy lexer=Lexer lex=yylex
+%option interactive
 
 %top {
-#include "parser.tab.hh"
+#include "parser.tab.hpp"
 #include "location.hh"
 %}
 
