@@ -5,5 +5,5 @@ reflex --flex --bison-cc --bison-locations \
   --header-file --interactive scanner.l
 bison -d parser.y
 
-c++ -std=c++17 main.cpp lex.yy.cpp parser.tab.cc -lreflex
+# c++ -std=c++17 main.cpp lex.yy.cpp parser.tab.cc -lreflex
 

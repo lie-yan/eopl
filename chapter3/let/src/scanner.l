@@ -19,7 +19,7 @@
 %}
 
 
-identifier  [[:alpha:]]([[:alnum:]]|[_])*
+identifier  [[:alpha:]]([[:alnum:]]|[_?])*
 string      \"([^\\\"]|\\\")*\"
 newline     \n
 blank       [\t ]
@@ -46,29 +46,36 @@ integer [-+]?[[:digit:]]+
 "%"             {
                   for (int c = yyinput(); c != '\n' && c != 0; c = yyinput())
                     ;
-
                   loc.lines();
                 }
 
+"zero?"         return yy::parser::token::ZEROQ;
+
+"if"            return yy::parser::token::IF;
+
+"then"          return yy::parser::token::THEN;
+
+"else"          return yy::parser::token::ELSE;
+
+"let"           return yy::parser::token::LET;
+
+"in"            return yy::parser::token::IN;
+
 {blank}         loc.step();
 {newline}       loc.lines();
-                
+
 {integer}       {
-                  yylval.emplace<int>(std::stoi(yytext));            
+                  yylval.emplace<int>(std::stoi(yytext));
+                  // std::cout << "integer: " << yytext << std::endl;
                   return yy::parser::token::INT;
                 }
 
-{s_identifier}  {
-                  std::cout << "identifier: " << yytext << " " << loc << std::endl;
+{identifier}  {
+                  yylval.emplace<eopl::Symbol>(yytext);
+                  // std::cout << "identifier: " << yytext << std::endl;
+                  return yy::parser::token::IDENTIFIER;
                 }
-
-{string}        {
-                  yylval.emplace<std::string>(yytext);
-                  return yy::parser::token::STRING;
-                }
-                
 {arbitrary}     return yytext[0];
-                
 
 %%
 
