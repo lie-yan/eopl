@@ -31,7 +31,7 @@ Value value_of (const ConstExp& exp, SpEnv env) {
   return exp.num;
 }
 Value value_of (const VarExp& exp, SpEnv env) {
-  return Env::apply(env, exp.var);
+  return Env::apply(std::move(env), exp.var);
 }
 Value value_of (const DiffExp& exp, SpEnv env) {
   Value val1 = value_of(exp.exp1, env);
@@ -41,19 +41,19 @@ Value value_of (const DiffExp& exp, SpEnv env) {
   return Int{i1 - i2};
 }
 Value value_of (const ZeroTestExp& exp, SpEnv env) {
-  Value val = value_of(exp.exp1, env);
+  Value val = value_of(exp.exp1, std::move(env));
   int i = value_to_int(val).val;
   return Bool{i == 0};
 }
 Value value_of (const IfExp& exp, SpEnv env) {
   Value val1 = value_of(exp.exp1, env);
   bool b1 = value_to_bool(val1).val;
-  if (b1) return value_of(exp.exp2, env);
-  else return value_of(exp.exp3, env);
+  if (b1) return value_of(exp.exp2, std::move(env));
+  else return value_of(exp.exp3, std::move(env));
 }
 Value value_of (const LetExp& exp, SpEnv env) {
   Value val1 = value_of(exp.exp1, env);
-  auto new_env = Env::extend(env, exp.var, std::move(val1));
-  return value_of(exp.body, new_env);
+  auto new_env = Env::extend(std::move(env), exp.var, std::move(val1));
+  return value_of(exp.body, std::move(new_env));
 }
 }
