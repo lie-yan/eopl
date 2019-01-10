@@ -25,6 +25,7 @@ set(SOURCES
         ${SOURCE_DIR}/main.cpp
         ${SOURCE_DIR}/value.cpp
         ${SOURCE_DIR}/expr.cpp
+        ${SOURCE_DIR}/interpreter.cpp
         ${FLEX_LetScanner_OUTPUTS}
         ${BISON_LetParser_OUTPUTS})
 

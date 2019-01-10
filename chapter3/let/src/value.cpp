@@ -4,15 +4,16 @@
 
 #include "value.h"
 #include <stack>
+#include <iomanip>
 
 namespace eopl {
 
 ValueType type_of (const Value& value) {
   struct TypeVisitor {
     ValueType operator () (Nil) { return ValueType::NIL; }
-    ValueType operator () (bool) { return ValueType::BOOL; }
-    ValueType operator () (int) { return ValueType::INT; }
-    ValueType operator () (double) { return ValueType::DOUBLE; }
+    ValueType operator () (Bool) { return ValueType::BOOL; }
+    ValueType operator () (Int) { return ValueType::INT; }
+    ValueType operator () (Double) { return ValueType::DOUBLE; }
     ValueType operator () (const RwString&) { return ValueType::STRING; }
     ValueType operator () (const RwSymbol&) { return ValueType::SYMBOL; }
     ValueType operator () (const RwPair&) { return ValueType::PAIR; }
@@ -32,9 +33,9 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     bool open_paren = false;
 
     void operator () (Nil) { os << "()"; }
-    void operator () (bool b) { os << (b ? "#t" : "#f"); }
-    void operator () (int i) { os << i; }
-    void operator () (double d) { os << d; }
+    void operator () (Bool b) { os << (b.val ? "#t" : "#f"); }
+    void operator () (Int i) { os << i.val; }
+    void operator () (Double d) { os << d.val; }
     void operator () (const RwString& str) { (*this)(str.get()); }
     void operator () (const RwSymbol& sym) { (*this)(sym.get()); }
     void operator () (const RwPair& pair) { (*this)(pair.get()); }
@@ -74,4 +75,61 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
   std::visit(OutputVisitor{os}, value);
   return os;
 }
+
+Int value_to_int (const Value& value) {
+  static const std::string msg = "unexpected type";
+  struct Visitor {
+    Int operator () (Nil) { throw std::runtime_error(msg); }
+    Int operator () (Bool) { throw std::runtime_error(msg); }
+    Int operator () (Int i) { return i; }
+    Int operator () (Double) { throw std::runtime_error(msg); }
+    Int operator () (const RwString&) { throw std::runtime_error(msg); }
+    Int operator () (const RwSymbol&) { throw std::runtime_error(msg); }
+    Int operator () (const RwPair&) { throw std::runtime_error(msg); }
+    Int operator () (const RwArray&) { throw std::runtime_error(msg); }
+    Int operator () (const String&) { throw std::runtime_error(msg); }
+    Int operator () (const Symbol&) { throw std::runtime_error(msg); }
+    Int operator () (const Pair&) { throw std::runtime_error(msg); }
+    Int operator () (const Array&) { throw std::runtime_error(msg); }
+  };
+  return std::visit(Visitor{}, value);
+}
+Bool value_to_bool (const Value& value) {
+  static const std::string msg = "unexpected type";
+  struct Visitor {
+    Bool operator () (Nil) { throw std::runtime_error(msg); }
+    Bool operator () (Bool b) { return b; }
+    Bool operator () (Int) { throw std::runtime_error(msg); }
+    Bool operator () (Double) { throw std::runtime_error(msg); }
+    Bool operator () (const RwString&) { throw std::runtime_error(msg); }
+    Bool operator () (const RwSymbol&) { throw std::runtime_error(msg); }
+    Bool operator () (const RwPair&) { throw std::runtime_error(msg); }
+    Bool operator () (const RwArray&) { throw std::runtime_error(msg); }
+    Bool operator () (const String&) { throw std::runtime_error(msg); }
+    Bool operator () (const Symbol&) { throw std::runtime_error(msg); }
+    Bool operator () (const Pair&) { throw std::runtime_error(msg); }
+    Bool operator () (const Array&) { throw std::runtime_error(msg); }
+  };
+  return std::visit(Visitor{}, value);
+}
+Double value_to_double (const Value& value) {
+  static const std::string msg = "unexpected type";
+  struct Visitor {
+    Double operator () (Nil) { throw std::runtime_error(msg); }
+    Double operator () (Bool) { throw std::runtime_error(msg); }
+    Double operator () (Int) { throw std::runtime_error(msg); }
+    Double operator () (Double d) { return d; }
+    Double operator () (const RwString&) { throw std::runtime_error(msg); }
+    Double operator () (const RwSymbol&) { throw std::runtime_error(msg); }
+    Double operator () (const RwPair&) { throw std::runtime_error(msg); }
+    Double operator () (const RwArray&) { throw std::runtime_error(msg); }
+    Double operator () (const String&) { throw std::runtime_error(msg); }
+    Double operator () (const Symbol&) { throw std::runtime_error(msg); }
+    Double operator () (const Pair&) { throw std::runtime_error(msg); }
+    Double operator () (const Array&) { throw std::runtime_error(msg); }
+  };
+  return std::visit(Visitor{}, value);
+}
+
+
 }

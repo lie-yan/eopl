@@ -12,14 +12,10 @@
 namespace eopl {
 
 struct ConstExp {
-  int num;
+  Int num;
 
   friend std::ostream& operator << (std::ostream& os, const ConstExp& constExp);
 };
-
-using RwDiffExp = boost::recursive_wrapper<struct DiffExp>;
-using RwZeroTestExp = boost::recursive_wrapper<struct ZeroTestExp>;
-using RwIfExp = boost::recursive_wrapper<struct IfExp>;
 
 struct VarExp {
   Symbol var;
@@ -27,13 +23,16 @@ struct VarExp {
   friend std::ostream& operator << (std::ostream& os, const VarExp& varExp);
 };
 
+using RwDiffExp = boost::recursive_wrapper<struct DiffExp>;
+using RwZeroTestExp = boost::recursive_wrapper<struct ZeroTestExp>;
+using RwIfExp = boost::recursive_wrapper<struct IfExp>;
 using RwLetExp = boost::recursive_wrapper<struct LetExp>;
 
 using Expression = std::variant<ConstExp,
+                                VarExp,
                                 RwDiffExp,
                                 RwZeroTestExp,
                                 RwIfExp,
-                                VarExp,
                                 RwLetExp>;
 
 std::ostream& operator << (std::ostream& os, const Expression& exp);

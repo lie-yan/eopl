@@ -7,8 +7,8 @@
 #include <string>
 #include <variant>
 #include <vector>
-#include <iomanip>
 #include <boost/variant.hpp>
+#include <ostream>
 #include "basic.h"
 
 namespace eopl {
@@ -22,10 +22,49 @@ struct Nil { };
 struct String : std::string { using std::string::string; };
 struct Symbol : std::string { using std::string::string; };
 
+struct Bool {
+  bool val;
+
+  Bool () : Bool(false) { }
+  Bool (bool val) : val(val) { }
+
+  friend
+  std::ostream& operator << (std::ostream& os, const Bool& aBool) {
+    os << std::boolalpha << aBool.val;
+    return os;
+  }
+};
+
+struct Int {
+  int val;
+
+  Int () : Int(0) { }
+  Int (int val) : val(val) { }
+
+  friend
+  std::ostream& operator << (std::ostream& os, const Int& anInt) {
+    os << anInt.val;
+    return os;
+  }
+};
+
+struct Double {
+  double val;
+
+  Double () : Double(0) { }
+  Double (double val) : val(val) { }
+
+  friend
+  std::ostream& operator << (std::ostream& os, const Double& aDouble) {
+    os << aDouble.val;
+    return os;
+  }
+};
+
 using Value = std::variant<Nil,
-                           bool,
-                           int,
-                           double,
+                           Bool,
+                           Int,
+                           Double,
                            RwString,
                            RwSymbol,
                            RwPair,
@@ -50,6 +89,9 @@ enum class ValueType {
 };
 
 ValueType type_of (const Value& value);
+Int value_to_int (const Value& value);
+Bool value_to_bool (const Value& value);
+Double value_to_double (const Value& value);
 
 std::ostream& operator << (std::ostream& os, const Value& value);
 
