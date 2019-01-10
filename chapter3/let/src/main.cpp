@@ -3,27 +3,29 @@
 #include "lex.yy.h"
 #include "interpreter.h"
 
-int main () {
+namespace eopl {
 
-  std::istringstream ss(
-      R"EOF(let z = 5
-in let x = 3
-in let y = -(x,1)
-in let x = 4 in
-  if zero?(-(z,z))
-    then -(z, -(x,y))
-    else 0)EOF");
-
-  using eopl::Program, eopl::value_of, eopl::Env;
-
+Value eval (const std::string& s) {
+  std::istringstream ss(s);
   yy::Lexer lexer(ss);
   Program result;
   yy::parser p(lexer, result);
   p.set_debug_level(getenv("YYDEBUG") != nullptr);
+  p.parse();
+  return value_of(result, Env::make_empty());
+}
 
+}
+
+int main () {
+  using eopl::eval, eopl::Int, eopl::Value;
   try {
-    p.parse();
-    std::cout << value_of(result, Env::make_empty()) << std::endl;
+    assert(eval(R"EOF(
+let z = 5
+in let x = 3
+in let y = -(x,1)
+in let x = 4 in -(z, -(x,y)))EOF") == Value(Int{3}));
+
   } catch (const yy::parser::syntax_error& e) {
     std::cout << "The program came into an error around "
               << e.location << ". Detail: " << e.what()

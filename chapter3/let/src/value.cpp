@@ -40,7 +40,7 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     void operator () (const RwSymbol& sym) { (*this)(sym.get()); }
     void operator () (const RwPair& pair) { (*this)(pair.get()); }
     void operator () (const RwArray& array) { (*this)(array.get()); }
-    void operator () (const String& str) { os << std::quoted(str); }
+    void operator () (const String& str) { os << std::quoted(str.get()); }
     void operator () (const Symbol& sym) { os << sym; }
     void operator () (const Pair& pair) {
       if (!open_paren) {
@@ -130,6 +130,5 @@ Double value_to_double (const Value& value) {
   };
   return std::visit(Visitor{}, value);
 }
-
 
 }

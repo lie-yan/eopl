@@ -68,7 +68,7 @@ integer [-+]?[[:digit:]]+
 {newline}       loc.lines();
 
 {integer}       {
-                  yylval.emplace<int>(std::stoi(yytext));
+                  yylval.emplace<eopl::Int>(std::stoi(yytext));
                   // std::cout << "integer: " << yytext << std::endl;
                   return yy::parser::token::INT;
                 }

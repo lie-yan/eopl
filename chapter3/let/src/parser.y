@@ -35,7 +35,7 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
 
 }
 
-%token <int>          INT           "integer"
+%token <eopl::Int>          INT           "integer"
 %token <eopl::Symbol> IDENTIFIER    "identifier"
 %token                ZERO_TEST     "zero?"
 %token                IF            "if"
