@@ -52,7 +52,7 @@ integer [-+]?[[:digit:]]+
                   loc.lines();
                 }
 
-"zero?"         return yy::parser::token::ZEROQ;
+"zero?"         return yy::parser::token::ZERO_TEST;
 
 "if"            return yy::parser::token::IF;
 

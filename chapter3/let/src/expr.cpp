@@ -12,12 +12,12 @@ std::ostream& operator << (std::ostream& os, const Expression& exp) {
 
     void operator () (const ConstExp& e) { os << e; }
     void operator () (const DiffExp& e) { os << e; }
-    void operator () (const ZeroQExp& e) { os << e; }
+    void operator () (const ZeroTestExp& e) { os << e; }
     void operator () (const IfExp& e) { os << e; }
     void operator () (const VarExp& e) { os << e; }
     void operator () (const LetExp& e) { os << e; }
     void operator () (const RwDiffExp& e) { (*this)(e.get()); }
-    void operator () (const RwZeroQExp& e) { (*this)(e.get()); }
+    void operator () (const RwZeroTestExp& e) { (*this)(e.get()); }
     void operator () (const RwIfExp& e) { (*this)(e.get()); }
     void operator () (const RwLetExp& e) { (*this)(e.get()); }
   };
@@ -36,8 +36,8 @@ std::ostream& operator << (std::ostream& os, const DiffExp& diffExp) {
   os << "DiffExp(" << diffExp.exp1 << ", " << diffExp.exp2 << ")";
   return os;
 }
-std::ostream& operator << (std::ostream& os, const ZeroQExp& qExp) {
-  os << "ZeroQExp(" << qExp.exp1 << ")";
+std::ostream& operator << (std::ostream& os, const ZeroTestExp& qExp) {
+  os << "ZeroTestExp(" << qExp.exp1 << ")";
   return os;
 }
 std::ostream& operator << (std::ostream& os, const IfExp& ifExp) {

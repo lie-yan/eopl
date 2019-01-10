@@ -18,7 +18,7 @@ struct ConstExp {
 };
 
 using RwDiffExp = boost::recursive_wrapper<struct DiffExp>;
-using RwZeroQExp = boost::recursive_wrapper<struct ZeroQExp>;
+using RwZeroTestExp = boost::recursive_wrapper<struct ZeroTestExp>;
 using RwIfExp = boost::recursive_wrapper<struct IfExp>;
 
 struct VarExp {
@@ -31,7 +31,7 @@ using RwLetExp = boost::recursive_wrapper<struct LetExp>;
 
 using Expression = std::variant<ConstExp,
                                 RwDiffExp,
-                                RwZeroQExp,
+                                RwZeroTestExp,
                                 RwIfExp,
                                 VarExp,
                                 RwLetExp>;
@@ -45,10 +45,10 @@ struct DiffExp {
   friend std::ostream& operator << (std::ostream& os, const DiffExp& diffExp);
 };
 
-struct ZeroQExp {
+struct ZeroTestExp {
   Expression exp1;
 
-  friend std::ostream& operator << (std::ostream& os, const ZeroQExp& qExp);
+  friend std::ostream& operator << (std::ostream& os, const ZeroTestExp& qExp);
 };
 
 struct IfExp {

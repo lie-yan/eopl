@@ -37,7 +37,7 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
 
 %token <int>          INT           "integer"
 %token <eopl::Symbol> IDENTIFIER    "identifier"
-%token                ZEROQ         "zero?"
+%token                ZERO_TEST     "zero?"
 %token                IF            "if"
 %token                THEN          "then"
 %token                ELSE          "else"
@@ -55,7 +55,7 @@ program : expression { result = eopl::Program{std::move($1)}; }
 expression  : INT      { $$ = eopl::ConstExp{$1}; }
             | '-' '(' expression ',' expression ')'
               { $$ = eopl::DiffExp{std::move($3), std::move($5)}; }
-            | ZEROQ '(' expression ')' { $$ = eopl::ZeroQExp{std::move($3)}; }
+            | ZERO_TEST '(' expression ')' { $$ = eopl::ZeroTestExp{std::move($3)}; }
             | IF expression THEN expression ELSE expression
               { $$ = eopl::IfExp{std::move($2), std::move($4), std::move($6)}; }
             | IDENTIFIER { $$ = eopl::VarExp{$1}; }
