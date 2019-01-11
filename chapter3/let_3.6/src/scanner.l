@@ -54,6 +54,8 @@ integer [-+]?[[:digit:]]+
 
 "zero?"         return yy::parser::token::ZERO_TEST;
 
+"minus"         return yy::parser::token::MINUS;
+
 "if"            return yy::parser::token::IF;
 
 "then"          return yy::parser::token::THEN;

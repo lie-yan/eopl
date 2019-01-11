@@ -29,4 +29,6 @@ Value value_of (const IfExp& exp, SpEnv env);
 
 Value value_of (const LetExp& exp, SpEnv env);
 
+Value value_of (const MinusExp& exp, SpEnv env);
+
 }

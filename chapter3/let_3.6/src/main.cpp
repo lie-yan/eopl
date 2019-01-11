@@ -31,6 +31,15 @@ let z = 5
 in let x = 3
 in if zero?(-(z,-(x,-2))) then 5 else 3)EOF") == Value(Int{5}));
 
+    assert(eval(R"EOF(
+let z = -5
+in let x = 3
+in if zero?(-(minus(z),-(x,-2))) then 5 else 3)EOF") == Value(Int{5}));
+
+    assert(eval(R"EOF(
+let z = -5
+in let x = 3
+in if zero?(-(minus(z),-(x, 2))) then 5 else 3)EOF") == Value(Int{3}));
 
   } catch (const yy::parser::syntax_error& e) {
     std::cout << "The program came into an error around "

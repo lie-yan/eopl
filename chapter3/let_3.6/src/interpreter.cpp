@@ -16,10 +16,12 @@ Value value_of (const Expression& expression, SpEnv env) {
     Value operator () (const ConstExp& exp) { return value_of(exp, env); }
     Value operator () (const VarExp& exp) { return value_of(exp, env); }
     Value operator () (const RwDiffExp& exp) { return value_of(exp.get(), env); }
+    Value operator () (const RwMinusExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwZeroTestExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwIfExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwLetExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const DiffExp& exp) { return value_of(exp, env); }
+    Value operator () (const MinusExp& exp) { return value_of(exp, env); }
     Value operator () (const ZeroTestExp& exp) { return value_of(exp, env); }
     Value operator () (const IfExp& exp) { return value_of(exp, env); }
     Value operator () (const LetExp& exp) { return value_of(exp, env); }
@@ -55,5 +57,10 @@ Value value_of (const LetExp& exp, SpEnv env) {
   Value val1 = value_of(exp.exp1, env);
   auto new_env = Env::extend(std::move(env), exp.var, std::move(val1));
   return value_of(exp.body, std::move(new_env));
+}
+Value value_of (const MinusExp& exp, SpEnv env) {
+  Value val1 = value_of(exp.exp1, std::move(env));
+  int i = value_to_int(val1).val;
+  return Int{-i};
 }
 }
