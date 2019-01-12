@@ -2,6 +2,9 @@
 // Created by robin on 2019-01-10.
 //
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include "interpreter.h"
 #include "builtin.h"
 #include "lex.yy.h"

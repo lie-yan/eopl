@@ -4,8 +4,14 @@ project(chapter3)
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories(/usr/local/include)
-include_directories(../../third-party/GSL/include)
 link_directories(/usr/local/lib)
+
+set(THIRD_PARTY_DIR ../../third-party)
+set(GTEST_DIR ${THIRD_PARTY_DIR}/googletest)
+include_directories(${THIRD_PARTY_DIR}/GSL/include)
+include_directories(${GTEST_DIR}/googletest/include)
+include_directories(${GTEST_DIR}/googlemock/include)
+link_directories(${GTEST_DIR}/cmake-build-debug/lib)
 
 set(SOURCE_DIR src)
 
@@ -22,7 +28,6 @@ ADD_FLEX_BISON_DEPENDENCY(LetScanner LetParser)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${SOURCE_DIR})
 set(SOURCES
-        ${SOURCE_DIR}/main.cpp
         ${SOURCE_DIR}/value.cpp
         ${SOURCE_DIR}/expr.cpp
         ${SOURCE_DIR}/interpreter.cpp
@@ -32,5 +37,12 @@ set(SOURCES
 
 #add_definitions(-DDEBUG)
 
-add_executable(chapter3-let ${SOURCES})
+add_executable(chapter3-let
+        ${SOURCES}
+        ${SOURCE_DIR}/main.cpp)
 target_link_libraries(chapter3-let fmt reflex)
+
+add_executable(chapter3-let-test
+        ${SOURCES}
+        ${SOURCE_DIR}/let_test.cpp)
+target_link_libraries(chapter3-let-test fmt reflex gtest gtest_main)
