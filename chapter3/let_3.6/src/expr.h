@@ -55,7 +55,7 @@ struct MinusExp {
 struct ZeroTestExp {
   Expression exp1;
 
-  friend std::ostream& operator << (std::ostream& os, const ZeroTestExp& qExp);
+  friend std::ostream& operator << (std::ostream& os, const ZeroTestExp& testExp);
 };
 
 struct IfExp {

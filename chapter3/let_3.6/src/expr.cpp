@@ -38,8 +38,8 @@ std::ostream& operator << (std::ostream& os, const DiffExp& diffExp) {
   os << "DiffExp(" << diffExp.exp1 << ", " << diffExp.exp2 << ")";
   return os;
 }
-std::ostream& operator << (std::ostream& os, const ZeroTestExp& qExp) {
-  os << "ZeroTestExp(" << qExp.exp1 << ")";
+std::ostream& operator << (std::ostream& os, const ZeroTestExp& testExp) {
+  os << "ZeroTestExp(" << testExp.exp1 << ")";
   return os;
 }
 std::ostream& operator << (std::ostream& os, const IfExp& ifExp) {
