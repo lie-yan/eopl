@@ -23,31 +23,23 @@ struct VarExp {
   friend std::ostream& operator << (std::ostream& os, const VarExp& varExp);
 };
 
-using RwDiffExp = boost::recursive_wrapper<struct DiffExp>;
-using RwZeroTestExp = boost::recursive_wrapper<struct ZeroTestExp>;
 using RwIfExp = boost::recursive_wrapper<struct IfExp>;
 using RwLetExp = boost::recursive_wrapper<struct LetExp>;
+using RwOpExp = boost::recursive_wrapper<struct OpExp>;
 
 using Expression = std::variant<ConstExp,
                                 VarExp,
-                                RwDiffExp,
-                                RwZeroTestExp,
+                                RwOpExp,
                                 RwIfExp,
                                 RwLetExp>;
 
 std::ostream& operator << (std::ostream& os, const Expression& exp);
 
-struct DiffExp {
-  Expression exp1;
-  Expression exp2;
+struct OpExp {
+  Symbol rator;
+  std::vector<Expression> rands;
 
-  friend std::ostream& operator << (std::ostream& os, const DiffExp& diffExp);
-};
-
-struct ZeroTestExp {
-  Expression exp1;
-
-  friend std::ostream& operator << (std::ostream& os, const ZeroTestExp& qExp);
+  friend std::ostream& operator << (std::ostream& os, const OpExp& opExp);
 };
 
 struct IfExp {

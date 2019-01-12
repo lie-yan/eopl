@@ -32,8 +32,8 @@ arbitrary   .
 bracket    [{}\[\]]
 
 s_delimiter   [();"'`|]|{bracket}
-s_non_delim   [[:alnum:]]|[!@#$%^&*\-_+=:,<.>/?]
-s_legal_start [[:alpha:]]{+}[!@#$%^&*\-_+=:,<.>/?]{-}[#,]
+s_non_delim   [[:alnum:]]|[!@#$%^&*\-_+=:<.>/?]
+s_legal_start [[:alpha:]]{+}[!@#$%^&*\-_+:,<.>/?]{-}[#,]
 s_identifier  {s_legal_start}{s_non_delim}*
 
 integer [-+]?[[:digit:]]+
@@ -52,33 +52,65 @@ integer [-+]?[[:digit:]]+
                   loc.lines();
                 }
 
-"zero?"         return yy::parser::token::ZERO_TEST;
+"if"            {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::IF;
+                }
 
-"if"            return yy::parser::token::IF;
+"then"          {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::THEN;
+                }
 
-"then"          return yy::parser::token::THEN;
+"else"          {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::ELSE;
+                }
 
-"else"          return yy::parser::token::ELSE;
+"let"           {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::LET;
+                }
 
-"let"           return yy::parser::token::LET;
-
-"in"            return yy::parser::token::IN;
+"in"            {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::IN;
+                }
 
 {blank}         loc.step();
 {newline}       loc.lines();
 
 {integer}       {
                   yylval.emplace<eopl::Int>(std::stoi(yytext));
-                  // std::cout << "integer: " << yytext << std::endl;
+                  #ifdef DEBUG
+                    std::cout << "integer: " << yytext << std::endl;
+                  #endif
                   return yy::parser::token::INT;
                 }
 
-{identifier}  {
+{s_identifier}  {
                   yylval.emplace<eopl::Symbol>(yytext);
-                  // std::cout << "identifier: " << yytext << std::endl;
+                #ifdef DEBUG
+                  std::cout << "identifier: " << yytext << std::endl;
+                #endif
                   return yy::parser::token::IDENTIFIER;
                 }
-{arbitrary}     return yytext[0];
+{arbitrary}     {
+                #ifdef DEBUG
+                  std::cout << "arbitrary: " << yytext << std::endl;
+                #endif
+                  return yytext[0];
+                }
 
 %%
 

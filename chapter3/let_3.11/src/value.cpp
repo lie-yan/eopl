@@ -94,6 +94,7 @@ Int value_to_int (const Value& value) {
   };
   return std::visit(Visitor{}, value);
 }
+
 Bool value_to_bool (const Value& value) {
   static const std::string msg = "unexpected type";
   struct Visitor {
@@ -112,6 +113,7 @@ Bool value_to_bool (const Value& value) {
   };
   return std::visit(Visitor{}, value);
 }
+
 Double value_to_double (const Value& value) {
   static const std::string msg = "unexpected type";
   struct Visitor {

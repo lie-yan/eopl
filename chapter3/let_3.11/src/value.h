@@ -54,6 +54,18 @@ public:
   friend bool operator != (const String& lhs, const String& rhs) {
     return !(rhs == lhs);
   }
+  friend bool operator < (const String& lhs, const String& rhs) {
+    return lhs.val < rhs.val;
+  }
+  friend bool operator > (const String& lhs, const String& rhs) {
+    return rhs < lhs;
+  }
+  friend bool operator <= (const String& lhs, const String& rhs) {
+    return !(rhs < lhs);
+  }
+  friend bool operator >= (const String& lhs, const String& rhs) {
+    return !(lhs < rhs);
+  }
   friend std::ostream& operator << (std::ostream& os, const String& string) {
     os << string.val;
     return os;
@@ -80,6 +92,18 @@ public:
   friend bool operator != (const Symbol& lhs, const Symbol& rhs) {
     return !(rhs == lhs);
   }
+  friend bool operator < (const Symbol& lhs, const Symbol& rhs) {
+    return lhs.val < rhs.val;
+  }
+  friend bool operator > (const Symbol& lhs, const Symbol& rhs) {
+    return rhs < lhs;
+  }
+  friend bool operator <= (const Symbol& lhs, const Symbol& rhs) {
+    return !(rhs < lhs);
+  }
+  friend bool operator >= (const Symbol& lhs, const Symbol& rhs) {
+    return !(lhs < rhs);
+  }
   friend std::ostream& operator << (std::ostream& os, const Symbol& string) {
     os << string.val;
     return os;
@@ -102,7 +126,18 @@ public:
   friend bool operator != (const Bool& lhs, const Bool& rhs) {
     return !(rhs == lhs);
   }
-
+  friend bool operator < (const Bool& lhs, const Bool& rhs) {
+    return lhs.val < rhs.val;
+  }
+  friend bool operator > (const Bool& lhs, const Bool& rhs) {
+    return rhs < lhs;
+  }
+  friend bool operator <= (const Bool& lhs, const Bool& rhs) {
+    return !(rhs < lhs);
+  }
+  friend bool operator >= (const Bool& lhs, const Bool& rhs) {
+    return !(lhs < rhs);
+  }
   friend std::ostream& operator << (std::ostream& os, const Bool& aBool) {
     os << std::boolalpha << aBool.val;
     return os;
@@ -125,7 +160,18 @@ public:
   friend bool operator != (const Int& lhs, const Int& rhs) {
     return !(rhs == lhs);
   }
-
+  friend bool operator < (const Int& lhs, const Int& rhs) {
+    return lhs.val < rhs.val;
+  }
+  friend bool operator > (const Int& lhs, const Int& rhs) {
+    return rhs < lhs;
+  }
+  friend bool operator <= (const Int& lhs, const Int& rhs) {
+    return !(rhs < lhs);
+  }
+  friend bool operator >= (const Int& lhs, const Int& rhs) {
+    return !(lhs < rhs);
+  }
   friend std::ostream& operator << (std::ostream& os, const Int& anInt) {
     os << anInt.val;
     return os;
@@ -146,6 +192,18 @@ public:
   }
   friend bool operator != (const Double& lhs, const Double& rhs) {
     return !(rhs == lhs);
+  }
+  friend bool operator < (const Double& lhs, const Double& rhs) {
+    return lhs.val < rhs.val;
+  }
+  friend bool operator > (const Double& lhs, const Double& rhs) {
+    return rhs < lhs;
+  }
+  friend bool operator <= (const Double& lhs, const Double& rhs) {
+    return !(rhs < lhs);
+  }
+  friend bool operator >= (const Double& lhs, const Double& rhs) {
+    return !(lhs < rhs);
   }
   friend std::ostream& operator << (std::ostream& os, const Double& aDouble) {
     os << aDouble.val;

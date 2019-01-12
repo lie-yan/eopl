@@ -14,19 +14,12 @@ using Env = Environment<Symbol, Value>;
 using SpEnv = Env::SpEnv;
 
 Value value_of (const Program& program, SpEnv env);
-
 Value value_of (const Expression& expression, SpEnv env);
-
 Value value_of (const ConstExp& exp, SpEnv env);
-
 Value value_of (const VarExp& exp, SpEnv env);
-
-Value value_of (const DiffExp& exp, SpEnv env);
-
-Value value_of (const ZeroTestExp& exp, SpEnv env);
-
 Value value_of (const IfExp& exp, SpEnv env);
-
 Value value_of (const LetExp& exp, SpEnv env);
+Value value_of (const OpExp& exp, SpEnv env);
+
 
 }

@@ -26,8 +26,11 @@ set(SOURCES
         ${SOURCE_DIR}/value.cpp
         ${SOURCE_DIR}/expr.cpp
         ${SOURCE_DIR}/interpreter.cpp
+        ${SOURCE_DIR}/builtin.cpp
         ${FLEX_LetScanner_OUTPUTS}
         ${BISON_LetParser_OUTPUTS})
+
+#add_definitions(-DDEBUG)
 
 add_executable(chapter3-let ${SOURCES})
 target_link_libraries(chapter3-let fmt reflex)
