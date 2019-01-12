@@ -4,6 +4,7 @@
 
 #include "interpreter.h"
 #include "builtin.h"
+#include "lex.yy.h"
 
 namespace eopl {
 
@@ -61,6 +62,17 @@ Value value_of (const OpExp& exp, SpEnv env) {
   } else {
     throw std::runtime_error(fmt::format("function {} does not exist", exp.rator));
   }
+}
+
+Value eval (const std::string& s) {
+  std::istringstream ss(s);
+  yy::Lexer lexer(ss);
+  Program result;
+  yy::parser p(lexer, result);
+  p.set_debug_level(getenv("YYDEBUG") != nullptr);
+  p.parse();
+
+  return value_of(result, Env::make_empty());
 }
 
 }

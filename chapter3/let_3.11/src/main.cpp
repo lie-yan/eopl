@@ -1,23 +1,8 @@
 #include <algorithm>
 #include <sstream>
 #include <fmt/format.h>
-#include "lex.yy.h"
+#include "parser.tab.hpp"
 #include "interpreter.h"
-
-namespace eopl {
-
-Value eval (const std::string& s) {
-  std::istringstream ss(s);
-  yy::Lexer lexer(ss);
-  Program result;
-  yy::parser p(lexer, result);
-  p.set_debug_level(getenv("YYDEBUG") != nullptr);
-  p.parse();
-
-  return value_of(result, Env::make_empty());
-}
-
-}
 
 void print_test_success(int i) {
   fmt::print("Passed test case {}.\n", i);
