@@ -29,6 +29,4 @@ cd ${CMAKE_DIR}
 echo "Created directory ${CMAKE_DIR}."
 
 cmake ..
-
-echo "Building ..."
 make
