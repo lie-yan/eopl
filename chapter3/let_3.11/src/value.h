@@ -89,11 +89,12 @@ private:
   std::string val;
 };
 
-struct Bool {
-  bool val;
-
+class Bool {
+public:
   Bool () : Bool(false) { }
   explicit Bool (bool val) : val(val) { }
+
+  bool get () const { return val; }
 
   friend bool operator == (const Bool& lhs, const Bool& rhs) {
     return lhs.val == rhs.val;
@@ -106,13 +107,17 @@ struct Bool {
     os << std::boolalpha << aBool.val;
     return os;
   }
+
+private:
+  bool val;
 };
 
-struct Int {
-  int val;
-
+class Int {
+public:
   Int () : Int(0) { }
   explicit Int (int val) : val(val) { }
+
+  int get () const { return val; }
 
   friend bool operator == (const Int& lhs, const Int& rhs) {
     return lhs.val == rhs.val;
@@ -125,13 +130,16 @@ struct Int {
     os << anInt.val;
     return os;
   }
+private:
+  int val;
 };
 
-struct Double {
-  double val;
-
+class Double {
+public:
   Double () : Double(0) { }
   explicit Double (double val) : val(val) { }
+
+  double get () const { return val; }
 
   friend bool operator == (const Double& lhs, const Double& rhs) {
     return lhs.val == rhs.val;
@@ -143,6 +151,8 @@ struct Double {
     os << aDouble.val;
     return os;
   }
+private:
+  double val;
 };
 
 using Value = std::variant<Nil,

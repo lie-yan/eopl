@@ -36,18 +36,18 @@ Value value_of (const VarExp& exp, SpEnv env) {
 Value value_of (const DiffExp& exp, SpEnv env) {
   Value val1 = value_of(exp.exp1, env);
   Value val2 = value_of(exp.exp2, env);
-  int i1 = value_to_int(val1).val;
-  int i2 = value_to_int(val2).val;
+  int i1 = value_to_int(val1).get();
+  int i2 = value_to_int(val2).get();
   return Int{i1 - i2};
 }
 Value value_of (const ZeroTestExp& exp, SpEnv env) {
   Value val = value_of(exp.exp1, std::move(env));
-  int i = value_to_int(val).val;
+  int i = value_to_int(val).get();
   return Bool{i == 0};
 }
 Value value_of (const IfExp& exp, SpEnv env) {
   Value val1 = value_of(exp.exp1, env);
-  bool b1 = value_to_bool(val1).val;
+  bool b1 = value_to_bool(val1).get();
   if (b1) return value_of(exp.exp2, std::move(env));
   else return value_of(exp.exp3, std::move(env));
 }

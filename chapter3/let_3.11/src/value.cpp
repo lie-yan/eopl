@@ -33,9 +33,9 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     bool open_paren = false;
 
     void operator () (Nil) { os << "()"; }
-    void operator () (Bool b) { os << (b.val ? "#t" : "#f"); }
-    void operator () (Int i) { os << i.val; }
-    void operator () (Double d) { os << d.val; }
+    void operator () (Bool b) { os << (b.get() ? "#t" : "#f"); }
+    void operator () (Int i) { os << i.get(); }
+    void operator () (Double d) { os << d.get(); }
     void operator () (const RwString& str) { (*this)(str.get()); }
     void operator () (const RwSymbol& sym) { (*this)(sym.get()); }
     void operator () (const RwPair& pair) { (*this)(pair.get()); }
