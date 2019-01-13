@@ -24,9 +24,7 @@ let x = 4 in list(x, -(x,1), -(x,3))
 
     res = eval(R"EOF(
 let x = 10
-in cond zero?(x) ==> +(x,1)
-        greater?(x, 3) ==> +(x,2)
-        less?(x, 100) ==> +(x,3)
+in cond
    end
 )EOF");
     std::cout << res << std::endl;

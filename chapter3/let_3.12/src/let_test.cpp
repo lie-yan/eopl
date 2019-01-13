@@ -124,6 +124,11 @@ in cond zero?(x) ==> +(x,1)
            "end"),
       std::runtime_error
   );
+
+  EXPECT_THROW(
+      eval("let x = 10 in cond end"),
+      std::runtime_error
+  );
 }
 
 int main (int argc, char** argv) {
