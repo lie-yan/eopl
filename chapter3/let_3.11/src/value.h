@@ -13,6 +13,17 @@
 
 namespace eopl {
 
+enum class ValueType {
+  NIL,
+  BOOL,
+  INT,
+  DOUBLE,
+  STRING,
+  SYMBOL,
+  PAIR,
+  ARRAY,
+};
+
 using RwString = boost::recursive_wrapper<struct String>;
 using RwSymbol = boost::recursive_wrapper<struct Symbol>;
 using RwArray = boost::recursive_wrapper<struct Array>;
@@ -221,12 +232,10 @@ using ValueCore = std::variant<Nil,
                                RwSymbol,
                                RwPair,
                                RwArray>;
-
 using Value = std::shared_ptr<ValueCore>;
-
-bool operator==(const Value& lhs, const Value& rhs);
-
-bool operator!=(const Value& lhs, const Value& rhs);
+bool operator == (const Value& lhs, const Value& rhs);
+bool operator != (const Value& lhs, const Value& rhs);
+std::ostream& operator << (std::ostream& os, const Value& value);
 
 struct Pair {
   Value first;
@@ -243,26 +252,7 @@ struct Pair {
 
 struct Array : std::vector<Value> { using std::vector<Value>::vector; };
 
-enum class ValueType {
-  NIL,
-  BOOL,
-  INT,
-  DOUBLE,
-  STRING,
-  SYMBOL,
-  PAIR,
-  ARRAY,
-};
-
-ValueType type_of (const Value& value);
-Int value_to_int (const Value& value);
-Bool value_to_bool (const Value& value);
-Double value_to_double (const Value& value);
-const String& value_to_string (const Value& value);
-const Symbol& value_to_symbol (const Value& value);
-const Pair& value_to_pair (const Value& value);
-const Array& value_to_array (const Value& value);
-
+/// constructors for `Value` below
 Value nil_to_value (Nil n = {});
 Value bool_to_value (Bool b);
 Value int_to_value (Int i);
@@ -272,6 +262,14 @@ Value symbol_to_value (Symbol s);
 Value pair_to_value (Pair p);
 Value array_to_value (Array a);
 
-std::ostream& operator << (std::ostream& os, const Value& value);
+/// observers for `Value` below
+ValueType type_of (const Value& value);
+Int value_to_int (const Value& value);
+Bool value_to_bool (const Value& value);
+Double value_to_double (const Value& value);
+const String& value_to_string (const Value& value);
+const Symbol& value_to_symbol (const Value& value);
+const Pair& value_to_pair (const Value& value);
+const Array& value_to_array (const Value& value);
 
 }
