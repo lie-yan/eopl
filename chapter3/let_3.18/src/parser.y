@@ -42,6 +42,7 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
 %token                ELSE          "else"
 %token                LET           "let"
 %token                LET_STAR      "let*"
+%token                UNPACK        "unpack"
 %token                IN            "in"
 %token                COND          "cond"
 %token                RIGHT_ARROW   "==>"
@@ -55,6 +56,7 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
 %type <eopl::LetExp::ClauseList> let_clause_list
 %type <eopl::LetExp::Clause> let_clause
 %type <bool> let_opt_star
+%type <std::vector<eopl::Symbol>> id_list
 
 %%
 
@@ -68,6 +70,8 @@ expression  : INT      { $$ = eopl::ConstExp{$1}; }
             | COND cond_clause_list END { $$ = eopl::CondExp{std::move($2)}; }
             | let_opt_star let_clause_list IN expression
               { $$ = eopl::LetExp{std::move($2), std::move($4), $1}; }
+            | UNPACK id_list '=' expression IN expression
+              { $$ = eopl::UnpackExp{std::move($2), std::move($4), std::move($6)}; }
             | IDENTIFIER { $$ = eopl::VarExp{$1}; }
             ;
 
@@ -95,5 +99,8 @@ let_opt_star : LET { $$ = false; }
              | LET_STAR { $$ = true; }
              ;
 
+id_list : %empty { $$ = std::vector<eopl::Symbol>(); }
+        | id_list IDENTIFIER { $1.push_back(std::move($2)); $$ = std::move($1); }
+        ;
 
 %%

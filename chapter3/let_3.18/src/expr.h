@@ -27,13 +27,15 @@ using RwIfExp = boost::recursive_wrapper<struct IfExp>;
 using RwLetExp = boost::recursive_wrapper<struct LetExp>;
 using RwOpExp = boost::recursive_wrapper<struct OpExp>;
 using RwCondExp = boost::recursive_wrapper<struct CondExp>;
+using RwUnpackExp = boost::recursive_wrapper<struct UnpackExp>;
 
 using Expression = std::variant<ConstExp,
                                 VarExp,
                                 RwOpExp,
                                 RwIfExp,
                                 RwLetExp,
-                                RwCondExp>;
+                                RwCondExp,
+                                RwUnpackExp>;
 
 std::ostream& operator << (std::ostream& os, const Expression& exp);
 
@@ -58,8 +60,17 @@ struct LetExp {
 
   ClauseList clauses;
   Expression body;
-  bool starred = false;
+  bool star = false;
+
   friend std::ostream& operator << (std::ostream& os, const LetExp& letExp);
+};
+
+struct UnpackExp {
+  std::vector<Symbol> vars;
+  Expression pack;
+  Expression body;
+
+  friend std::ostream& operator << (std::ostream& os, const UnpackExp& unpackExp);
 };
 
 struct CondExp {

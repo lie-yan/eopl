@@ -146,6 +146,16 @@ TEST(let_lang, let) {
 
 }
 
+TEST(let_lang, unpack) {
+  using namespace eopl;
+
+  EXPECT_EQ(eval("let u = 7 in unpack x y = cons(u,cons(3,emptylist)) in -(x,y)"), int_to_value(Int{4}));
+  EXPECT_THROW(
+      eval("let u = 7 in unpack x y z = cons(u,cons(3,emptylist)) in -(x,y)"),
+      std::runtime_error
+      );
+}
+
 int main (int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

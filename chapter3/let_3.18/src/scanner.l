@@ -87,6 +87,14 @@ integer [-+]?[[:digit:]]+
                   return yy::parser::token::LET_STAR;
                 }
 
+"unpack"        {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::UNPACK;
+                }
+
+
 "in"            {
                 #ifdef DEBUG
                   std::cout << "keyword: " << yytext << std::endl;
@@ -121,18 +129,18 @@ integer [-+]?[[:digit:]]+
 {newline}       loc.lines();
 
 {integer}       {
-                  yylval.emplace<eopl::Int>(std::stoi(yytext));
                 #ifdef DEBUG
                     std::cout << "integer: " << yytext << std::endl;
                 #endif
+                  yylval.emplace<eopl::Int>(std::stoi(yytext));
                   return yy::parser::token::INT;
                 }
 
 {s_identifier}  {
-                  yylval.emplace<eopl::Symbol>(yytext);
                 #ifdef DEBUG
                   std::cout << "identifier: " << yytext << std::endl;
                 #endif
+                  yylval.emplace<eopl::Symbol>(yytext);
                   return yy::parser::token::IDENTIFIER;
                 }
 

@@ -24,10 +24,12 @@ Value value_of (const Expression& exp, SpEnv env) {
     Value operator () (const RwLetExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwOpExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwCondExp& exp) { return value_of(exp.get(), env); }
+    Value operator () (const RwUnpackExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const IfExp& exp) { return value_of(exp, env); }
     Value operator () (const LetExp& exp) { return value_of(exp, env); }
     Value operator () (const OpExp& exp) { return value_of(exp, env); }
     Value operator () (const CondExp& exp) { return value_of(exp, env); }
+    Value operator () (const UnpackExp& exp) { return value_of(exp, env); }
   };
   return std::visit(EvalVisitor{env}, exp);
 }
@@ -48,7 +50,7 @@ Value value_of (const IfExp& exp, SpEnv env) {
 }
 
 Value value_of (const LetExp& exp, SpEnv env) {
-  if (exp.starred) {
+  if (exp.star) {
     auto new_env = std::accumulate(std::begin(exp.clauses),
                                    std::end(exp.clauses),
                                    env,
@@ -97,6 +99,31 @@ Value value_of (const CondExp& exp, SpEnv env) {
                              "cond expression, but none were found");
   } else {
     return value_of(it->second, env);
+  }
+}
+
+Value value_of (const UnpackExp& exp, SpEnv env) {
+  static const std::string msg = "the size of identifier list and that of the pack "
+                           "does not match";
+
+  auto lst = value_of(exp.pack, env);
+  using P = decltype(std::pair(lst, env));
+  P p = std::accumulate(std::begin(exp.vars),
+                        std::end(exp.vars),
+                        P(lst, env),
+                        [] (P acc, const Symbol& s) -> P {
+                          if (auto type = type_of(acc.first); type == ValueType::PAIR) {
+                            auto& pair = value_to_pair(acc.first);
+                            auto new_env = Env::extend(std::move(acc.second), s, pair.first);
+                            return std::pair(pair.second, std::move(new_env));
+                          } else {
+                            throw std::runtime_error(msg);
+                          }
+                        });
+  if (auto type = type_of(p.first); type != ValueType::NIL) {
+    throw std::runtime_error(msg);
+  } else {
+    return value_of(exp.body, std::move(p.second));
   }
 }
 
