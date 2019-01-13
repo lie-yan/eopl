@@ -4,7 +4,7 @@
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
-
+#include <numeric>
 #include "interpreter.h"
 #include "builtin.h"
 #include "lex.yy.h"
@@ -48,9 +48,25 @@ Value value_of (const IfExp& exp, SpEnv env) {
 }
 
 Value value_of (const LetExp& exp, SpEnv env) {
-  Value val1 = value_of(exp.exp1, env);
-  auto new_env = Env::extend(std::move(env), exp.var, std::move(val1));
-  return value_of(exp.body, std::move(new_env));
+  if (exp.starred) {
+    auto new_env = std::accumulate(std::begin(exp.clauses),
+                                   std::end(exp.clauses),
+                                   env,
+                                   [] (SpEnv acc, const LetExp::Clause& c) -> SpEnv {
+                                     auto res = value_of(c.second, acc);
+                                     return Env::extend(std::move(acc), c.first, std::move(res));
+                                   });
+    return value_of(exp.body, std::move(new_env));
+  } else {
+    auto new_env = std::accumulate(std::begin(exp.clauses),
+                                   std::end(exp.clauses),
+                                   env,
+                                   [&env] (SpEnv acc, const LetExp::Clause& c) -> SpEnv {
+                                     auto res = value_of(c.second, env);
+                                     return Env::extend(std::move(acc), c.first, std::move(res));
+                                   });
+    return value_of(exp.body, std::move(new_env));
+  }
 }
 
 Value value_of (const OpExp& exp, SpEnv env) {

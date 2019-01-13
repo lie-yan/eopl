@@ -131,6 +131,21 @@ in cond zero?(x) ==> +(x,1)
   );
 }
 
+TEST(let_lang, let) {
+  using namespace eopl;
+
+  EXPECT_EQ(eval("let x = 30"
+                 "in let x = -(x,1)"
+                 "       y = -(x,2)"
+                 "in -(x,y)"), int_to_value(Int{1}));
+
+  EXPECT_EQ(eval("let x = 30"
+                 "in let* x = -(x,1)"
+                 "        y = -(x,2)"
+                 "in -(x,y)"), int_to_value(Int{2}));
+
+}
+
 int main (int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

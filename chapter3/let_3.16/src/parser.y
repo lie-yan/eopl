@@ -41,6 +41,7 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
 %token                THEN          "then"
 %token                ELSE          "else"
 %token                LET           "let"
+%token                LET_STAR      "let*"
 %token                IN            "in"
 %token                COND          "cond"
 %token                RIGHT_ARROW   "==>"
@@ -51,6 +52,9 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
 %type <std::vector<eopl::Expression>> exp_nlist
 %type <eopl::CondExp::ClauseList> cond_clause_list
 %type <eopl::CondExp::Clause> cond_clause
+%type <eopl::LetExp::ClauseList> let_clause_list
+%type <eopl::LetExp::Clause> let_clause
+%type <bool> let_opt_star
 
 %%
 
@@ -62,8 +66,8 @@ expression  : INT      { $$ = eopl::ConstExp{$1}; }
             | IF expression THEN expression ELSE expression
               { $$ = eopl::IfExp{std::move($2), std::move($4), std::move($6)}; }
             | COND cond_clause_list END { $$ = eopl::CondExp{std::move($2)}; }
-            | LET IDENTIFIER '=' expression IN expression
-              { $$ = eopl::LetExp{std::move($2), std::move($4), std::move($6)}; }
+            | let_opt_star let_clause_list IN expression
+              { $$ = eopl::LetExp{std::move($2), std::move($4), $1}; }
             | IDENTIFIER { $$ = eopl::VarExp{$1}; }
             ;
 
@@ -78,5 +82,18 @@ cond_clause_list : %empty { $$ = eopl::CondExp::ClauseList(); }
 cond_clause : expression RIGHT_ARROW expression
               { $$ = eopl::CondExp::Clause{std::move($1), std::move($3)}; }
             ;
+
+let_clause_list : %empty { $$ = eopl::LetExp::ClauseList(); }
+                | let_clause_list let_clause { $1.push_back(std::move($2)); $$ = std::move($1); }
+                ;
+
+let_clause : IDENTIFIER '=' expression
+             { $$ = eopl::LetExp::Clause{std::move($1), std::move($3)}; }
+           ;
+
+let_opt_star : LET { $$ = false; }
+             | LET_STAR { $$ = true; }
+             ;
+
 
 %%

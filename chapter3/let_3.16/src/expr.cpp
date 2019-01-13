@@ -40,10 +40,7 @@ std::ostream& operator << (std::ostream& os, const IfExp& ifExp) {
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const LetExp& letExp) {
-  os << "LetExp(" << letExp.var << ", " << letExp.exp1 << ", " << letExp.body << ")";
-  return os;
-}
+
 
 std::ostream& operator << (std::ostream& os, const Program& program) {
   os << "Program(" << program.exp1 << ")";
@@ -69,8 +66,18 @@ std::ostream& operator << (std::ostream& os, const CondExp::Clause& clause) {
   return os;
 }
 
+std::ostream& operator << (std::ostream& os, const LetExp::Clause& clause) {
+  os << "(" << clause.first << " = " << clause.second << ")";
+  return os;
+}
+
 std::ostream& operator << (std::ostream& os, const CondExp& condExp) {
   os << "CondExp(" << condExp.clauses << ")";
+  return os;
+}
+
+std::ostream& operator << (std::ostream& os, const LetExp& letExp) {
+  os << "LetExp(clauses: " << letExp.clauses << ", body: " << letExp.body << ")";
   return os;
 }
 }

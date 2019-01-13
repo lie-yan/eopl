@@ -53,10 +53,12 @@ struct IfExp {
 };
 
 struct LetExp {
-  Symbol var;
-  Expression exp1;
-  Expression body;
+  using Clause = std::pair<Symbol, Expression>;
+  using ClauseList = std::vector<Clause>;
 
+  ClauseList clauses;
+  Expression body;
+  bool starred = false;
   friend std::ostream& operator << (std::ostream& os, const LetExp& letExp);
 };
 
