@@ -3,7 +3,7 @@
 //
 
 #include "builtin.h"
-
+#include "value.h"
 #include <numeric>
 
 namespace eopl::builtin {
@@ -36,14 +36,16 @@ std::optional<BuiltinFun> find_builtin (const Symbol& name) {
 Value minus (const std::vector<Value>& args) {
   assert(args.size() == 1);
   auto i = value_to_int(args[0]);
-  return Int{-i.get()};
+  auto res = Int{-i.get()};
+  return int_to_value(res);
 }
 
 Value diff (const std::vector<Value>& args) {
   assert(args.size() == 2);
   auto i1 = value_to_int(args[0]);
   auto i2 = value_to_int(args[1]);
-  return Int{i1.get() - i2.get()};
+  auto res = Int{i1.get() - i2.get()};
+  return int_to_value(res);
 }
 
 Value sum (const std::vector<Value>& args) {
@@ -54,7 +56,7 @@ Value sum (const std::vector<Value>& args) {
                             [] (int acc, const Value& val) {
                               return acc + value_to_int(val).get();
                             });
-  return Int{res};
+  return int_to_value(Int{res});
 }
 
 Value mult (const std::vector<Value>& args) {
@@ -65,51 +67,57 @@ Value mult (const std::vector<Value>& args) {
                             [] (int acc, const Value& val) {
                               return acc * value_to_int(val).get();
                             });
-  return Int{res};
+  return int_to_value(Int{res});
 }
 
 Value divide (const std::vector<Value>& args) {
   assert(args.size() == 2);
   auto i1 = value_to_int(args[0]);
   auto i2 = value_to_int(args[1]);
-  return Int{i1.get() / i2.get()};
+  auto res = Int{i1.get() / i2.get()};
+  return int_to_value(res);
 }
 
 Value zero_test (const std::vector<Value>& args) {
   assert(args.size() == 1);
   auto i = value_to_int(args[0]);
-  return Bool{i.get() == 0};
+  auto res = Bool{i.get() == 0};
+  return bool_to_value(res);
 }
 
 Value equal_test (const std::vector<Value>& args) {
   assert(args.size() == 2);
   auto i1 = value_to_int(args[0]);
   auto i2 = value_to_int(args[1]);
-  return Bool{i1.get() == i2.get()};
+  auto res = Bool{i1.get() == i2.get()};
+  return bool_to_value(res);
 }
 
 Value greater_test (const std::vector<Value>& args) {
   assert(args.size() == 2);
   auto i1 = value_to_int(args[0]);
   auto i2 = value_to_int(args[1]);
-  return Bool{i1.get() > i2.get()};
+  auto res = Bool{i1.get() > i2.get()};
+  return bool_to_value(res);
 }
 
 Value less_test (const std::vector<Value>& args) {
   assert(args.size() == 2);
   auto i1 = value_to_int(args[0]);
   auto i2 = value_to_int(args[1]);
-  return Bool{i1.get() < i2.get()};
+  auto res = Bool{i1.get() < i2.get()};
+  return bool_to_value(res);
 }
 
 Value cons (const std::vector<Value>& args) {
   assert(args.size() == 2);
-  return Pair{args[0], args[1]};
+  auto res = Pair{args[0], args[1]};
+  return pair_to_value(std::move(res));
 }
 Value car (const std::vector<Value>& args) {
   assert(args.size() == 1);
   if (type_of(args[0]) == ValueType::PAIR) {
-    return std::get<RwPair>(args[0]).get().first;
+    return value_to_pair(args[0]).first;
   } else {
     throw std::runtime_error("Pair expected");
   }
@@ -117,7 +125,7 @@ Value car (const std::vector<Value>& args) {
 Value cdr (const std::vector<Value>& args) {
   assert(args.size() == 1);
   if (type_of(args[0]) == ValueType::PAIR) {
-    return std::get<RwPair>(args[0]).get().second;
+    return value_to_pair(args[0]).second;
   } else {
     throw std::runtime_error("Pair expected");
   }
@@ -125,15 +133,17 @@ Value cdr (const std::vector<Value>& args) {
 
 Value null_test (const std::vector<Value>& args) {
   assert(args.size() == 1);
-  return Bool{type_of(args[0]) == ValueType::NIL};
+  auto res = Bool{type_of(args[0]) == ValueType::NIL};
+  return bool_to_value(res);
 }
 
 Value list (const std::vector<Value>& args) {
   Value res = std::accumulate(std::rbegin(args),
                               std::rend(args),
-                              Value(Nil{}),
+                              nil_to_value(),
                               [] (Value acc, Value value) -> Value {
-                                return Pair{std::move(value), std::move(acc)};
+                                auto res = Pair{std::move(value), std::move(acc)};
+                                return pair_to_value(std::move(res));
                               });
   return res;
 }

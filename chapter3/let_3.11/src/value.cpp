@@ -8,6 +8,14 @@
 
 namespace eopl {
 
+bool operator == (const Value& lhs, const Value& rhs) {
+  return *lhs == *rhs;
+}
+
+bool operator != (const Value& lhs, const Value& rhs) {
+  return !(lhs == rhs);
+}
+
 ValueType type_of (const Value& value) {
   struct TypeVisitor {
     ValueType operator () (Nil) { return ValueType::NIL; }
@@ -24,7 +32,7 @@ ValueType type_of (const Value& value) {
     ValueType operator () (const Array&) { return ValueType::ARRAY; }
   };
 
-  return std::visit(TypeVisitor{}, value);
+  return std::visit(TypeVisitor{}, *value);
 }
 
 std::ostream& operator << (std::ostream& os, const Value& value) {
@@ -48,16 +56,16 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
         os << '(';
       }
 
-      std::visit(OutputVisitor{os}, pair.first);
+      std::visit(OutputVisitor{os}, *pair.first);
 
       if (auto type = type_of(pair.second); type == ValueType::PAIR) {
         os << ' ';
-        std::visit(*this, pair.second);
+        std::visit(*this, *pair.second);
       } else if (type == ValueType::NIL) {
         os << ')';
       } else {
         os << " . ";
-        std::visit(*this, pair.second);
+        std::visit(*this, *pair.second);
         os << ')';
       }
     }
@@ -66,13 +74,13 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
       os << '[';
       interleave(std::begin(array),
                  std::end(array),
-                 [this] (const auto& item) { std::visit(OutputVisitor{os}, item); },
+                 [this] (const auto& item) { std::visit(OutputVisitor{os}, *item); },
                  [this] () { os << ", "; });
       os << ']';
     }
   };
 
-  std::visit(OutputVisitor{os}, value);
+  std::visit(OutputVisitor{os}, *value);
   return os;
 }
 
@@ -92,7 +100,7 @@ Int value_to_int (const Value& value) {
     Int operator () (const Pair&) { throw std::runtime_error(msg); }
     Int operator () (const Array&) { throw std::runtime_error(msg); }
   };
-  return std::visit(Visitor{}, value);
+  return std::visit(Visitor{}, *value);
 }
 
 Bool value_to_bool (const Value& value) {
@@ -111,7 +119,7 @@ Bool value_to_bool (const Value& value) {
     Bool operator () (const Pair&) { throw std::runtime_error(msg); }
     Bool operator () (const Array&) { throw std::runtime_error(msg); }
   };
-  return std::visit(Visitor{}, value);
+  return std::visit(Visitor{}, *value);
 }
 
 Double value_to_double (const Value& value) {
@@ -130,7 +138,7 @@ Double value_to_double (const Value& value) {
     Double operator () (const Pair&) { throw std::runtime_error(msg); }
     Double operator () (const Array&) { throw std::runtime_error(msg); }
   };
-  return std::visit(Visitor{}, value);
+  return std::visit(Visitor{}, *value);
 }
 
 const String& value_to_string (const Value& value) {
@@ -149,7 +157,7 @@ const String& value_to_string (const Value& value) {
     const String& operator () (const Pair&) { throw std::runtime_error(msg); }
     const String& operator () (const Array&) { throw std::runtime_error(msg); }
   };
-  return std::visit(Visitor{}, value);
+  return std::visit(Visitor{}, *value);
 }
 const Symbol& value_to_symbol (const Value& value) {
   static const std::string msg = "unexpected type";
@@ -167,7 +175,7 @@ const Symbol& value_to_symbol (const Value& value) {
     const Symbol& operator () (const Pair&) { throw std::runtime_error(msg); }
     const Symbol& operator () (const Array&) { throw std::runtime_error(msg); }
   };
-  return std::visit(Visitor{}, value);
+  return std::visit(Visitor{}, *value);
 }
 const Pair& value_to_pair (const Value& value) {
   static const std::string msg = "unexpected type";
@@ -185,7 +193,7 @@ const Pair& value_to_pair (const Value& value) {
     const Pair& operator () (const Pair& p) { return p; }
     const Pair& operator () (const Array&) { throw std::runtime_error(msg); }
   };
-  return std::visit(Visitor{}, value);
+  return std::visit(Visitor{}, *value);
 }
 const Array& value_to_array (const Value& value) {
   static const std::string msg = "unexpected type";
@@ -203,40 +211,39 @@ const Array& value_to_array (const Value& value) {
     const Array& operator () (const Pair&) { throw std::runtime_error(msg); }
     const Array& operator () (const Array& a) { return a; }
   };
-  return std::visit(Visitor{}, value);
+  return std::visit(Visitor{}, *value);
 }
 
-Value nil_to_value () {
-  return {Nil()};
+Value nil_to_value (Nil) {
+  return std::make_shared<ValueCore>(Nil());
 }
 
 Value bool_to_value (Bool b) {
-  return {b};
+  return std::make_shared<ValueCore>(b);
 }
 
 Value int_to_value (Int i) {
-  return {i};
+  return std::make_shared<ValueCore>(i);
 }
 
 Value double_to_value (Double d) {
-  return {d};
+  return std::make_shared<ValueCore>(d);
 }
 
 Value string_to_value (String s) {
-  return {std::move(s)};
+  return std::make_shared<ValueCore>(std::move(s));
 }
 
 Value symbol_to_value (Symbol s) {
-  return {std::move(s)};
+  return std::make_shared<ValueCore>(std::move(s));
 }
 
 Value pair_to_value (Pair p) {
-  return {std::move(p)};
+  return std::make_shared<ValueCore>(std::move(p));
 }
 
 Value array_to_value (Array a) {
-  return {std::move(a)};
+  return std::make_shared<ValueCore>(std::move(a));
 }
-
 
 }

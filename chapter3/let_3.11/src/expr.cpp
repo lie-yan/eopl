@@ -57,7 +57,7 @@ std::ostream& operator << (std::ostream& os, const std::vector<Expression>& exps
 }
 
 std::ostream& operator << (std::ostream& os, const OpExp& opExp) {
-  os << "OpExp(rator: " << opExp.rator << " rands: " << opExp.rands << ")";
+  os << "OpExp(rator: " << opExp.rator << ", rands: " << opExp.rands << ")";
   return os;
 }
 

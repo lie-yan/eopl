@@ -15,7 +15,7 @@ Value value_of (const Program& program, SpEnv env) {
   return value_of(program.exp1, std::move(env));
 }
 
-Value value_of (const Expression& expression, SpEnv env) {
+Value value_of (const Expression& exp, SpEnv env) {
   struct EvalVisitor {
     const SpEnv& env;
     Value operator () (const ConstExp& exp) { return value_of(exp, env); }
@@ -27,11 +27,11 @@ Value value_of (const Expression& expression, SpEnv env) {
     Value operator () (const LetExp& exp) { return value_of(exp, env); }
     Value operator () (const OpExp& exp) { return value_of(exp, env); }
   };
-  return std::visit(EvalVisitor{env}, expression);
+  return std::visit(EvalVisitor{env}, exp);
 }
 
 Value value_of (const ConstExp& exp, SpEnv env) {
-  return exp.num;
+  return int_to_value(exp.num);
 }
 
 Value value_of (const VarExp& exp, SpEnv env) {
@@ -69,7 +69,7 @@ Value value_of (const OpExp& exp, SpEnv env) {
 
 SpEnv make_initial_env () {
   auto ret = Env::make_empty();
-  ret = Env::extend(ret, Symbol{"emptylist"}, Nil{});
+  ret = Env::extend(ret, Symbol{"emptylist"}, nil_to_value(Nil()));
   return ret;
 }
 

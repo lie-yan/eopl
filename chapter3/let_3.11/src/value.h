@@ -39,7 +39,7 @@ struct Nil {
 
 class String {
 public:
-  String () { }
+  String () = default;
   String (std::string val) : val(std::move(val)) { }
   String (const String&) = default;
   String (String&&) = default;
@@ -77,7 +77,7 @@ private:
 
 class Symbol {
 public:
-  Symbol () { }
+  Symbol () = default;
   Symbol (std::string val) : val(std::move(val)) { }
   Symbol (const Symbol&) = default;
   Symbol (Symbol&&) = default;
@@ -213,14 +213,20 @@ private:
   double val;
 };
 
-using Value = std::variant<Nil,
-                           Bool,
-                           Int,
-                           Double,
-                           RwString,
-                           RwSymbol,
-                           RwPair,
-                           RwArray>;
+using ValueCore = std::variant<Nil,
+                               Bool,
+                               Int,
+                               Double,
+                               RwString,
+                               RwSymbol,
+                               RwPair,
+                               RwArray>;
+
+using Value = std::shared_ptr<ValueCore>;
+
+bool operator==(const Value& lhs, const Value& rhs);
+
+bool operator!=(const Value& lhs, const Value& rhs);
 
 struct Pair {
   Value first;
@@ -252,19 +258,19 @@ ValueType type_of (const Value& value);
 Int value_to_int (const Value& value);
 Bool value_to_bool (const Value& value);
 Double value_to_double (const Value& value);
-const String& value_to_string( const Value& value);
+const String& value_to_string (const Value& value);
 const Symbol& value_to_symbol (const Value& value);
-const Pair& value_to_pair(const Value& value);
-const Array& value_to_array(const Value& value);
+const Pair& value_to_pair (const Value& value);
+const Array& value_to_array (const Value& value);
 
-Value nil_to_value();
-Value bool_to_value(Bool b);
-Value int_to_value(Int i);
-Value double_to_value(Double d);
-Value string_to_value(String s);
-Value symbol_to_value(Symbol s);
-Value pair_to_value(Pair p);
-Value array_to_value(Array a);
+Value nil_to_value (Nil n = {});
+Value bool_to_value (Bool b);
+Value int_to_value (Int i);
+Value double_to_value (Double d);
+Value string_to_value (String s);
+Value symbol_to_value (Symbol s);
+Value pair_to_value (Pair p);
+Value array_to_value (Array a);
 
 std::ostream& operator << (std::ostream& os, const Value& value);
 
