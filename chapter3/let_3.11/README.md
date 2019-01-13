@@ -1,1 +1,1 @@
-This piece of code meets the requirements of Exercise 3.7, 3.8, 3.11.
+This piece of code meets the requirements of Exercise 3.7, 3.8, 3.9, 3.10, and 3.11.
