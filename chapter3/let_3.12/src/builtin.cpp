@@ -142,8 +142,8 @@ Value list (const std::vector<Value>& args) {
                               std::rend(args),
                               nil_to_value(),
                               [] (Value acc, Value value) -> Value {
-                                auto res = Pair{std::move(value), std::move(acc)};
-                                return pair_to_value(std::move(res));
+                                auto t = Pair{std::move(value), std::move(acc)};
+                                return pair_to_value(std::move(t));
                               });
   return res;
 }
