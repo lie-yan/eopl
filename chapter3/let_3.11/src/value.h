@@ -252,6 +252,19 @@ ValueType type_of (const Value& value);
 Int value_to_int (const Value& value);
 Bool value_to_bool (const Value& value);
 Double value_to_double (const Value& value);
+const String& value_to_string( const Value& value);
+const Symbol& value_to_symbol (const Value& value);
+const Pair& value_to_pair(const Value& value);
+const Array& value_to_array(const Value& value);
+
+Value nil_to_value();
+Value bool_to_value(Bool b);
+Value int_to_value(Int i);
+Value double_to_value(Double d);
+Value string_to_value(String s);
+Value symbol_to_value(Symbol s);
+Value pair_to_value(Pair p);
+Value array_to_value(Array a);
 
 std::ostream& operator << (std::ostream& os, const Value& value);
 

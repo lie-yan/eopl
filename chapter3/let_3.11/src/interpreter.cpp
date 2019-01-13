@@ -67,6 +67,12 @@ Value value_of (const OpExp& exp, SpEnv env) {
   }
 }
 
+SpEnv make_initial_env () {
+  auto ret = Env::make_empty();
+  ret = Env::extend(ret, Symbol{"emptylist"}, Nil{});
+  return ret;
+}
+
 Value eval (const std::string& s) {
   std::istringstream ss(s);
   yy::Lexer lexer(ss);
@@ -75,7 +81,7 @@ Value eval (const std::string& s) {
   p.set_debug_level(getenv("YYDEBUG") != nullptr);
   p.parse();
 
-  return value_of(result, Env::make_empty());
+  return value_of(result, make_initial_env());
 }
 
 }

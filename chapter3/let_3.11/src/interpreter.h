@@ -21,8 +21,7 @@ Value value_of (const IfExp& exp, SpEnv env);
 Value value_of (const LetExp& exp, SpEnv env);
 Value value_of (const OpExp& exp, SpEnv env);
 
-
+SpEnv make_initial_env ();
 Value eval (const std::string& s);
-
 
 }

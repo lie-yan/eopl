@@ -11,29 +11,16 @@ void print_test_success(int i) {
 int main () {
   using eopl::eval, eopl::Int, eopl::Bool, eopl::Value;
   try {
-    assert(eval(R"EOF(
-let z = 5
-in let x = 3
-in let y = -(x,1)
-in let x = 4 in -(z, -(x,y)))EOF") == Value(Int{3}));
-    int i = 0;
-    print_test_success(i++);
+    auto res = eval(R"EOF(
+let x = 4 in cons(x,
+cons(cons(-(x,1), emptylist), emptylist))
+)EOF");
+    std::cout << res << std::endl;
 
-    assert(eval(R"EOF(
-let z = 5
-in let x = 3
-in let true = zero?(0)
-in let false = zero?(1)
-in if zero?(-(z,-(x,-2))) then true else false )EOF") == Value(Bool{true}));
-    print_test_success(i++);
-
-    assert(eval(R"EOF(
-let z = 5
-in let x = 3
-in let x = +(z,x)
-in let x = *(x, 10)
-in /(x, 5)  )EOF") == Value(Int{16}));
-    print_test_success(i++);
+    res = eval(R"EOF(
+let x = 4 in list(x, -(x,1), -(x,3))
+)EOF");
+    std::cout << res << std::endl;
 
   } catch (const yy::parser::syntax_error& e) {
     fmt::print("The program came into an error around {}. Detail: {}.\n", e.location, e.what());

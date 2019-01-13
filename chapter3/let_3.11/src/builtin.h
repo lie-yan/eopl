@@ -23,4 +23,10 @@ Value greater_test (const std::vector<Value>& args);
 Value less_test (const std::vector<Value>& args);
 Value diff (const std::vector<Value>& args);
 
+Value cons(const std::vector<Value>& args);
+Value car(const std::vector<Value>& args);
+Value cdr(const std::vector<Value>& args);
+Value null_test(const std::vector<Value>& args);
+Value list(const std::vector<Value>& args);
+
 }
