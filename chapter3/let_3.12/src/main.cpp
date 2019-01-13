@@ -22,6 +22,14 @@ let x = 4 in list(x, -(x,1), -(x,3))
 )EOF");
     std::cout << res << std::endl;
 
+    res = eval(R"EOF(
+let x = 10
+in cond zero?(x) ==> +(x,1)
+        greater?(x, 3) ==> +(x,2)
+        less?(x, 100) ==> +(x,3)
+   end
+)EOF");
+    std::cout << res << std::endl;
   } catch (const yy::parser::syntax_error& e) {
     fmt::print("The program came into an error around {}. Detail: {}.\n", e.location, e.what());
   } catch (const std::runtime_error& e) {

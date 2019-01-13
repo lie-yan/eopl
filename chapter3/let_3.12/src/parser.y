@@ -42,10 +42,16 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
 %token                ELSE          "else"
 %token                LET           "let"
 %token                IN            "in"
+%token                COND          "cond"
+%token                RIGHT_ARROW   "==>"
+%token                END           "end"
 %token                END_OF_FILE   "end of file"
 
 %type <eopl::Expression> expression
 %type <std::vector<eopl::Expression>> exp_nlist
+%type <eopl::CondExp::ClauseList> cond_clause_list
+%type <eopl::CondExp::Clause> cond_clause
+
 %%
 
 program : expression { result = eopl::Program{std::move($1)}; }
@@ -55,13 +61,22 @@ expression  : INT      { $$ = eopl::ConstExp{$1}; }
             | IDENTIFIER '(' exp_nlist ')' { $$ = eopl::OpExp{std::move($1), std::move($3)}; }
             | IF expression THEN expression ELSE expression
               { $$ = eopl::IfExp{std::move($2), std::move($4), std::move($6)}; }
-            | IDENTIFIER { $$ = eopl::VarExp{$1}; }
+            | COND cond_clause_list END { $$ = eopl::CondExp{std::move($2)}; }
             | LET IDENTIFIER '=' expression IN expression
               { $$ = eopl::LetExp{std::move($2), std::move($4), std::move($6)}; }
+            | IDENTIFIER { $$ = eopl::VarExp{$1}; }
             ;
 
 exp_nlist : expression  { $$ = {std::move($1)}; }
           | exp_nlist ',' expression { $1.push_back(std::move($3)); $$ = std::move($1); }
           ;
+
+cond_clause_list : %empty { $$ = eopl::CondExp::ClauseList(); }
+                 | cond_clause_list cond_clause { $1.push_back(std::move($2)); $$ = std::move($1); }
+                 ;
+
+cond_clause : expression RIGHT_ARROW expression
+              { $$ = eopl::CondExp::Clause{std::move($1), std::move($3)}; }
+            ;
 
 %%

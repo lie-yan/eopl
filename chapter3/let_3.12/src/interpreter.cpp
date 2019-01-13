@@ -23,9 +23,11 @@ Value value_of (const Expression& exp, SpEnv env) {
     Value operator () (const RwIfExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwLetExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwOpExp& exp) { return value_of(exp.get(), env); }
+    Value operator () (const RwCondExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const IfExp& exp) { return value_of(exp, env); }
     Value operator () (const LetExp& exp) { return value_of(exp, env); }
     Value operator () (const OpExp& exp) { return value_of(exp, env); }
+    Value operator () (const CondExp& exp) { return value_of(exp, env); }
   };
   return std::visit(EvalVisitor{env}, exp);
 }
@@ -64,6 +66,21 @@ Value value_of (const OpExp& exp, SpEnv env) {
     return (*fun)(values);
   } else {
     throw std::runtime_error(fmt::format("function {} does not exist", exp.rator));
+  }
+}
+
+Value value_of (const CondExp& exp, SpEnv env) {
+  auto it = std::find_if(std::begin(exp.clauses),
+                         std::end(exp.clauses),
+                         [env] (const CondExp::Clause& c) -> bool {
+                           auto b = value_of(c.first, env);
+                           return value_to_bool(b).get();
+                         });
+  if (it == std::end(exp.clauses)) {
+    throw std::runtime_error("at least one clause should be true for the "
+                             "cond expression, but none were found");
+  } else {
+    return value_of(it->second, env);
   }
 }
 

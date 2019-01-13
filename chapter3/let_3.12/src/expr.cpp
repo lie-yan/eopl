@@ -15,9 +15,11 @@ std::ostream& operator << (std::ostream& os, const Expression& exp) {
     void operator () (const VarExp& e) { os << e; }
     void operator () (const LetExp& e) { os << e; }
     void operator () (const OpExp& e) { os << e; }
+    void operator () (const CondExp& e) { os << e; }
     void operator () (const RwIfExp& e) { (*this)(e.get()); }
     void operator () (const RwLetExp& e) { (*this)(e.get()); }
     void operator () (const RwOpExp& e) { (*this)(e.get()); }
+    void operator () (const RwCondExp& e) { (*this)(e.get()); }
   };
   std::visit(OutputVisitor{os}, exp);
   return os;
@@ -48,9 +50,10 @@ std::ostream& operator << (std::ostream& os, const Program& program) {
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const std::vector<Expression>& exps) {
-  interleave(std::begin(exps),
-             std::end(exps),
+template<typename T>
+std::ostream& operator << (std::ostream& os, const std::vector<T>& ts) {
+  interleave(std::begin(ts),
+             std::end(ts),
              [&os] (const auto& x) { os << x; },
              [&os] () { os << ", "; });
   return os;
@@ -61,4 +64,13 @@ std::ostream& operator << (std::ostream& os, const OpExp& opExp) {
   return os;
 }
 
+std::ostream& operator << (std::ostream& os, const CondExp::Clause& clause) {
+  os << "(" << clause.first << " ==> " << clause.second << ")";
+  return os;
+}
+
+std::ostream& operator << (std::ostream& os, const CondExp& condExp) {
+  os << "CondExp(" << condExp.clauses << ")";
+  return os;
+}
 }

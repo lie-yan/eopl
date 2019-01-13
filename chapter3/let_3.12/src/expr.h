@@ -26,12 +26,14 @@ struct VarExp {
 using RwIfExp = boost::recursive_wrapper<struct IfExp>;
 using RwLetExp = boost::recursive_wrapper<struct LetExp>;
 using RwOpExp = boost::recursive_wrapper<struct OpExp>;
+using RwCondExp = boost::recursive_wrapper<struct CondExp>;
 
 using Expression = std::variant<ConstExp,
                                 VarExp,
                                 RwOpExp,
                                 RwIfExp,
-                                RwLetExp>;
+                                RwLetExp,
+                                RwCondExp>;
 
 std::ostream& operator << (std::ostream& os, const Expression& exp);
 
@@ -56,6 +58,14 @@ struct LetExp {
   Expression body;
 
   friend std::ostream& operator << (std::ostream& os, const LetExp& letExp);
+};
+
+struct CondExp {
+  using Clause = std::pair<Expression, Expression>;
+  using ClauseList = std::vector<Clause>;
+  ClauseList clauses;
+
+  friend std::ostream& operator << (std::ostream& os, const CondExp& condExp);
 };
 
 struct Program {

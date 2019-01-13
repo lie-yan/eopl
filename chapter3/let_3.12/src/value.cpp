@@ -214,8 +214,8 @@ const Array& value_to_array (const Value& value) {
   return std::visit(Visitor{}, *value);
 }
 
-Value nil_to_value (Nil) {
-  return std::make_shared<ValueCore>(Nil());
+Value nil_to_value (Nil n) {
+  return std::make_shared<ValueCore>(n);
 }
 
 Value bool_to_value (Bool b) {

@@ -87,6 +87,28 @@ integer [-+]?[[:digit:]]+
                   return yy::parser::token::IN;
                 }
 
+"cond"          {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::COND;
+                }
+
+"==>"           {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::RIGHT_ARROW;
+                }
+
+"end"           {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::END;
+                }
+
+
 {blank}         loc.step();
 {newline}       loc.lines();
 

@@ -83,7 +83,50 @@ in if zero?(-(z,-(x,-2))) then true else false )EOF") == bool_to_value(Bool{true
 
 }
 
-int main(int argc, char **argv) {
+TEST(let_lang, list) {
+  using namespace eopl;
+
+  {
+    std::ostringstream ss;
+    auto res = eval(R"EOF(
+let x = 4 in cons(x,
+cons(cons(-(x,1), emptylist), emptylist))
+)EOF");
+    ss << res;
+    EXPECT_EQ(ss.str(), "(4 (3))");
+  }
+
+  {
+    std::ostringstream ss;
+    auto res = eval("let x = 4 in list(x, -(x,1), -(x,3))");
+    ss << res;
+    EXPECT_EQ(ss.str(), "(4 3 1)");
+  }
+}
+
+TEST(let_lang, cond) {
+  using namespace eopl;
+
+  auto res = eval(R"EOF(
+let x = 10
+in cond zero?(x) ==> +(x,1)
+        greater?(x, 3) ==> +(x,2)
+        less?(x, 100) ==> +(x,3)
+   end
+)EOF");
+
+  EXPECT_EQ(res, int_to_value(Int(12)));
+
+  EXPECT_THROW(
+      eval("cond zero?(1) ==> 10 "
+           "    greater?(10, 11) ==> 20"
+           "    less?(20, 19) ==> 30"
+           "end"),
+      std::runtime_error
+  );
+}
+
+int main (int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
