@@ -25,6 +25,7 @@ let x = 4 in list(x, -(x,1), -(x,3))
     res = eval(R"EOF(
 let x = 10
 in cond
+   zero?(0) ==> 1
    end
 )EOF");
     std::cout << res << std::endl;
