@@ -4,7 +4,7 @@
 #include "parser.tab.hpp"
 #include "interpreter.h"
 
-void print_test_success(int i) {
+void print_test_success (int i) {
   fmt::print("Passed test case {}.\n", i);
 }
 
