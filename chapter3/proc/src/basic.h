@@ -7,9 +7,8 @@
 namespace eopl {
 
 /**
- * @brief Apply function `f` on the elements of range [first, last)
- *        successively. Between consecutive calls of `f`, function `g`
- *        is called.
+ * @brief Apply function <code>f</code> on the elements of range <code>[first, last)</code>
+ *        successively. Between consecutive calls to <code>f</code>, invoke function <code>g</code>.
  * @param first the start of range
  * @param last the end of range
  * @param f a unary function
@@ -17,7 +16,7 @@ namespace eopl {
  */
 template<typename InputIt, typename F, typename G>
 void interleave (InputIt first, InputIt last, F f, G g) {
-  
+
   if (first == last) {
     return;
   } else {
