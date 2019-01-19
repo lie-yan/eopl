@@ -16,6 +16,7 @@
 #include <iostream>
 #include <string>
 
+#undef yyterminate
 #define yyterminate() return 0
 #undef YY_USER_ACTION
 #define YY_USER_ACTION  loc.columns (yyleng);

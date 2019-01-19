@@ -20,10 +20,10 @@ find_package(BISON)
 set(FLEX_EXECUTABLE reflex)
 set(FLEX_VERSION reflex-1.0.10)
 
-FLEX_TARGET(LetScanner ${SOURCE_DIR}/scanner.l ${CMAKE_CURRENT_BINARY_DIR}/lex.yy.cpp
+FLEX_TARGET(Scanner ${SOURCE_DIR}/scanner.l ${CMAKE_CURRENT_BINARY_DIR}/lex.yy.cpp
         COMPILE_FLAGS --header-file=${CMAKE_CURRENT_BINARY_DIR}/lex.yy.h)
-BISON_TARGET(LetParser ${SOURCE_DIR}/parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.tab.cpp)
-ADD_FLEX_BISON_DEPENDENCY(LetScanner LetParser)
+BISON_TARGET(Parser ${SOURCE_DIR}/parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.tab.cpp)
+ADD_FLEX_BISON_DEPENDENCY(Scanner Parser)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${SOURCE_DIR})
@@ -32,17 +32,17 @@ set(SOURCES
         ${SOURCE_DIR}/expr.cpp
         ${SOURCE_DIR}/interpreter.cpp
         ${SOURCE_DIR}/builtin.cpp
-        ${FLEX_LetScanner_OUTPUTS}
-        ${BISON_LetParser_OUTPUTS})
+        ${FLEX_Scanner_OUTPUTS}
+        ${BISON_Parser_OUTPUTS})
 
 #add_definitions(-DDEBUG)
 
-add_executable(chapter3-let
+add_executable(chapter3-proc
         ${SOURCES}
         ${SOURCE_DIR}/main.cpp)
-target_link_libraries(chapter3-let fmt reflex)
+target_link_libraries(chapter3-proc fmt reflex)
 
-add_executable(chapter3-let-test
+add_executable(chapter3-proc-test
         ${SOURCES}
-        ${SOURCE_DIR}/let_test.cpp)
-target_link_libraries(chapter3-let-test fmt reflex gtest gtest_main)
+        ${SOURCE_DIR}/proc_test.cpp)
+target_link_libraries(chapter3-proc-test fmt reflex gtest gtest_main)
