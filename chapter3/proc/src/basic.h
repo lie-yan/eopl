@@ -7,8 +7,9 @@
 namespace eopl {
 
 /**
- * @brief Apply function <code>f</code> on the elements of range <code>[first, last)</code>
- *        successively. Between consecutive calls to <code>f</code>, invoke function <code>g</code>.
+ * @brief Apply function <code>f</code> on the elements of range
+ *        <code>[first, last)</code> successively. Between consecutive calls to
+ *        <code>f</code>, invoke function <code>g</code>.
  * @param first the start of range
  * @param last the end of range
  * @param f a unary function

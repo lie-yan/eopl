@@ -74,7 +74,9 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
       os << '[';
       interleave(std::begin(array),
                  std::end(array),
-                 [this] (const auto& item) { std::visit(OutputVisitor{os}, *item); },
+                 [this] (const auto& item) {
+                   std::visit(OutputVisitor{os}, *item);
+                 },
                  [this] () { os << ", "; });
       os << ']';
     }
