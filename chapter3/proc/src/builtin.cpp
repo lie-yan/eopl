@@ -114,6 +114,7 @@ Value cons (const std::vector<Value>& args) {
   auto res = Pair{args[0], args[1]};
   return pair_to_value(std::move(res));
 }
+
 Value car (const std::vector<Value>& args) {
   assert(args.size() == 1);
   if (type_of(args[0]) == ValueType::PAIR) {
@@ -122,6 +123,7 @@ Value car (const std::vector<Value>& args) {
     throw std::runtime_error("Pair expected");
   }
 }
+
 Value cdr (const std::vector<Value>& args) {
   assert(args.size() == 1);
   if (type_of(args[0]) == ValueType::PAIR) {

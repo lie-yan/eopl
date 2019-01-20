@@ -161,6 +161,7 @@ const String& value_to_string (const Value& value) {
   };
   return std::visit(Visitor{}, *value);
 }
+
 const Symbol& value_to_symbol (const Value& value) {
   static const std::string msg = "unexpected type";
   struct Visitor {
@@ -198,6 +199,7 @@ const Pair& value_to_pair (const Value& value) {
   };
   return std::visit(Visitor{}, *value);
 }
+
 const Array& value_to_array (const Value& value) {
   static const std::string msg = "unexpected type";
   struct Visitor {
