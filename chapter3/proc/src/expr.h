@@ -26,7 +26,6 @@ struct VarExp {
 
 using RwIfExp = boost::recursive_wrapper<struct IfExp>;
 using RwLetExp = boost::recursive_wrapper<struct LetExp>;
-using RwOpExp = boost::recursive_wrapper<struct OpExp>;
 using RwCondExp = boost::recursive_wrapper<struct CondExp>;
 using RwUnpackExp = boost::recursive_wrapper<struct UnpackExp>;
 using RwProcExp = boost::recursive_wrapper<struct ProcExp>;
@@ -34,7 +33,6 @@ using RwCallExp = boost::recursive_wrapper<struct CallExp>;
 
 using Expression_ = std::variant<ConstExp,
                                  VarExp,
-                                 RwOpExp,
                                  RwIfExp,
                                  RwLetExp,
                                  RwCondExp,
@@ -45,13 +43,6 @@ using Expression_ = std::variant<ConstExp,
 using Expression = std::shared_ptr<Expression_>;
 
 std::ostream& operator << (std::ostream& os, const Expression& exp);
-
-struct OpExp {
-  Symbol rator;
-  std::vector<Expression> rands;
-
-  friend std::ostream& operator << (std::ostream& os, const OpExp& opExp);
-};
 
 struct IfExp {
   Expression cond;  // cond
@@ -108,11 +99,6 @@ struct Program {
   friend std::ostream& operator << (std::ostream& os, const Program& program);
 };
 
-template<typename E>
-Expression to_expr (E exp) {
-  return std::make_shared<Expression_>(std::move(exp));
-}
-
 using Env = Environment<Symbol, Value>;
 using SpEnv = Env::SpEnv;
 
@@ -159,7 +145,6 @@ const Proc& value_to_proc (const Value& value);
 enum class ExprType {
   CONST_EXP,
   VAR_EXP,
-  OP_EXP,
   IF_EXP,
   LET_EXP,
   COND_EXP,
@@ -168,8 +153,12 @@ enum class ExprType {
   CALL_EXP,
 };
 
-ExprType type_of(const Expression& expression);
+template<typename E>
+Expression to_expr (E exp) {
+  return std::make_shared<Expression_>(std::move(exp));
+}
 
-const VarExp& to_var_exp(const Expression& expression);
+ExprType type_of (const Expression& expression);
+const VarExp& to_var_exp (const Expression& expression);
 
 }

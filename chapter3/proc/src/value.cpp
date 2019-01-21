@@ -103,31 +103,31 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
   return os;
 }
 
-Int value_to_int (const Value& value) {
+Int to_int (const Value& value) {
   return std::get<Int>(*value);
 }
 
-Bool value_to_bool (const Value& value) {
+Bool to_bool (const Value& value) {
   return std::get<Bool>(*value);
 }
 
-Double value_to_double (const Value& value) {
+Double to_double (const Value& value) {
   return std::get<Double>(*value);
 }
 
-const String& value_to_string (const Value& value) {
+const String& to_string (const Value& value) {
   return std::get<RwString>(*value).get();
 }
 
-const Symbol& value_to_symbol (const Value& value) {
+const Symbol& to_symbol (const Value& value) {
   return std::get<RwSymbol>(*value).get();
 }
 
-const Pair& value_to_pair (const Value& value) {
+const Pair& to_pair (const Value& value) {
   return std::get<RwPair>(*value).get();
 }
 
-const Array& value_to_array (const Value& value) {
+const Array& to_array (const Value& value) {
   return std::get<RwArray>(*value).get();
 }
 
@@ -135,35 +135,35 @@ const Proc& value_to_proc (const Value& value) {
   return std::get<RwProc>(*value).get();
 }
 
-Value nil_to_value (Nil n) {
+Value to_value (Nil n) {
   return std::make_shared<Value_>(n);
 }
 
-Value bool_to_value (Bool b) {
+Value to_value (Bool b) {
   return std::make_shared<Value_>(b);
 }
 
-Value int_to_value (Int i) {
+Value to_value (Int i) {
   return std::make_shared<Value_>(i);
 }
 
-Value double_to_value (Double d) {
+Value to_value (Double d) {
   return std::make_shared<Value_>(d);
 }
 
-Value string_to_value (String s) {
+Value to_value (String s) {
   return std::make_shared<Value_>(std::move(s));
 }
 
-Value symbol_to_value (Symbol s) {
+Value to_value (Symbol s) {
   return std::make_shared<Value_>(std::move(s));
 }
 
-Value pair_to_value (Pair p) {
+Value to_value (Pair p) {
   return std::make_shared<Value_>(std::move(p));
 }
 
-Value array_to_value (Array a) {
+Value to_value (Array a) {
   return std::make_shared<Value_>(std::move(a));
 }
 

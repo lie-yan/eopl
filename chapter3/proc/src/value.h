@@ -32,14 +32,12 @@ using RwPair = boost::recursive_wrapper<struct Pair>;
 using RwProc = boost::recursive_wrapper<struct Proc>; // `struct Proc` defined in `expr.h`
 
 template<typename T>
-bool operator == (const boost::recursive_wrapper<T>& lhs,
-                  const boost::recursive_wrapper<T>& rhs) {
+bool operator == (const boost::recursive_wrapper<T>& lhs, const boost::recursive_wrapper<T>& rhs) {
   return lhs.get() == rhs.get();
 }
 
 template<typename T>
-bool operator != (const boost::recursive_wrapper<T>& lhs,
-                  const boost::recursive_wrapper<T>& rhs) {
+bool operator != (const boost::recursive_wrapper<T>& lhs, const boost::recursive_wrapper<T>& rhs) {
   return !(rhs == lhs);
 }
 
@@ -240,7 +238,6 @@ using Value_ = std::variant<Nil,
 
 using Value = std::shared_ptr<Value_>;
 
-
 bool operator == (const Value& lhs, const Value& rhs);
 bool operator != (const Value& lhs, const Value& rhs);
 std::ostream& operator << (std::ostream& os, const Value& value);
@@ -261,23 +258,23 @@ struct Pair {
 struct Array : std::vector<Value> { using std::vector<Value>::vector; };
 
 /// constructors for `Value` below
-Value nil_to_value (Nil n = {});
-Value bool_to_value (Bool b);
-Value int_to_value (Int i);
-Value double_to_value (Double d);
-Value string_to_value (String s);
-Value symbol_to_value (Symbol s);
-Value pair_to_value (Pair p);
-Value array_to_value (Array a);
+Value to_value (Nil n = {});
+Value to_value (Bool b);
+Value to_value (Int i);
+Value to_value (Double d);
+Value to_value (String s);
+Value to_value (Symbol s);
+Value to_value (Pair p);
+Value to_value (Array a);
 
 /// observers for `Value` below
 ValueType type_of (const Value& value);
-Int value_to_int (const Value& value);
-Bool value_to_bool (const Value& value);
-Double value_to_double (const Value& value);
-const String& value_to_string (const Value& value);
-const Symbol& value_to_symbol (const Value& value);
-const Pair& value_to_pair (const Value& value);
-const Array& value_to_array (const Value& value);
+Int to_int (const Value& value);
+Bool to_bool (const Value& value);
+Double to_double (const Value& value);
+const String& to_string (const Value& value);
+const Symbol& to_symbol (const Value& value);
+const Pair& to_pair (const Value& value);
+const Array& to_array (const Value& value);
 
 }

@@ -12,54 +12,54 @@ TEST(let_lang, arithmetic_operations) {
     in let y = 3
     in (+ x y)
   )EOF";
-  EXPECT_EQ(eval(s), int_to_value(Int{5}));
+  EXPECT_EQ(eval(s), to_value(Int{5}));
 
   s = R"EOF(
     let x = 2
     in let y = 3
     in (- x y)
   )EOF";
-  EXPECT_EQ(eval(s), int_to_value(Int{-1}));
+  EXPECT_EQ(eval(s), to_value(Int{-1}));
 
   s = R"EOF(
     let x = 3
     in let y = 4
     in (* x y)
   )EOF";
-  EXPECT_EQ(eval(s), int_to_value(Int{12}));
+  EXPECT_EQ(eval(s), to_value(Int{12}));
 
   s = R"EOF(
     let x = 7
     in let y = 3
     in (/ x y)
   )EOF";
-  EXPECT_EQ(eval(s), int_to_value(Int{2}));
+  EXPECT_EQ(eval(s), to_value(Int{2}));
 
   s = R"EOF(
     let x = 7
     in let y = 3
     in (minus (/ x y))
   )EOF";
-  EXPECT_EQ(eval(s), int_to_value(Int{-2}));
+  EXPECT_EQ(eval(s), to_value(Int{-2}));
 }
 
 TEST(let_lang, relational_operations) {
   using namespace eopl;
-  EXPECT_EQ(eval("(zero? 0)"), bool_to_value(Bool{true}));
-  EXPECT_EQ(eval("(zero? -100)"), bool_to_value(Bool{false}));
+  EXPECT_EQ(eval("(zero? 0)"), to_value(Bool{true}));
+  EXPECT_EQ(eval("(zero? -100)"), to_value(Bool{false}));
 
   std::string s = R"EOF(
   let x = 10
   in (greater? x 12)
   )EOF";
-  EXPECT_EQ(eval(s), bool_to_value(Bool{false}));
+  EXPECT_EQ(eval(s), to_value(Bool{false}));
 
   s = R"EOF(
   let x = 10
   in let y = 100
   in (less? x y)
   )EOF";
-  EXPECT_EQ(eval(s), bool_to_value(Bool{true}));
+  EXPECT_EQ(eval(s), to_value(Bool{true}));
 
   s = R"EOF(
   let x = 10
@@ -67,7 +67,7 @@ TEST(let_lang, relational_operations) {
   in let y = (/ z 10)
   in (equal? x y)
   )EOF";
-  EXPECT_EQ(eval(s), bool_to_value(Bool{true}));
+  EXPECT_EQ(eval(s), to_value(Bool{true}));
 
 }
 
@@ -79,7 +79,7 @@ let z = 5
 in let x = 3
 in let true = (zero? 0)
 in let false = (zero? 1)
-in if (zero? (- z (- x -2))) then true else false )EOF") == bool_to_value(Bool{true}));
+in if (zero? (- z (- x -2))) then true else false )EOF") == to_value(Bool{true}));
 
 }
 
@@ -115,7 +115,7 @@ in cond (zero? x) ==> (+ x 1)
    end
 )EOF");
 
-  EXPECT_EQ(res, int_to_value(Int(12)));
+  EXPECT_EQ(res, to_value(Int(12)));
 
   EXPECT_THROW(
       eval("cond (zero? 1) ==> 10 "
@@ -137,19 +137,19 @@ TEST(let_lang, let) {
   EXPECT_EQ(eval("let x = 30"
                  "in let x = (- x 1)"
                  "       y = (- x 2)"
-                 "in (- x y)"), int_to_value(Int{1}));
+                 "in (- x y)"), to_value(Int{1}));
 
   EXPECT_EQ(eval("let x = 30"
                  "in let* x = (- x 1)"
                  "        y = (- x 2)"
-                 "in (- x y)"), int_to_value(Int{2}));
+                 "in (- x y)"), to_value(Int{2}));
 
 }
 
 TEST(let_lang, unpack) {
   using namespace eopl;
 
-  EXPECT_EQ(eval("let u = 7 in unpack x y = (cons u (cons 3 emptylist)) in (- x y)"), int_to_value(Int{4}));
+  EXPECT_EQ(eval("let u = 7 in unpack x y = (cons u (cons 3 emptylist)) in (- x y)"), to_value(Int{4}));
   EXPECT_THROW(
       eval("let u = 7 in unpack x y z = (cons u (cons 3 emptylist)) in (- x y)"),
       std::runtime_error
@@ -160,9 +160,9 @@ TEST(proc_lang, baisc) {
   using namespace eopl;
 
   EXPECT_EQ(eval("let f = proc (x) (- x 11) in (f (f 77))"),
-            int_to_value(Int{55}));
+            to_value(Int{55}));
   EXPECT_EQ(eval("(proc (f) (f (f 77)) proc (x) (- x 11))"),
-            int_to_value(Int{55}));
+            to_value(Int{55}));
 }
 
 TEST(proc_lang, multi_param) {
@@ -171,7 +171,7 @@ TEST(proc_lang, multi_param) {
   EXPECT_EQ(eval("let sq = proc (x) (* x x)"
                  "in let sum = proc (x, y) (+ x y) "
                  "in (sum (sq 3) (sq 4))"),
-            int_to_value(Int{25}));
+            to_value(Int{25}));
 }
 
 int main (int argc, char** argv) {

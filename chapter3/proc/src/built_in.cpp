@@ -35,17 +35,17 @@ std::optional<BuiltInFun> find_built_in (const Symbol& name) {
 
 Value minus (const std::vector<Value>& args) {
   assert(args.size() == 1);
-  auto i = value_to_int(args[0]);
+  auto i = to_int(args[0]);
   auto res = Int{-i.get()};
-  return int_to_value(res);
+  return to_value(res);
 }
 
 Value diff (const std::vector<Value>& args) {
   assert(args.size() == 2);
-  auto i1 = value_to_int(args[0]);
-  auto i2 = value_to_int(args[1]);
+  auto i1 = to_int(args[0]);
+  auto i2 = to_int(args[1]);
   auto res = Int{i1.get() - i2.get()};
-  return int_to_value(res);
+  return to_value(res);
 }
 
 Value sum (const std::vector<Value>& args) {
@@ -54,9 +54,9 @@ Value sum (const std::vector<Value>& args) {
                             std::end(args),
                             0,
                             [] (int acc, const Value& val) {
-                              return acc + value_to_int(val).get();
+                              return acc + to_int(val).get();
                             });
-  return int_to_value(Int{res});
+  return to_value(Int{res});
 }
 
 Value mult (const std::vector<Value>& args) {
@@ -65,60 +65,60 @@ Value mult (const std::vector<Value>& args) {
                             std::end(args),
                             1,
                             [] (int acc, const Value& val) {
-                              return acc * value_to_int(val).get();
+                              return acc * to_int(val).get();
                             });
-  return int_to_value(Int{res});
+  return to_value(Int{res});
 }
 
 Value divide (const std::vector<Value>& args) {
   assert(args.size() == 2);
-  auto i1 = value_to_int(args[0]);
-  auto i2 = value_to_int(args[1]);
+  auto i1 = to_int(args[0]);
+  auto i2 = to_int(args[1]);
   auto res = Int{i1.get() / i2.get()};
-  return int_to_value(res);
+  return to_value(res);
 }
 
 Value zero_test (const std::vector<Value>& args) {
   assert(args.size() == 1);
-  auto i = value_to_int(args[0]);
+  auto i = to_int(args[0]);
   auto res = Bool{i.get() == 0};
-  return bool_to_value(res);
+  return to_value(res);
 }
 
 Value equal_test (const std::vector<Value>& args) {
   assert(args.size() == 2);
-  auto i1 = value_to_int(args[0]);
-  auto i2 = value_to_int(args[1]);
+  auto i1 = to_int(args[0]);
+  auto i2 = to_int(args[1]);
   auto res = Bool{i1.get() == i2.get()};
-  return bool_to_value(res);
+  return to_value(res);
 }
 
 Value greater_test (const std::vector<Value>& args) {
   assert(args.size() == 2);
-  auto i1 = value_to_int(args[0]);
-  auto i2 = value_to_int(args[1]);
+  auto i1 = to_int(args[0]);
+  auto i2 = to_int(args[1]);
   auto res = Bool{i1.get() > i2.get()};
-  return bool_to_value(res);
+  return to_value(res);
 }
 
 Value less_test (const std::vector<Value>& args) {
   assert(args.size() == 2);
-  auto i1 = value_to_int(args[0]);
-  auto i2 = value_to_int(args[1]);
+  auto i1 = to_int(args[0]);
+  auto i2 = to_int(args[1]);
   auto res = Bool{i1.get() < i2.get()};
-  return bool_to_value(res);
+  return to_value(res);
 }
 
 Value cons (const std::vector<Value>& args) {
   assert(args.size() == 2);
   auto res = Pair{args[0], args[1]};
-  return pair_to_value(std::move(res));
+  return to_value(std::move(res));
 }
 
 Value car (const std::vector<Value>& args) {
   assert(args.size() == 1);
   if (type_of(args[0]) == ValueType::PAIR) {
-    return value_to_pair(args[0]).first;
+    return to_pair(args[0]).first;
   } else {
     throw std::runtime_error("Pair expected");
   }
@@ -127,7 +127,7 @@ Value car (const std::vector<Value>& args) {
 Value cdr (const std::vector<Value>& args) {
   assert(args.size() == 1);
   if (type_of(args[0]) == ValueType::PAIR) {
-    return value_to_pair(args[0]).second;
+    return to_pair(args[0]).second;
   } else {
     throw std::runtime_error("Pair expected");
   }
@@ -136,16 +136,16 @@ Value cdr (const std::vector<Value>& args) {
 Value null_test (const std::vector<Value>& args) {
   assert(args.size() == 1);
   auto res = Bool{type_of(args[0]) == ValueType::NIL};
-  return bool_to_value(res);
+  return to_value(res);
 }
 
 Value list (const std::vector<Value>& args) {
   Value res = std::accumulate(std::rbegin(args),
                               std::rend(args),
-                              nil_to_value(),
+                              to_value(),
                               [] (Value acc, Value value) -> Value {
                                 auto t = Pair{std::move(value), std::move(acc)};
-                                return pair_to_value(std::move(t));
+                                return to_value(std::move(t));
                               });
   return res;
 }

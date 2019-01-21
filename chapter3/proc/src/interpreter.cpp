@@ -24,14 +24,14 @@ Value value_of (const Expression& exp, SpEnv env) {
     Value operator () (const VarExp& exp) { return value_of(exp, env); }
     Value operator () (const RwIfExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwLetExp& exp) { return value_of(exp.get(), env); }
-    Value operator () (const RwOpExp& exp) { return value_of(exp.get(), env); }
+//    Value operator () (const RwOpExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwCondExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwUnpackExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwProcExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwCallExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const IfExp& exp) { return value_of(exp, env); }
     Value operator () (const LetExp& exp) { return value_of(exp, env); }
-    Value operator () (const OpExp& exp) { return value_of(exp, env); }
+//    Value operator () (const OpExp& exp) { return value_of(exp, env); }
     Value operator () (const CondExp& exp) { return value_of(exp, env); }
     Value operator () (const UnpackExp& exp) { return value_of(exp, env); }
     Value operator () (const ProcExp& exp) { return value_of(exp, env); }
@@ -41,7 +41,7 @@ Value value_of (const Expression& exp, SpEnv env) {
 }
 
 Value value_of (const ConstExp& exp, SpEnv env) {
-  return int_to_value(exp.num);
+  return to_value(exp.num);
 }
 
 Value value_of (const VarExp& exp, SpEnv env) {
@@ -50,7 +50,7 @@ Value value_of (const VarExp& exp, SpEnv env) {
 
 Value value_of (const IfExp& exp, SpEnv env) {
   Value val1 = value_of(exp.cond, env);
-  bool b1 = value_to_bool(val1).get();
+  bool b1 = to_bool(val1).get();
   if (b1) return value_of(exp.then_, std::move(env));
   else return value_of(exp.else_, std::move(env));
 }
@@ -77,28 +77,12 @@ Value value_of (const LetExp& exp, SpEnv env) {
   }
 }
 
-Value value_of (const OpExp& exp, SpEnv env) {
-  std::vector<Value> values;
-  std::transform(std::begin(exp.rands),
-                 std::end(exp.rands),
-                 std::back_inserter(values),
-                 [&env] (const auto& e) -> Value {
-                   return value_of(e, env);
-                 });
-  auto fun = built_in::find_built_in(exp.rator);
-  if (fun) {
-    return (*fun)(values);
-  } else {
-    throw std::runtime_error(fmt::format("function {} does not exist", exp.rator));
-  }
-}
-
 Value value_of (const CondExp& exp, SpEnv env) {
   auto it = std::find_if(std::begin(exp.clauses),
                          std::end(exp.clauses),
                          [env] (const CondExp::Clause& c) -> bool {
                            auto b = value_of(c.first, env);
-                           return value_to_bool(b).get();
+                           return to_bool(b).get();
                          });
   if (it == std::end(exp.clauses)) {
     throw std::runtime_error("at least one clause should be true for the "
@@ -119,7 +103,7 @@ Value value_of (const UnpackExp& exp, SpEnv env) {
                         P(lst, env),
                         [] (P acc, const Symbol& s) -> P {
                           if (auto type = type_of(acc.first); type == ValueType::PAIR) {
-                            auto& pair = value_to_pair(acc.first);
+                            auto& pair = to_pair(acc.first);
                             auto new_env = Env::extend(std::move(acc.second), s, pair.first);
                             return std::pair(pair.second, std::move(new_env));
                           } else {
@@ -180,7 +164,7 @@ Value value_of (const CallExp& exp, SpEnv env) {
 
 SpEnv make_initial_env () {
   auto ret = Env::make_empty();
-  ret = Env::extend(ret, Symbol{"emptylist"}, nil_to_value(Nil()));
+  ret = Env::extend(ret, Symbol{"emptylist"}, to_value(Nil()));
   return ret;
 }
 

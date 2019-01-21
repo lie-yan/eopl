@@ -33,7 +33,7 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
   throw parser::syntax_error(l, m);
 }
 
-using eopl::ConstExp, eopl::VarExp, eopl::OpExp;
+using eopl::ConstExp, eopl::VarExp;
 using eopl::IfExp, eopl::LetExp, eopl::UnpackExp;
 using eopl::CondExp, eopl::ProcExp, eopl::CallExp;
 using eopl::Program;
