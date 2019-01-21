@@ -240,6 +240,7 @@ using Value_ = std::variant<Nil,
 
 using Value = std::shared_ptr<Value_>;
 
+
 bool operator == (const Value& lhs, const Value& rhs);
 bool operator != (const Value& lhs, const Value& rhs);
 std::ostream& operator << (std::ostream& os, const Value& value);

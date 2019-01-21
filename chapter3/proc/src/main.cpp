@@ -11,23 +11,10 @@ void print_test_success (int i) {
 int main () {
   using eopl::eval, eopl::Int, eopl::Bool, eopl::Value;
   try {
-    auto res = eval(R"EOF(
-let x = 4 in cons(x,
-cons(cons(-(x,1), emptylist), emptylist))
-)EOF");
+    auto res = eval("let f = proc (x) -(x,11) in (f (f 77))");
     std::cout << res << std::endl;
 
-    res = eval(R"EOF(
-let x = 4 in list(x, -(x,1), -(x,3))
-)EOF");
-    std::cout << res << std::endl;
-
-    res = eval(R"EOF(
-let x = 10
-in cond
-   zero?(0) ==> 1
-   end
-)EOF");
+    res = eval("(proc (f) (f (f 77)) proc (x) -(x,11))");
     std::cout << res << std::endl;
   } catch (const yy::parser::syntax_error& e) {
     fmt::print("The program came into an error around {}. Detail: {}.\n", e.location, e.what());

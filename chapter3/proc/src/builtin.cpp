@@ -6,10 +6,10 @@
 #include "value.h"
 #include <numeric>
 
-namespace eopl::builtin {
+namespace eopl::built_in {
 
-std::optional<BuiltinFun> find_builtin (const Symbol& name) {
-  static std::map<Symbol, BuiltinFun> fun_table = {
+std::optional<BuiltInFun> find_built_in (const Symbol& name) {
+  static std::map<Symbol, BuiltInFun> fun_table = {
       {Symbol{"zero?"},    zero_test},
       {Symbol{"equal?"},   equal_test},
       {Symbol{"greater?"}, greater_test},

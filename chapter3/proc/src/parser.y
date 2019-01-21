@@ -71,8 +71,9 @@ program : expression { result = Program{std::move($1)}; }
         ;
 
 expression  : INT      { $$ = to_expr(ConstExp{$1}); }
-            | IDENTIFIER '(' exp_nlist ')'
-              { $$ = to_expr(OpExp{std::move($1), std::move($3)}); }
+            | IDENTIFIER { $$ = to_expr(VarExp{$1}); }
+/*            | IDENTIFIER '(' exp_nlist ')'
+              { $$ = to_expr(OpExp{std::move($1), std::move($3)}); } */
             | IF expression THEN expression ELSE expression
               { $$ = to_expr(IfExp{std::move($2), std::move($4), std::move($6)}); }
             | COND cond_clause_list END
@@ -81,15 +82,15 @@ expression  : INT      { $$ = to_expr(ConstExp{$1}); }
               { $$ = to_expr(LetExp{std::move($2), std::move($4), $1}); }
             | UNPACK id_list '=' expression IN expression
               { $$ = to_expr(UnpackExp{std::move($2), std::move($4), std::move($6)}); }
-            | IDENTIFIER { $$ = to_expr(VarExp{$1}); }
-            | PROC '(' IDENTIFIER ')' expression
+            | PROC '(' id_list ')' expression
               { $$ = to_expr(ProcExp{std::move($3), std::move($5)}); }
-            | '(' expression expression ')'
+            | '(' expression exp_nlist ')'
               { $$ = to_expr(CallExp{std::move($2), std::move($3)}); }
             ;
 
 exp_nlist : expression  { $$ = {std::move($1)}; }
-          | exp_nlist ',' expression { $1.push_back(std::move($3)); $$ = std::move($1); }
+/*          | exp_nlist ',' expression { $1.push_back(std::move($3)); $$ = std::move($1); } */
+          | exp_nlist expression { $1.push_back(std::move($2)); $$ = std::move($1); }
           ;
 
 cond_clause_list : %empty { $$ = eopl::CondExp::ClauseList(); }

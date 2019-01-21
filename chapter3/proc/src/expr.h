@@ -89,7 +89,7 @@ struct CondExp {
 };
 
 struct ProcExp {
-  Symbol var;
+  std::vector<Symbol> vars;
   Expression body;
 
   friend std::ostream& operator << (std::ostream& os, const ProcExp& procExp);
@@ -97,7 +97,7 @@ struct ProcExp {
 
 struct CallExp {
   Expression rator;
-  Expression rand;
+  std::vector<Expression> rands;
 
   friend std::ostream& operator << (std::ostream& os, const CallExp& callExp);
 };
@@ -117,12 +117,12 @@ using Env = Environment<Symbol, Value>;
 using SpEnv = Env::SpEnv;
 
 struct Proc {
-  Symbol var;
+  std::vector<Symbol> vars;
   Expression body;
   SpEnv saved_env;
 
   friend bool operator == (const Proc& lhs, const Proc& rhs) {
-    return lhs.var == rhs.var &&
+    return lhs.vars == rhs.vars &&
            lhs.body == rhs.body &&
            lhs.saved_env == rhs.saved_env;
   }
@@ -131,9 +131,9 @@ struct Proc {
   }
 
   friend bool operator < (const Proc& lhs, const Proc& rhs) {
-    if (lhs.var < rhs.var)
+    if (lhs.vars < rhs.vars)
       return true;
-    if (rhs.var < lhs.var)
+    if (rhs.vars < lhs.vars)
       return false;
     if (lhs.body < rhs.body)
       return true;
@@ -156,5 +156,20 @@ struct Proc {
 Value proc_to_value (Proc p);
 const Proc& value_to_proc (const Value& value);
 
+enum class ExprType {
+  CONST_EXP,
+  VAR_EXP,
+  OP_EXP,
+  IF_EXP,
+  LET_EXP,
+  COND_EXP,
+  UNPACK_EXP,
+  PROC_EXP,
+  CALL_EXP,
+};
+
+ExprType type_of(const Expression& expression);
+
+const VarExp& to_var_exp(const Expression& expression);
 
 }

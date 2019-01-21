@@ -153,7 +153,16 @@ TEST(let_lang, unpack) {
   EXPECT_THROW(
       eval("let u = 7 in unpack x y z = cons(u,cons(3,emptylist)) in -(x,y)"),
       std::runtime_error
-      );
+  );
+}
+
+TEST(proc_lang, baisc) {
+  using namespace eopl;
+
+  EXPECT_EQ(eval("let f = proc (x) (- x 11) in (f (f 77))"),
+            int_to_value(Int{55}));
+  EXPECT_EQ(eval("(proc (f) (f (f 77)) proc (x) (- x 11))"),
+            int_to_value(Int{55}));
 }
 
 int main (int argc, char** argv) {

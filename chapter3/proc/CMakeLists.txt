@@ -35,7 +35,7 @@ set(SOURCES
         ${FLEX_Scanner_OUTPUTS}
         ${BISON_Parser_OUTPUTS})
 
-#add_definitions(-DDEBUG)
+add_definitions(-DDEBUG)
 
 add_executable(chapter3-proc
         ${SOURCES}

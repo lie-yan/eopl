@@ -24,6 +24,8 @@ Value value_of (const UnpackExp& exp, SpEnv env);
 Value value_of (const ProcExp& exp, SpEnv env);
 Value value_of (const CallExp& exp, SpEnv env);
 
+std::vector<Value> value_of (const std::vector<Expression>& exps, SpEnv env);
+
 SpEnv make_initial_env ();
 Value eval (const std::string& s);
 

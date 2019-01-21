@@ -85,7 +85,7 @@ Value value_of (const OpExp& exp, SpEnv env) {
                  [&env] (const auto& e) -> Value {
                    return value_of(e, env);
                  });
-  auto fun = builtin::find_builtin(exp.rator);
+  auto fun = built_in::find_built_in(exp.rator);
   if (fun) {
     return (*fun)(values);
   } else {
@@ -134,19 +134,47 @@ Value value_of (const UnpackExp& exp, SpEnv env) {
 }
 
 Value value_of (const ProcExp& exp, SpEnv env) {
-  return proc_to_value(Proc{exp.var, exp.body, std::move(env)});
+  return proc_to_value(Proc{exp.vars, exp.body, std::move(env)});
+}
+
+std::vector<Value> value_of (const std::vector<Expression>& exps, SpEnv env) {
+  std::vector<Value> results;
+  std::transform(std::begin(exps),
+                 std::end(exps),
+                 std::back_inserter(results),
+                 [&env] (const auto& e) -> Value {
+                   return value_of(e, env);
+                 });
+  return results;
 }
 
 Value value_of (const CallExp& exp, SpEnv env) {
-  auto rator = value_of(exp.rator, env);
-  if (type_of(rator) == ValueType::PROC) {
-    auto& proc = value_to_proc(rator);
-    auto rand = value_of(exp.rand, env);
-    return value_of(proc.body,
-                    Env::extend(proc.saved_env, proc.var, std::move(rand)));
+
+  auto eval_proc = [] (const auto& exp, auto env) {
+    if (auto rator = value_of(exp.rator, env);
+        type_of(rator) == ValueType::PROC) {
+
+      auto& proc = value_to_proc(rator);
+      auto args = value_of(exp.rands, env);
+      auto new_env = Env::extend(proc.saved_env, proc.vars, std::move(args));
+      return value_of(proc.body, new_env);
+    } else {
+      std::string msg = "the rator should be a Proc object";
+      throw std::runtime_error(msg);
+    }
+  };
+
+  if (type_of(exp.rator) == ExprType::VAR_EXP) {
+    auto& sym = to_var_exp(exp.rator).var;
+    auto f_opt = built_in::find_built_in(sym);
+    if (f_opt) {
+      auto args = value_of(exp.rands, env);
+      return (*f_opt)(args);
+    } else {
+      return eval_proc(exp, env);
+    }
   } else {
-    std::string msg = "the rator should be a proc object";
-    throw std::runtime_error(msg);
+    return eval_proc(exp, env);
   }
 }
 

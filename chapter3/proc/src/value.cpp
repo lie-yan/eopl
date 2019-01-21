@@ -38,6 +38,16 @@ ValueType type_of (const Value& value) {
   return std::visit(TypeVisitor{}, *value);
 }
 
+
+template<typename T>
+std::ostream& operator << (std::ostream& os, const std::vector<T>& ts) {
+  interleave(std::begin(ts),
+             std::end(ts),
+             [&os] (const auto& x) { os << x; },
+             [&os] () { os << " "; });
+  return os;
+}
+
 std::ostream& operator << (std::ostream& os, const Value& value) {
   struct OutputVisitor {
     std::ostream& os;
@@ -85,7 +95,7 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
       os << ']';
     }
     void operator () (const Proc& proc) {
-      os << "<proc " << proc.var << ">";
+      os << "<proc " << proc.vars << ">";
     }
   };
 
@@ -160,5 +170,7 @@ Value array_to_value (Array a) {
 Value proc_to_value (Proc p) {
   return std::make_shared<Value_>(std::move(p));
 }
+
+
 
 }

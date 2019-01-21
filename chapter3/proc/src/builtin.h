@@ -7,11 +7,11 @@
 #include <optional>
 #include "value.h"
 
-namespace eopl::builtin {
+namespace eopl::built_in {
 
-using BuiltinFun = std::function<Value (const std::vector<Value>&)>;
+using BuiltInFun = std::function<Value (const std::vector<Value>&)>;
 
-std::optional<BuiltinFun> find_builtin (const Symbol& name);
+std::optional<BuiltInFun> find_built_in (const Symbol& name);
 
 Value minus (const std::vector<Value>& args);
 Value diff (const std::vector<Value>& args);
