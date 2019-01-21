@@ -140,7 +140,9 @@ Value value_of (const CallExp& exp, SpEnv env) {
 
       auto& proc = to_proc(rator);
       auto args = value_of(exp.rands, env);
-      auto new_env = Env::extend(proc.saved_env, proc.params, std::move(args));
+
+      // key change for dynamic binding
+      auto new_env = Env::extend(env, proc.params, std::move(args));
       return value_of(proc.body, new_env);
     } else {
       std::string msg = "the rator should be a Proc object";

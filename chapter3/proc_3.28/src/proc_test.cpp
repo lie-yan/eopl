@@ -174,6 +174,16 @@ TEST(proc_lang, multi_param) {
             to_value(Int{25}));
 }
 
+TEST(proc_lang, dynamic_binding) {
+  using namespace eopl;
+
+  EXPECT_EQ(eval("let a = 3 "
+                 "in let p = proc (x) (- x a) "
+                 "       a = 5 "
+                 "in (- a (p 2))"),
+            to_value(Int{8}));
+}
+
 int main (int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
