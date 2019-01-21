@@ -42,10 +42,12 @@ public:
                        std::vector<Symbol> syms,
                        std::vector<Value> values) {
     assert(syms.size() == values.size());
-    return std::inner_product(std::begin(syms), std::end(syms),
-                              std::begin(values), parent,
-                              [] (auto acc, auto&& pair) {
-                                return extend(acc,
+    return std::inner_product(std::begin(syms),
+                              std::end(syms),
+                              std::begin(values),
+                              parent,
+                              [] (auto&& acc, auto&& pair) {
+                                return extend(std::forward<decltype(acc)>(acc),
                                               std::move(pair.first),
                                               std::move(pair.second));
                               },

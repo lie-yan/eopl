@@ -9,9 +9,6 @@
 
 namespace eopl {
 
-//using Env = Environment<Symbol, Value>;
-//using SpEnv = Env::SpEnv;
-
 Value value_of (const Program& program, SpEnv env);
 Value value_of (const Expression& exp, SpEnv env);
 Value value_of (const ConstExp& exp, SpEnv env);

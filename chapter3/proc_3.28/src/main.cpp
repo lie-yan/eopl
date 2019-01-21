@@ -4,10 +4,6 @@
 #include "parser.tab.hpp"
 #include "interpreter.h"
 
-void print_test_success (int i) {
-  fmt::print("Passed test case {}.\n", i);
-}
-
 int main () {
   using eopl::eval, eopl::Int, eopl::Bool, eopl::Value;
   try {

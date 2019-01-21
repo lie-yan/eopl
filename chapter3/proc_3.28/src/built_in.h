@@ -11,6 +11,13 @@ namespace eopl::built_in {
 
 using BuiltInFun = std::function<Value (const std::vector<Value>&)>;
 
+/**
+ * @brief Given a fixed symbol, return the function corresponding to
+ *        the symbol if any; otherwise return None.
+ *
+ * @param name the name to searched for
+ * @return the function if any, or None
+ */
 std::optional<BuiltInFun> find_built_in (const Symbol& name);
 
 Value minus (const std::vector<Value>& args);
