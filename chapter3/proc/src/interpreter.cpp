@@ -8,7 +8,7 @@
 #include <fmt/ostream.h>
 #include <numeric>
 #include "interpreter.h"
-#include "builtin.h"
+#include "built_in.h"
 #include "lex.yy.h"
 
 namespace eopl {

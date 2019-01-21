@@ -31,11 +31,11 @@ set(SOURCES
         ${SOURCE_DIR}/value.cpp
         ${SOURCE_DIR}/expr.cpp
         ${SOURCE_DIR}/interpreter.cpp
-        ${SOURCE_DIR}/builtin.cpp
+        ${SOURCE_DIR}/built_in.cpp
         ${FLEX_Scanner_OUTPUTS}
         ${BISON_Parser_OUTPUTS})
 
-add_definitions(-DDEBUG)
+#add_definitions(-DDEBUG)
 
 add_executable(chapter3-proc
         ${SOURCES}
