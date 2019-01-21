@@ -27,7 +27,7 @@ std::ostream& operator << (std::ostream& os, const Expression& exp) {
     void operator () (const RwProcExp& e) { (*this)(e.get()); }
     void operator () (const RwCallExp& e) { (*this)(e.get()); }
   };
-  std::visit(OutputVisitor{os}, exp);
+  std::visit(OutputVisitor{os}, *exp);
   return os;
 }
 
@@ -42,7 +42,7 @@ std::ostream& operator << (std::ostream& os, const VarExp& varExp) {
 }
 
 std::ostream& operator << (std::ostream& os, const IfExp& ifExp) {
-  os << "IfExp(" << ifExp.exp1 << ", " << ifExp.exp2 << ", " << ifExp.exp3 << ")";
+  os << "IfExp(" << ifExp.cond << ", " << ifExp.then_ << ", " << ifExp.else_ << ")";
   return os;
 }
 
@@ -101,4 +101,13 @@ std::ostream& operator << (std::ostream& os, const CallExp& callExp) {
   os << "CallExp(rator: " << callExp.rator << ", rand: " << callExp.rand << ")";
   return os;
 }
+
+std::ostream& operator << (std::ostream& os, const Proc& proc) {
+  os << "Proc(var: " << proc.var
+     << ", body: " << proc.body
+     << ", saved_env: " << proc.saved_env << ")";
+  return os;
+}
+
+
 }

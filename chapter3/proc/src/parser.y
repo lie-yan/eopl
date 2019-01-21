@@ -33,6 +33,12 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
   throw parser::syntax_error(l, m);
 }
 
+using eopl::ConstExp, eopl::VarExp, eopl::OpExp;
+using eopl::IfExp, eopl::LetExp, eopl::UnpackExp;
+using eopl::CondExp, eopl::ProcExp, eopl::CallExp;
+using eopl::Program;
+using eopl::to_expr;
+
 }
 
 %token <eopl::Int>    INT           "integer"
@@ -61,23 +67,25 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
 
 %%
 
-program : expression { result = eopl::Program{std::move($1)}; }
+program : expression { result = Program{std::move($1)}; }
         ;
 
-expression  : INT      { $$ = eopl::ConstExp{$1}; }
-            | IDENTIFIER '(' exp_nlist ')' { $$ = eopl::OpExp{std::move($1), std::move($3)}; }
+expression  : INT      { $$ = to_expr(ConstExp{$1}); }
+            | IDENTIFIER '(' exp_nlist ')'
+              { $$ = to_expr(OpExp{std::move($1), std::move($3)}); }
             | IF expression THEN expression ELSE expression
-              { $$ = eopl::IfExp{std::move($2), std::move($4), std::move($6)}; }
-            | COND cond_clause_list END { $$ = eopl::CondExp{std::move($2)}; }
+              { $$ = to_expr(IfExp{std::move($2), std::move($4), std::move($6)}); }
+            | COND cond_clause_list END
+              { $$ = to_expr(CondExp{std::move($2)}); }
             | let_opt_star let_clause_list IN expression
-              { $$ = eopl::LetExp{std::move($2), std::move($4), $1}; }
+              { $$ = to_expr(LetExp{std::move($2), std::move($4), $1}); }
             | UNPACK id_list '=' expression IN expression
-              { $$ = eopl::UnpackExp{std::move($2), std::move($4), std::move($6)}; }
-            | IDENTIFIER { $$ = eopl::VarExp{$1}; }
+              { $$ = to_expr(UnpackExp{std::move($2), std::move($4), std::move($6)}); }
+            | IDENTIFIER { $$ = to_expr(VarExp{$1}); }
             | PROC '(' IDENTIFIER ')' expression
-              { $$ = eopl::ProcExp{std::move($3), std::move($5)}; }
+              { $$ = to_expr(ProcExp{std::move($3), std::move($5)}); }
             | '(' expression expression ')'
-              { $$ = eopl::CallExp{std::move($2), std::move($3)}; }
+              { $$ = to_expr(CallExp{std::move($2), std::move($3)}); }
             ;
 
 exp_nlist : expression  { $$ = {std::move($1)}; }

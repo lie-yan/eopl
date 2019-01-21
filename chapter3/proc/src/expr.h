@@ -8,6 +8,7 @@
 #include <boost/variant.hpp>
 #include <ostream>
 #include "value.h"
+#include "env.h"
 
 namespace eopl {
 
@@ -31,15 +32,17 @@ using RwUnpackExp = boost::recursive_wrapper<struct UnpackExp>;
 using RwProcExp = boost::recursive_wrapper<struct ProcExp>;
 using RwCallExp = boost::recursive_wrapper<struct CallExp>;
 
-using Expression = std::variant<ConstExp,
-                                VarExp,
-                                RwOpExp,
-                                RwIfExp,
-                                RwLetExp,
-                                RwCondExp,
-                                RwUnpackExp,
-                                RwProcExp,
-                                RwCallExp>;
+using Expression_ = std::variant<ConstExp,
+                                 VarExp,
+                                 RwOpExp,
+                                 RwIfExp,
+                                 RwLetExp,
+                                 RwCondExp,
+                                 RwUnpackExp,
+                                 RwProcExp,
+                                 RwCallExp>;
+
+using Expression = std::shared_ptr<Expression_>;
 
 std::ostream& operator << (std::ostream& os, const Expression& exp);
 
@@ -51,9 +54,9 @@ struct OpExp {
 };
 
 struct IfExp {
-  Expression exp1;  // cond
-  Expression exp2;  // then clause
-  Expression exp3;  // else clause
+  Expression cond;  // cond
+  Expression then_;  // then clause
+  Expression else_;  // else clause
 
   friend std::ostream& operator << (std::ostream& os, const IfExp& ifExp);
 };
@@ -104,5 +107,54 @@ struct Program {
 
   friend std::ostream& operator << (std::ostream& os, const Program& program);
 };
+
+template<typename E>
+Expression to_expr (E exp) {
+  return std::make_shared<Expression_>(std::move(exp));
+}
+
+using Env = Environment<Symbol, Value>;
+using SpEnv = Env::SpEnv;
+
+struct Proc {
+  Symbol var;
+  Expression body;
+  SpEnv saved_env;
+
+  friend bool operator == (const Proc& lhs, const Proc& rhs) {
+    return lhs.var == rhs.var &&
+           lhs.body == rhs.body &&
+           lhs.saved_env == rhs.saved_env;
+  }
+  friend bool operator != (const Proc& lhs, const Proc& rhs) {
+    return !(rhs == lhs);
+  }
+
+  friend bool operator < (const Proc& lhs, const Proc& rhs) {
+    if (lhs.var < rhs.var)
+      return true;
+    if (rhs.var < lhs.var)
+      return false;
+    if (lhs.body < rhs.body)
+      return true;
+    if (rhs.body < lhs.body)
+      return false;
+    return lhs.saved_env < rhs.saved_env;
+  }
+  friend bool operator > (const Proc& lhs, const Proc& rhs) {
+    return rhs < lhs;
+  }
+  friend bool operator <= (const Proc& lhs, const Proc& rhs) {
+    return !(rhs < lhs);
+  }
+  friend bool operator >= (const Proc& lhs, const Proc& rhs) {
+    return !(lhs < rhs);
+  }
+  friend std::ostream& operator << (std::ostream& os, const Proc& proc);
+};
+
+Value proc_to_value (Proc p);
+const Proc& value_to_proc (const Value& value);
+
 
 }

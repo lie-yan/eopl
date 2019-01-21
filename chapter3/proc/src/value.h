@@ -22,20 +22,24 @@ enum class ValueType {
   SYMBOL,
   PAIR,
   ARRAY,
+  PROC,
 };
 
 using RwString = boost::recursive_wrapper<struct String>;
 using RwSymbol = boost::recursive_wrapper<struct Symbol>;
 using RwArray = boost::recursive_wrapper<struct Array>;
 using RwPair = boost::recursive_wrapper<struct Pair>;
+using RwProc = boost::recursive_wrapper<struct Proc>; // `struct Proc` defined in `expr.h`
 
 template<typename T>
-bool operator == (const boost::recursive_wrapper<T>& lhs, const boost::recursive_wrapper<T>& rhs) {
+bool operator == (const boost::recursive_wrapper<T>& lhs,
+                  const boost::recursive_wrapper<T>& rhs) {
   return lhs.get() == rhs.get();
 }
 
 template<typename T>
-bool operator != (const boost::recursive_wrapper<T>& lhs, const boost::recursive_wrapper<T>& rhs) {
+bool operator != (const boost::recursive_wrapper<T>& lhs,
+                  const boost::recursive_wrapper<T>& rhs) {
   return !(rhs == lhs);
 }
 
@@ -224,15 +228,18 @@ private:
   double val;
 };
 
-using ValueCore = std::variant<Nil,
-                               Bool,
-                               Int,
-                               Double,
-                               RwString,
-                               RwSymbol,
-                               RwPair,
-                               RwArray>;
-using Value = std::shared_ptr<ValueCore>;
+using Value_ = std::variant<Nil,
+                            Bool,
+                            Int,
+                            Double,
+                            RwString,
+                            RwSymbol,
+                            RwPair,
+                            RwArray,
+                            RwProc>;
+
+using Value = std::shared_ptr<Value_>;
+
 bool operator == (const Value& lhs, const Value& rhs);
 bool operator != (const Value& lhs, const Value& rhs);
 std::ostream& operator << (std::ostream& os, const Value& value);

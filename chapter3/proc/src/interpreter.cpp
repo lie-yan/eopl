@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by robin on 2019-01-10.
 //
@@ -25,13 +27,17 @@ Value value_of (const Expression& exp, SpEnv env) {
     Value operator () (const RwOpExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwCondExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwUnpackExp& exp) { return value_of(exp.get(), env); }
+    Value operator () (const RwProcExp& exp) { return value_of(exp.get(), env); }
+    Value operator () (const RwCallExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const IfExp& exp) { return value_of(exp, env); }
     Value operator () (const LetExp& exp) { return value_of(exp, env); }
     Value operator () (const OpExp& exp) { return value_of(exp, env); }
     Value operator () (const CondExp& exp) { return value_of(exp, env); }
     Value operator () (const UnpackExp& exp) { return value_of(exp, env); }
+    Value operator () (const ProcExp& exp) { return value_of(exp, env); }
+    Value operator () (const CallExp& exp) { return value_of(exp, env); }
   };
-  return std::visit(EvalVisitor{env}, exp);
+  return std::visit(EvalVisitor{env}, *exp);
 }
 
 Value value_of (const ConstExp& exp, SpEnv env) {
@@ -43,10 +49,10 @@ Value value_of (const VarExp& exp, SpEnv env) {
 }
 
 Value value_of (const IfExp& exp, SpEnv env) {
-  Value val1 = value_of(exp.exp1, env);
+  Value val1 = value_of(exp.cond, env);
   bool b1 = value_to_bool(val1).get();
-  if (b1) return value_of(exp.exp2, std::move(env));
-  else return value_of(exp.exp3, std::move(env));
+  if (b1) return value_of(exp.then_, std::move(env));
+  else return value_of(exp.else_, std::move(env));
 }
 
 Value value_of (const LetExp& exp, SpEnv env) {
@@ -104,7 +110,7 @@ Value value_of (const CondExp& exp, SpEnv env) {
 
 Value value_of (const UnpackExp& exp, SpEnv env) {
   static const std::string msg = "the size of identifier list and that of the pack "
-                           "does not match";
+                                 "does not match";
 
   auto lst = value_of(exp.pack, env);
   using P = decltype(std::pair(lst, env));
@@ -124,6 +130,23 @@ Value value_of (const UnpackExp& exp, SpEnv env) {
     throw std::runtime_error(msg);
   } else {
     return value_of(exp.body, std::move(p.second));
+  }
+}
+
+Value value_of (const ProcExp& exp, SpEnv env) {
+  return proc_to_value(Proc{exp.var, exp.body, std::move(env)});
+}
+
+Value value_of (const CallExp& exp, SpEnv env) {
+  auto rator = value_of(exp.rator, env);
+  if (type_of(rator) == ValueType::PROC) {
+    auto& proc = value_to_proc(rator);
+    auto rand = value_of(exp.rand, env);
+    return value_of(proc.body,
+                    Env::extend(proc.saved_env, proc.var, std::move(rand)));
+  } else {
+    std::string msg = "the rator should be a proc object";
+    throw std::runtime_error(msg);
   }
 }
 
