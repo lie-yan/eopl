@@ -64,6 +64,7 @@ using eopl::to_expr;
 %type <eopl::LetExp::Clause> let_clause
 %type <bool> let_opt_star
 %type <std::vector<eopl::Symbol>> id_list
+%type <std::vector<eopl::Symbol>> param_list
 
 %%
 
@@ -80,7 +81,7 @@ expression  : INT      { $$ = to_expr(ConstExp{$1}); }
               { $$ = to_expr(LetExp{std::move($2), std::move($4), $1}); }
             | UNPACK id_list '=' expression IN expression
               { $$ = to_expr(UnpackExp{std::move($2), std::move($4), std::move($6)}); }
-            | PROC '(' id_list ')' expression
+            | PROC '(' param_list ')' expression
               { $$ = to_expr(ProcExp{std::move($3), std::move($5)}); }
             | '(' expression exp_nlist ')'
               { $$ = to_expr(CallExp{std::move($2), std::move($3)}); }
@@ -113,5 +114,10 @@ let_opt_star : LET { $$ = false; }
 id_list : %empty { $$ = std::vector<eopl::Symbol>(); }
         | id_list IDENTIFIER { $1.push_back(std::move($2)); $$ = std::move($1); }
         ;
+
+param_list : %empty { $$ = std::vector<eopl::Symbol>(); }
+           | IDENTIFIER { $$ = std::vector<eopl::Symbol>{std::move($1)}; }
+           | param_list ',' IDENTIFIER { $1.push_back(std::move($3)); $$ = std::move($1); }
+           ;
 
 %%

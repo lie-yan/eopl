@@ -165,6 +165,15 @@ TEST(proc_lang, baisc) {
             int_to_value(Int{55}));
 }
 
+TEST(proc_lang, multi_param) {
+  using namespace eopl;
+
+  EXPECT_EQ(eval("let sq = proc (x) (* x x)"
+                 "in let sum = proc (x, y) (+ x y) "
+                 "in (sum (sq 3) (sq 4))"),
+            int_to_value(Int{25}));
+}
+
 int main (int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

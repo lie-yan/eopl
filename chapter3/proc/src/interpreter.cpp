@@ -165,8 +165,8 @@ Value value_of (const CallExp& exp, SpEnv env) {
   };
 
   if (type_of(exp.rator) == ExprType::VAR_EXP) {
-    auto& sym = to_var_exp(exp.rator).var;
-    auto f_opt = built_in::find_built_in(sym);
+    auto& op_name = to_var_exp(exp.rator).var;
+    auto f_opt = built_in::find_built_in(op_name);
     if (f_opt) {
       auto args = value_of(exp.rands, env);
       return (*f_opt)(args);
