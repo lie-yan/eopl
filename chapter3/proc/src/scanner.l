@@ -124,6 +124,13 @@ integer [-+]?[[:digit:]]+
                   return yy::parser::token::END;
                 }
 
+"proc"          {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::PROC;
+                }
+
 
 {blank}         loc.step();
 

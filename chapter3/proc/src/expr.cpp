@@ -17,12 +17,15 @@ std::ostream& operator << (std::ostream& os, const Expression& exp) {
     void operator () (const OpExp& e) { os << e; }
     void operator () (const CondExp& e) { os << e; }
     void operator () (const UnpackExp& e) { os << e; }
+    void operator () (const ProcExp& e) { os << e; }
+    void operator () (const CallExp& e) { os << e; }
     void operator () (const RwIfExp& e) { (*this)(e.get()); }
     void operator () (const RwLetExp& e) { (*this)(e.get()); }
     void operator () (const RwOpExp& e) { (*this)(e.get()); }
     void operator () (const RwCondExp& e) { (*this)(e.get()); }
     void operator () (const RwUnpackExp& e) { (*this)(e.get()); }
-
+    void operator () (const RwProcExp& e) { (*this)(e.get()); }
+    void operator () (const RwCallExp& e) { (*this)(e.get()); }
   };
   std::visit(OutputVisitor{os}, exp);
   return os;
@@ -86,6 +89,16 @@ std::ostream& operator << (std::ostream& os, const UnpackExp& unpackExp) {
   os << "UnpackExp(vars: " << unpackExp.vars
      << ", pack: " << unpackExp.pack
      << ", body: " << unpackExp.body << ")";
+  return os;
+}
+
+std::ostream& operator << (std::ostream& os, const ProcExp& procExp) {
+  os << "ProcExp(var: " << procExp.var << ", body: " << procExp.body << ")";
+  return os;
+}
+
+std::ostream& operator << (std::ostream& os, const CallExp& callExp) {
+  os << "CallExp(rator: " << callExp.rator << ", rand: " << callExp.rand << ")";
   return os;
 }
 }

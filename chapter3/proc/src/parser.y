@@ -47,6 +47,7 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
 %token                COND          "cond"
 %token                RIGHT_ARROW   "==>"
 %token                END           "end"
+%token                PROC          "proc"
 %token                END_OF_FILE   "end of file"
 
 %type <eopl::Expression> expression
@@ -73,6 +74,10 @@ expression  : INT      { $$ = eopl::ConstExp{$1}; }
             | UNPACK id_list '=' expression IN expression
               { $$ = eopl::UnpackExp{std::move($2), std::move($4), std::move($6)}; }
             | IDENTIFIER { $$ = eopl::VarExp{$1}; }
+            | PROC '(' IDENTIFIER ')' expression
+              { $$ = eopl::ProcExp{std::move($3), std::move($5)}; }
+            | '(' expression expression ')'
+              { $$ = eopl::CallExp{std::move($2), std::move($3)}; }
             ;
 
 exp_nlist : expression  { $$ = {std::move($1)}; }
