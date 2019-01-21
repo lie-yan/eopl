@@ -41,7 +41,6 @@ using Expression_ = std::variant<ConstExp,
                                  RwCallExp>;
 
 using Expression = std::shared_ptr<Expression_>;
-
 std::ostream& operator << (std::ostream& os, const Expression& exp);
 
 struct IfExp {
@@ -80,7 +79,7 @@ struct CondExp {
 };
 
 struct ProcExp {
-  std::vector<Symbol> vars;
+  std::vector<Symbol> params;
   Expression body;
 
   friend std::ostream& operator << (std::ostream& os, const ProcExp& procExp);
@@ -103,23 +102,22 @@ using Env = Environment<Symbol, Value>;
 using SpEnv = Env::SpEnv;
 
 struct Proc {
-  std::vector<Symbol> vars;
+  std::vector<Symbol> params;
   Expression body;
   SpEnv saved_env;
 
   friend bool operator == (const Proc& lhs, const Proc& rhs) {
-    return lhs.vars == rhs.vars &&
+    return lhs.params == rhs.params &&
            lhs.body == rhs.body &&
            lhs.saved_env == rhs.saved_env;
   }
   friend bool operator != (const Proc& lhs, const Proc& rhs) {
     return !(rhs == lhs);
   }
-
   friend bool operator < (const Proc& lhs, const Proc& rhs) {
-    if (lhs.vars < rhs.vars)
+    if (lhs.params < rhs.params)
       return true;
-    if (rhs.vars < lhs.vars)
+    if (rhs.params < lhs.params)
       return false;
     if (lhs.body < rhs.body)
       return true;
@@ -139,10 +137,7 @@ struct Proc {
   friend std::ostream& operator << (std::ostream& os, const Proc& proc);
 };
 
-Value proc_to_value (Proc p);
-const Proc& value_to_proc (const Value& value);
-
-enum class ExprType {
+enum class ExpType {
   CONST_EXP,
   VAR_EXP,
   IF_EXP,
@@ -153,12 +148,26 @@ enum class ExprType {
   CALL_EXP,
 };
 
+// constructors for Expression
 template<typename E>
-Expression to_expr (E exp) {
+Expression to_exp (E exp) {
   return std::make_shared<Expression_>(std::move(exp));
 }
 
-ExprType type_of (const Expression& expression);
+// observers for Expression
+ExpType type_of (const Expression& expression);
+
+const ConstExp& to_const_exp (const Expression& expression);
 const VarExp& to_var_exp (const Expression& expression);
+const IfExp& to_if_exp (const Expression& expression);
+const LetExp& to_let_exp (const Expression& expression);
+const CondExp& to_cond_exp (const Expression& expression);
+const UnpackExp& to_unpack_exp (const Expression& expression);
+const ProcExp& to_proc_exp (const Expression& expression);
+const CallExp& to_call_exp (const Expression& expression);
+
+// observer for Value -> Proc
+const Proc& to_proc (const Value& value);
+
 
 }

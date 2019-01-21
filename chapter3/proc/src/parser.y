@@ -33,11 +33,9 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
   throw parser::syntax_error(l, m);
 }
 
-using eopl::ConstExp, eopl::VarExp;
-using eopl::IfExp, eopl::LetExp, eopl::UnpackExp;
-using eopl::CondExp, eopl::ProcExp, eopl::CallExp;
-using eopl::Program;
-using eopl::to_expr;
+using eopl::ConstExp, eopl::VarExp, eopl::IfExp, eopl::LetExp, eopl::UnpackExp;
+using eopl::CondExp, eopl::ProcExp, eopl::CallExp, eopl::Program;
+using eopl::to_exp;
 
 }
 
@@ -71,20 +69,20 @@ using eopl::to_expr;
 program : expression { result = Program{std::move($1)}; }
         ;
 
-expression  : INT      { $$ = to_expr(ConstExp{$1}); }
-            | IDENTIFIER { $$ = to_expr(VarExp{$1}); }
+expression  : INT      { $$ = to_exp(ConstExp{$1}); }
+            | IDENTIFIER { $$ = to_exp(VarExp{$1}); }
             | IF expression THEN expression ELSE expression
-              { $$ = to_expr(IfExp{std::move($2), std::move($4), std::move($6)}); }
+              { $$ = to_exp(IfExp{std::move($2), std::move($4), std::move($6)}); }
             | COND cond_clause_list END
-              { $$ = to_expr(CondExp{std::move($2)}); }
+              { $$ = to_exp(CondExp{std::move($2)}); }
             | let_opt_star let_clause_list IN expression
-              { $$ = to_expr(LetExp{std::move($2), std::move($4), $1}); }
+              { $$ = to_exp(LetExp{std::move($2), std::move($4), $1}); }
             | UNPACK id_list '=' expression IN expression
-              { $$ = to_expr(UnpackExp{std::move($2), std::move($4), std::move($6)}); }
+              { $$ = to_exp(UnpackExp{std::move($2), std::move($4), std::move($6)}); }
             | PROC '(' param_list ')' expression
-              { $$ = to_expr(ProcExp{std::move($3), std::move($5)}); }
+              { $$ = to_exp(ProcExp{std::move($3), std::move($5)}); }
             | '(' expression exp_nlist ')'
-              { $$ = to_expr(CallExp{std::move($2), std::move($3)}); }
+              { $$ = to_exp(CallExp{std::move($2), std::move($3)}); }
             ;
 
 exp_nlist : expression  { $$ = {std::move($1)}; }

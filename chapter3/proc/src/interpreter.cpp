@@ -118,7 +118,7 @@ Value value_of (const UnpackExp& exp, SpEnv env) {
 }
 
 Value value_of (const ProcExp& exp, SpEnv env) {
-  return proc_to_value(Proc{exp.vars, exp.body, std::move(env)});
+  return to_value(Proc{exp.params, exp.body, std::move(env)});
 }
 
 std::vector<Value> value_of (const std::vector<Expression>& exps, SpEnv env) {
@@ -138,9 +138,9 @@ Value value_of (const CallExp& exp, SpEnv env) {
     if (auto rator = value_of(exp.rator, env);
         type_of(rator) == ValueType::PROC) {
 
-      auto& proc = value_to_proc(rator);
+      auto& proc = to_proc(rator);
       auto args = value_of(exp.rands, env);
-      auto new_env = Env::extend(proc.saved_env, proc.vars, std::move(args));
+      auto new_env = Env::extend(proc.saved_env, proc.params, std::move(args));
       return value_of(proc.body, new_env);
     } else {
       std::string msg = "the rator should be a Proc object";
@@ -148,7 +148,7 @@ Value value_of (const CallExp& exp, SpEnv env) {
     }
   };
 
-  if (type_of(exp.rator) == ExprType::VAR_EXP) {
+  if (type_of(exp.rator) == ExpType::VAR_EXP) {
     auto& op_name = to_var_exp(exp.rator).var;
     auto f_opt = built_in::find_built_in(op_name);
     if (f_opt) {

@@ -258,14 +258,8 @@ struct Pair {
 struct Array : std::vector<Value> { using std::vector<Value>::vector; };
 
 /// constructors for `Value` below
-Value to_value (Nil n = {});
-Value to_value (Bool b);
-Value to_value (Int i);
-Value to_value (Double d);
-Value to_value (String s);
-Value to_value (Symbol s);
-Value to_value (Pair p);
-Value to_value (Array a);
+template<typename T>
+Value to_value (T&& v) { return std::make_shared<Value_>(std::forward<T>(v)); }
 
 /// observers for `Value` below
 ValueType type_of (const Value& value);

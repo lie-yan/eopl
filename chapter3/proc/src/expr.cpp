@@ -86,7 +86,8 @@ std::ostream& operator << (std::ostream& os, const UnpackExp& unpackExp) {
 }
 
 std::ostream& operator << (std::ostream& os, const ProcExp& procExp) {
-  os << "ProcExp(vars: " << procExp.vars << ", body: " << procExp.body << ")";
+  os << "ProcExp(params: " << procExp.params
+     << ", body: " << procExp.body << ")";
   return os;
 }
 
@@ -98,35 +99,63 @@ std::ostream& operator << (std::ostream& os, const CallExp& callExp) {
 }
 
 std::ostream& operator << (std::ostream& os, const Proc& proc) {
-  os << "Proc(vars: " << proc.vars
+  os << "Proc(params: " << proc.params
      << ", body: " << proc.body
      << ", saved_env: " << proc.saved_env << ")";
   return os;
 }
 
-ExprType type_of (const Expression& expression) {
+ExpType type_of (const Expression& expression) {
   struct TypeVisitor {
-    ExprType operator () (const ConstExp&) { return ExprType::CONST_EXP; }
-    ExprType operator () (const VarExp&) { return ExprType::VAR_EXP; }
-    ExprType operator () (const IfExp&) { return ExprType::IF_EXP; }
-    ExprType operator () (const CondExp&) { return ExprType::COND_EXP; }
-    ExprType operator () (const LetExp&) { return ExprType::LET_EXP; }
-    ExprType operator () (const UnpackExp&) { return ExprType::UNPACK_EXP; }
-    ExprType operator () (const ProcExp&) { return ExprType::PROC_EXP; }
-    ExprType operator () (const CallExp&) { return ExprType::CALL_EXP; }
-    ExprType operator () (const RwIfExp&) { return ExprType::IF_EXP; }
-    ExprType operator () (const RwCondExp&) { return ExprType::COND_EXP; }
-    ExprType operator () (const RwLetExp&) { return ExprType::LET_EXP; }
-    ExprType operator () (const RwUnpackExp&) { return ExprType::UNPACK_EXP; }
-    ExprType operator () (const RwProcExp&) { return ExprType::PROC_EXP; }
-    ExprType operator () (const RwCallExp&) { return ExprType::CALL_EXP; }
+    ExpType operator () (const ConstExp&) { return ExpType::CONST_EXP; }
+    ExpType operator () (const VarExp&) { return ExpType::VAR_EXP; }
+    ExpType operator () (const IfExp&) { return ExpType::IF_EXP; }
+    ExpType operator () (const CondExp&) { return ExpType::COND_EXP; }
+    ExpType operator () (const LetExp&) { return ExpType::LET_EXP; }
+    ExpType operator () (const UnpackExp&) { return ExpType::UNPACK_EXP; }
+    ExpType operator () (const ProcExp&) { return ExpType::PROC_EXP; }
+    ExpType operator () (const CallExp&) { return ExpType::CALL_EXP; }
+    ExpType operator () (const RwIfExp&) { return ExpType::IF_EXP; }
+    ExpType operator () (const RwCondExp&) { return ExpType::COND_EXP; }
+    ExpType operator () (const RwLetExp&) { return ExpType::LET_EXP; }
+    ExpType operator () (const RwUnpackExp&) { return ExpType::UNPACK_EXP; }
+    ExpType operator () (const RwProcExp&) { return ExpType::PROC_EXP; }
+    ExpType operator () (const RwCallExp&) { return ExpType::CALL_EXP; }
   };
 
   return std::visit(TypeVisitor{}, *expression);
 }
 
+const ConstExp& to_const_exp (const Expression& expression) {
+  return std::get<ConstExp>(*expression);
+}
+
 const VarExp& to_var_exp (const Expression& expression) {
   return std::get<VarExp>(*expression);
+}
+
+const IfExp& to_if_exp (const Expression& expression) {
+  return std::get<RwIfExp>(*expression).get();
+}
+
+const LetExp& to_let_exp (const Expression& expression) {
+  return std::get<RwLetExp>(*expression).get();
+}
+
+const CondExp& to_cond_exp (const Expression& expression) {
+  return std::get<RwCondExp>(*expression).get();
+}
+
+const UnpackExp& to_unpack_exp (const Expression& expression) {
+  return std::get<RwUnpackExp>(*expression).get();
+}
+
+const ProcExp& to_proc_exp (const Expression& expression) {
+  return std::get<RwProcExp>(*expression).get();
+}
+
+const CallExp& to_call_exp (const Expression& expression) {
+  return std::get<RwCallExp>(*expression).get();
 }
 
 

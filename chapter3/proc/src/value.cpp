@@ -38,7 +38,6 @@ ValueType type_of (const Value& value) {
   return std::visit(TypeVisitor{}, *value);
 }
 
-
 template<typename T>
 std::ostream& operator << (std::ostream& os, const std::vector<T>& ts) {
   interleave(std::begin(ts),
@@ -95,7 +94,7 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
       os << ']';
     }
     void operator () (const Proc& proc) {
-      os << "<proc " << proc.vars << ">";
+      os << "<proc " << proc.params << ">";
     }
   };
 
@@ -131,46 +130,8 @@ const Array& to_array (const Value& value) {
   return std::get<RwArray>(*value).get();
 }
 
-const Proc& value_to_proc (const Value& value) {
+const Proc& to_proc (const Value& value) {
   return std::get<RwProc>(*value).get();
 }
-
-Value to_value (Nil n) {
-  return std::make_shared<Value_>(n);
-}
-
-Value to_value (Bool b) {
-  return std::make_shared<Value_>(b);
-}
-
-Value to_value (Int i) {
-  return std::make_shared<Value_>(i);
-}
-
-Value to_value (Double d) {
-  return std::make_shared<Value_>(d);
-}
-
-Value to_value (String s) {
-  return std::make_shared<Value_>(std::move(s));
-}
-
-Value to_value (Symbol s) {
-  return std::make_shared<Value_>(std::move(s));
-}
-
-Value to_value (Pair p) {
-  return std::make_shared<Value_>(std::move(p));
-}
-
-Value to_value (Array a) {
-  return std::make_shared<Value_>(std::move(a));
-}
-
-Value proc_to_value (Proc p) {
-  return std::make_shared<Value_>(std::move(p));
-}
-
-
 
 }
