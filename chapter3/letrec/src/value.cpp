@@ -4,6 +4,7 @@
 
 #include "value.h"
 #include "expr.h"
+#include "env.h"
 #include <stack>
 #include <iomanip>
 
@@ -131,6 +132,10 @@ const Array& to_array (const Value& value) {
 }
 
 const Proc& to_proc (const Value& value) {
+  return std::get<RwProc>(*value).get();
+}
+
+Proc& to_proc (Value& value) {
   return std::get<RwProc>(*value).get();
 }
 

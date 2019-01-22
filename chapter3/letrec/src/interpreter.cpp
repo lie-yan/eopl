@@ -24,18 +24,11 @@ Value value_of (const Expression& exp, SpEnv env) {
     Value operator () (const VarExp& exp) { return value_of(exp, env); }
     Value operator () (const RwIfExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwLetExp& exp) { return value_of(exp.get(), env); }
-//    Value operator () (const RwOpExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwCondExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwUnpackExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwProcExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwCallExp& exp) { return value_of(exp.get(), env); }
-    Value operator () (const IfExp& exp) { return value_of(exp, env); }
-    Value operator () (const LetExp& exp) { return value_of(exp, env); }
-//    Value operator () (const OpExp& exp) { return value_of(exp, env); }
-    Value operator () (const CondExp& exp) { return value_of(exp, env); }
-    Value operator () (const UnpackExp& exp) { return value_of(exp, env); }
-    Value operator () (const ProcExp& exp) { return value_of(exp, env); }
-    Value operator () (const CallExp& exp) { return value_of(exp, env); }
+    Value operator () (const RwLetrecExp& exp) { return value_of(exp.get(), env); }
   };
   return std::visit(EvalVisitor{env}, *exp);
 }
@@ -161,6 +154,20 @@ Value value_of (const CallExp& exp, SpEnv env) {
   } else {
     return eval_proc(exp, env);
   }
+}
+
+Value value_of (const LetrecExp& exp, SpEnv env) {
+  std::vector<Value> saved;
+  SpEnv new_env = std::accumulate(std::begin(exp.procs),
+                                  std::end(exp.procs),
+                                  env,
+                                  [&saved] (SpEnv acc, const LetrecProc& proc) {
+                                    auto p = to_value(Proc{proc.params, proc.body, acc});
+                                    saved.push_back(p);
+                                    return Env::extend(acc, proc.name, p);
+                                  });
+  for (auto& v : saved) to_proc(v).saved_env = new_env;
+  return value_of(exp.body, new_env);
 }
 
 SpEnv make_initial_env () {

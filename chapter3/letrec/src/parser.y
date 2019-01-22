@@ -34,7 +34,8 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
 }
 
 using eopl::ConstExp, eopl::VarExp, eopl::IfExp, eopl::LetExp, eopl::UnpackExp;
-using eopl::CondExp, eopl::ProcExp, eopl::CallExp, eopl::Program;
+using eopl::CondExp, eopl::ProcExp, eopl::CallExp, eopl::LetrecExp, eopl::Program;
+using eopl::LetrecProc;
 using eopl::to_exp;
 
 }
@@ -46,6 +47,7 @@ using eopl::to_exp;
 %token                ELSE          "else"
 %token                LET           "let"
 %token                LET_STAR      "let*"
+%token                LETREC        "letrec"
 %token                UNPACK        "unpack"
 %token                IN            "in"
 %token                COND          "cond"
@@ -63,7 +65,8 @@ using eopl::to_exp;
 %type <bool> let_opt_star
 %type <std::vector<eopl::Symbol>> id_list
 %type <std::vector<eopl::Symbol>> param_list
-
+%type <eopl::LetrecProc> proc_def
+%type <std::vector<eopl::LetrecProc>> proc_def_nlist
 %%
 
 program : expression { result = Program{std::move($1)}; }
@@ -83,6 +86,8 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
               { $$ = to_exp(ProcExp{std::move($3), std::move($5)}); }
             | '(' expression exp_nlist ')'
               { $$ = to_exp(CallExp{std::move($2), std::move($3)}); }
+            | LETREC proc_def_nlist IN expression
+              { $$ = to_exp(LetrecExp{std::move($2), std::move($4)}); }
             ;
 
 exp_nlist : expression  { $$ = {std::move($1)}; }
@@ -108,6 +113,14 @@ let_clause : IDENTIFIER '=' expression
 let_opt_star : LET { $$ = false; }
              | LET_STAR { $$ = true; }
              ;
+
+proc_def_nlist : proc_def { $$ = std::vector<eopl::LetrecProc>{std::move($1)}; }
+               | proc_def_nlist proc_def { $1.push_back(std::move($2)); $$ = std::move($1); }
+               ;
+
+proc_def : IDENTIFIER '(' param_list ')' '=' expression
+           { $$ = LetrecProc{std::move($1), std::move($3), std::move($6)}; }
+         ;
 
 id_list : %empty { $$ = std::vector<eopl::Symbol>(); }
         | id_list IDENTIFIER { $1.push_back(std::move($2)); $$ = std::move($1); }

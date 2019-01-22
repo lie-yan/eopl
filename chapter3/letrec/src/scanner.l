@@ -88,6 +88,13 @@ integer [-+]?[[:digit:]]+
                   return yy::parser::token::LET_STAR;
                 }
 
+"letrec"        {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::LETREC;
+                }
+
 "unpack"        {
                 #ifdef DEBUG
                   std::cout << "keyword: " << yytext << std::endl;

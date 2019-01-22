@@ -9,13 +9,29 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <numeric>
+#include "expr.h"
 
 namespace eopl {
 
-template<typename Symbol, typename Value>
+template<typename Symbol, typename Value, typename Expression>
 //   requires Regular<Symbol>, Semiregular<Value>
 class Environment {
 public:
+
+  struct ForOrd {
+    Symbol symbol;
+    Value value;
+  };
+
+  struct ForRec {
+    Symbol proc_name;
+    std::vector<Symbol> bound_vars;
+    Expression body;
+  };
+
+
+  using SVPair = std::pair<Symbol, Value>;
+
   using SpEnv = std::shared_ptr<Environment>;
 
   struct SymbolNotFoundError : std::runtime_error {
@@ -28,14 +44,17 @@ public:
   Environment (Environment&&) = delete;
   Environment& operator = (Environment&&) = delete;
 
-  Environment (SpEnv parent, std::pair<Symbol, Value> pair)
-      : parent_(std::move(parent)), pair_(std::move(pair)) { }
+  Environment (SpEnv parent, ForOrd pair)
+      : parent_(std::move(parent)), bound_record_(std::move(pair)) { }
+
+  Environment (SpEnv parent, ForRec triple)
+      : parent_(std::move(parent)), bound_record_(std::move(triple)) { }
 
   static SpEnv make_empty () { return SpEnv(); }
 
   static SpEnv extend (Environment::SpEnv parent, Symbol sym, Value value) {
     return std::make_shared<Environment>(std::move(parent),
-                                         std::pair(std::move(sym), std::move(value)));
+                                         ForOrd{std::move(sym), std::move(value)});
   }
 
   static SpEnv extend (Environment::SpEnv parent,
@@ -48,25 +67,87 @@ public:
                               parent,
                               [] (auto&& acc, auto&& pair) {
                                 return extend(std::forward<decltype(acc)>(acc),
-                                              std::move(pair.first),
-                                              std::move(pair.second));
+                                              std::move(pair.symbol),
+                                              std::move(pair.value));
                               },
                               [] (auto&& sym, auto&& val) {
-                                return std::pair(std::forward<decltype(sym)>(sym),
-                                                 std::forward<decltype(val)>(val));
+                                return ForOrd{std::forward<decltype(sym)>(sym),
+                                              std::forward<decltype(val)>(val)};
                               });
   }
 
-  static const Value& apply (Environment::SpEnv env, const Symbol& sym) {
-    for (; env; env = env->parent_) {
-      if (env->pair_.first == sym) return env->pair_.second;
+  static SpEnv extend_rec (Environment::SpEnv parent, Symbol proc_name,
+                           std::vector<Symbol> bound_vars, Expression body) {
+    return std::make_shared<Environment>(std::move(parent),
+                                         ForRec{std::move(proc_name),
+                                                std::move(bound_vars),
+                                                std::move(body)});
+  }
+
+  static Value apply (Environment::SpEnv env, const Symbol& sym) {
+
+    for (auto p = env; p; p = p->parent_) {
+      auto& bound_record = p->bound_record_;
+      if (std::holds_alternative<ForOrd>(bound_record)) {
+        if (auto& ord = std::get<ForOrd>(bound_record); ord.symbol == sym) {
+          return ord.value;
+        }
+      } else if (std::holds_alternative<ForRec>(bound_record)) {
+        if (auto& rec = std::get<ForRec>(bound_record); rec.proc_name == sym) {
+          return to_value(Proc{rec.bound_vars, rec.body, env});
+        }
+      }
     }
     throw SymbolNotFoundError(fmt::format("Symbol {} not found.", sym));
   }
 
 private:
   SpEnv parent_;
-  std::pair<Symbol, Value> pair_;
+
+  std::variant<ForOrd, ForRec> bound_record_;
 };
+
+using Env = Environment<Symbol, Value, Expression>;
+using SpEnv = Env::SpEnv;
+
+struct Proc {
+  const std::vector<Symbol>& params;
+  Expression body;
+  SpEnv saved_env;
+
+  friend bool operator == (const Proc& lhs, const Proc& rhs) {
+    return lhs.params == rhs.params &&
+           lhs.body == rhs.body &&
+           lhs.saved_env == rhs.saved_env;
+  }
+  friend bool operator != (const Proc& lhs, const Proc& rhs) {
+    return !(rhs == lhs);
+  }
+  friend bool operator < (const Proc& lhs, const Proc& rhs) {
+    if (lhs.params < rhs.params)
+      return true;
+    if (rhs.params < lhs.params)
+      return false;
+    if (lhs.body < rhs.body)
+      return true;
+    if (rhs.body < lhs.body)
+      return false;
+    return lhs.saved_env < rhs.saved_env;
+  }
+  friend bool operator > (const Proc& lhs, const Proc& rhs) {
+    return rhs < lhs;
+  }
+  friend bool operator <= (const Proc& lhs, const Proc& rhs) {
+    return !(rhs < lhs);
+  }
+  friend bool operator >= (const Proc& lhs, const Proc& rhs) {
+    return !(lhs < rhs);
+  }
+  friend std::ostream& operator << (std::ostream& os, const Proc& proc);
+};
+
+// observer for Value -> Proc
+const Proc& to_proc (const Value& value);
+Proc& to_proc (Value& value);
 
 }

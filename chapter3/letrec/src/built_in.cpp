@@ -5,6 +5,7 @@
 #include "built_in.h"
 #include "value.h"
 #include "expr.h"
+#include "env.h"
 #include <numeric>
 
 namespace eopl::built_in {

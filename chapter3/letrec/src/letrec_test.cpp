@@ -156,7 +156,7 @@ TEST(let_lang, unpack) {
   );
 }
 
-TEST(proc_lang, baisc) {
+TEST(proc_lang, basic) {
   using namespace eopl;
 
   EXPECT_EQ(eval("let f = proc (x) (- x 11) in (f (f 77))"),
@@ -174,6 +174,26 @@ TEST(proc_lang, multi_param) {
             to_value(Int{25}));
 }
 
+TEST(letrec_lang, basic) {
+  using namespace eopl;
+
+  EXPECT_EQ(
+      eval("letrec double(x) = if (zero? x) then 0 else (- (double (- x 1)) -2) "
+           "in (double 6)"),
+      to_value(Int{12}));
+}
+
+TEST(letrec_lang, mutual_recursive) {
+  using namespace eopl;
+
+  EXPECT_EQ(
+      eval("letrec "
+           "even(x) = if (zero? x) then 1 else (odd (- x 1)) "
+           "odd(x) = if (zero? x) then 0 else (even (- x 1)) "
+           "in let even = proc(x) (* x x) "
+           "in (odd 13)"),
+      to_value(Int{1}));
+}
 
 int main (int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
