@@ -1,5 +1,3 @@
-#include <utility>
-
 //
 // Created by robin on 2019-01-10.
 //
@@ -7,6 +5,8 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <numeric>
+#include <utility>
+
 #include "interpreter.h"
 #include "built_in.h"
 #include "lex.yy.h"
@@ -160,7 +160,7 @@ Value value_of (const LetrecExp& exp, SpEnv env) {
   std::vector<Value> saved;
   SpEnv new_env = std::accumulate(std::begin(exp.procs),
                                   std::end(exp.procs),
-                                  env,
+                                  std::move(env),
                                   [&saved] (SpEnv acc, const LetrecProc& proc) {
                                     auto p = to_value(Proc{proc.params, proc.body, acc});
                                     saved.push_back(p);

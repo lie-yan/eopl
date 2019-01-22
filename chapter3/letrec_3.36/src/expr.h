@@ -114,45 +114,6 @@ struct Program {
   friend std::ostream& operator << (std::ostream& os, const Program& program);
 };
 
-//using Env = Environment<Symbol, Value>;
-//using SpEnv = Env::SpEnv;
-//
-//struct Proc {
-//  const std::vector<Symbol>& params;
-//  Expression body;
-//  SpEnv saved_env;
-//
-//  friend bool operator == (const Proc& lhs, const Proc& rhs) {
-//    return lhs.params == rhs.params &&
-//           lhs.body == rhs.body &&
-//           lhs.saved_env == rhs.saved_env;
-//  }
-//  friend bool operator != (const Proc& lhs, const Proc& rhs) {
-//    return !(rhs == lhs);
-//  }
-//  friend bool operator < (const Proc& lhs, const Proc& rhs) {
-//    if (lhs.params < rhs.params)
-//      return true;
-//    if (rhs.params < lhs.params)
-//      return false;
-//    if (lhs.body < rhs.body)
-//      return true;
-//    if (rhs.body < lhs.body)
-//      return false;
-//    return lhs.saved_env < rhs.saved_env;
-//  }
-//  friend bool operator > (const Proc& lhs, const Proc& rhs) {
-//    return rhs < lhs;
-//  }
-//  friend bool operator <= (const Proc& lhs, const Proc& rhs) {
-//    return !(rhs < lhs);
-//  }
-//  friend bool operator >= (const Proc& lhs, const Proc& rhs) {
-//    return !(lhs < rhs);
-//  }
-//  friend std::ostream& operator << (std::ostream& os, const Proc& proc);
-//};
-
 enum class ExpType {
   CONST_EXP,
   VAR_EXP,
