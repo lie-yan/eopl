@@ -12,7 +12,6 @@
 #include <numeric>
 #include <utility>
 
-
 namespace eopl {
 
 Value value_of (const Program& program, SpEnv env) {

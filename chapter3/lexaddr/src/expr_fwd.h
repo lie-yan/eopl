@@ -61,4 +61,6 @@ Expression to_exp (T&& exp) {
   return std::make_shared<Expression_>(std::forward<T>(exp));
 }
 
+struct Program;
+
 }
