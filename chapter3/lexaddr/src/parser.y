@@ -33,9 +33,17 @@ void yy::parser::error(const parser::location_type& l, const std::string& m) {
   throw parser::syntax_error(l, m);
 }
 
-using eopl::ConstExp, eopl::VarExp, eopl::IfExp, eopl::LetExp, eopl::UnpackExp;
-using eopl::CondExp, eopl::ProcExp, eopl::CallExp, eopl::LetrecExp, eopl::Program;
+using eopl::ConstExp;
+using eopl::VarExp;
+using eopl::IfExp;
+using eopl::LetExp;
+using eopl::UnpackExp;
+using eopl::CondExp;
+using eopl::ProcExp;
+using eopl::CallExp;
+using eopl::LetrecExp;
 using eopl::LetrecProc;
+using eopl::Program;
 using eopl::to_exp;
 
 }

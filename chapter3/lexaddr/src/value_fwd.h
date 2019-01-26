@@ -21,24 +21,6 @@ enum class ValueType {
   PROC,
 };
 
-using RwString = boost::recursive_wrapper<struct String>;
-using RwSymbol = boost::recursive_wrapper<struct Symbol>;
-using RwArray = boost::recursive_wrapper<struct Array>;
-using RwPair = boost::recursive_wrapper<struct Pair>;
-using RwProc = boost::recursive_wrapper<struct Proc>;
-
-template<typename T>
-bool operator == (const boost::recursive_wrapper<T>& lhs,
-                  const boost::recursive_wrapper<T>& rhs) {
-  return lhs.get() == rhs.get();
-}
-
-template<typename T>
-bool operator != (const boost::recursive_wrapper<T>& lhs,
-                  const boost::recursive_wrapper<T>& rhs) {
-  return !(rhs == lhs);
-}
-
 struct Nil {
   friend bool operator == (const Nil& lhs, const Nil& rhs) {
     return true;
@@ -229,6 +211,24 @@ public:
 private:
   double val;
 };
+
+using RwString = boost::recursive_wrapper<struct String>;
+using RwSymbol = boost::recursive_wrapper<struct Symbol>;
+using RwArray = boost::recursive_wrapper<struct Array>;
+using RwPair = boost::recursive_wrapper<struct Pair>;
+using RwProc = boost::recursive_wrapper<struct Proc>;
+
+template<typename T>
+bool operator == (const boost::recursive_wrapper<T>& lhs,
+                  const boost::recursive_wrapper<T>& rhs) {
+  return lhs.get() == rhs.get();
+}
+
+template<typename T>
+bool operator != (const boost::recursive_wrapper<T>& lhs,
+                  const boost::recursive_wrapper<T>& rhs) {
+  return !(rhs == lhs);
+}
 
 using Value_ = std::variant<Nil,
                             Bool,
