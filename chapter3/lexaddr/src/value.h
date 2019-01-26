@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <string>
 #include <variant>
-#include <vector>
 #include <boost/variant.hpp>
+#include <string>
+#include <vector>
 #include <ostream>
-#include "basic.h"
 
 namespace eopl {
 

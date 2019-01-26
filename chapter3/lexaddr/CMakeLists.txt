@@ -37,12 +37,12 @@ set(SOURCES
 
 #add_definitions(-DDEBUG)
 
-add_executable(chapter3-letrec
+add_executable(chapter3-lexaddr
         ${SOURCES}
         ${SOURCE_DIR}/main.cpp)
-target_link_libraries(chapter3-letrec fmt reflex)
+target_link_libraries(chapter3-lexaddr fmt reflex)
 
-add_executable(chapter3-letrec-test
+add_executable(chapter3-lexaddr-test
         ${SOURCES}
-        ${SOURCE_DIR}/letrec_test.cpp)
-target_link_libraries(chapter3-letrec-test fmt reflex gtest gtest_main)
+        ${SOURCE_DIR}/lexaddr_test.cpp)
+target_link_libraries(chapter3-lexaddr-test fmt reflex gtest gtest_main)
