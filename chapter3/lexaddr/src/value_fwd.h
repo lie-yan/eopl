@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <boost/variant.hpp>
+
 namespace eopl {
 
 enum class ValueType {
@@ -22,15 +24,17 @@ using RwString = boost::recursive_wrapper<struct String>;
 using RwSymbol = boost::recursive_wrapper<struct Symbol>;
 using RwArray = boost::recursive_wrapper<struct Array>;
 using RwPair = boost::recursive_wrapper<struct Pair>;
-using RwProc = boost::recursive_wrapper<struct Proc>; // `struct Proc` defined in `expr.h`
+using RwProc = boost::recursive_wrapper<struct Proc>;
 
 template<typename T>
-bool operator == (const boost::recursive_wrapper<T>& lhs, const boost::recursive_wrapper<T>& rhs) {
+bool operator == (const boost::recursive_wrapper<T>& lhs,
+                  const boost::recursive_wrapper<T>& rhs) {
   return lhs.get() == rhs.get();
 }
 
 template<typename T>
-bool operator != (const boost::recursive_wrapper<T>& lhs, const boost::recursive_wrapper<T>& rhs) {
+bool operator != (const boost::recursive_wrapper<T>& lhs,
+                  const boost::recursive_wrapper<T>& rhs) {
   return !(rhs == lhs);
 }
 
@@ -46,7 +50,7 @@ struct Nil {
 class String {
 public:
   String () = default;
-  String (std::string val) : val(std::move(val)) { }
+  explicit String (std::string val) : val(std::move(val)) { }
   String (const String&) = default;
   String (String&&) = default;
   String& operator = (const String&) = default;
@@ -84,7 +88,7 @@ private:
 class Symbol {
 public:
   Symbol () = default;
-  Symbol (std::string val) : val(std::move(val)) { }
+  explicit Symbol (std::string val) : val(std::move(val)) { }
   Symbol (const Symbol&) = default;
   Symbol (Symbol&&) = default;
   Symbol& operator = (const Symbol&) = default;

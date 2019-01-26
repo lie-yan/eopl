@@ -4,45 +4,11 @@
 
 #pragma once
 
-#include <variant>
-#include <boost/variant.hpp>
-#include <ostream>
-#include "value.h"
 #include "expr_fwd.h"
-namespace eopl {
 
-//struct ConstExp {
-//  Int num;
-//
-//  friend std::ostream& operator << (std::ostream& os, const ConstExp& constExp);
-//};
-//
-//struct VarExp {
-//  Symbol var;
-//
-//  friend std::ostream& operator << (std::ostream& os, const VarExp& varExp);
-//};
-//
-//using RwIfExp = boost::recursive_wrapper<struct IfExp>;
-//using RwLetExp = boost::recursive_wrapper<struct LetExp>;
-//using RwCondExp = boost::recursive_wrapper<struct CondExp>;
-//using RwUnpackExp = boost::recursive_wrapper<struct UnpackExp>;
-//using RwProcExp = boost::recursive_wrapper<struct ProcExp>;
-//using RwCallExp = boost::recursive_wrapper<struct CallExp>;
-//using RwLetrecExp = boost::recursive_wrapper<struct LetrecExp>;
-//
-//using Expression_ = std::variant<ConstExp,
-//                                 VarExp,
-//                                 RwIfExp,
-//                                 RwLetExp,
-//                                 RwCondExp,
-//                                 RwUnpackExp,
-//                                 RwProcExp,
-//                                 RwCallExp,
-//                                 RwLetrecExp>;
-//
-//using Expression = std::shared_ptr<Expression_>;
-//std::ostream& operator << (std::ostream& os, const Expression& exp);
+#include <ostream>
+
+namespace eopl {
 
 struct IfExp {
   Expression cond;  // cond
@@ -114,24 +80,6 @@ struct Program {
   friend std::ostream& operator << (std::ostream& os, const Program& program);
 };
 
-enum class ExpType {
-  CONST_EXP,
-  VAR_EXP,
-  IF_EXP,
-  LET_EXP,
-  COND_EXP,
-  UNPACK_EXP,
-  PROC_EXP,
-  CALL_EXP,
-  LETREC_EXP,
-};
-
-// constructors for Expression
-template<typename T>
-Expression to_exp (T&& exp) {
-  return std::make_shared<Expression_>(std::forward<T>(exp));
-}
-
 // observers for Expression
 ExpType type_of (const Expression& expression);
 const ConstExp& to_const_exp (const Expression& expression);
@@ -143,6 +91,5 @@ const UnpackExp& to_unpack_exp (const Expression& expression);
 const ProcExp& to_proc_exp (const Expression& expression);
 const CallExp& to_call_exp (const Expression& expression);
 const LetrecExp& to_letrec_exp (const Expression& expression);
-
 
 }

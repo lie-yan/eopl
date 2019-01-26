@@ -6,7 +6,21 @@
 
 #include "value_fwd.h"
 
+#include <iostream>
+
 namespace eopl {
+
+enum class ExpType {
+  CONST_EXP,
+  VAR_EXP,
+  IF_EXP,
+  LET_EXP,
+  COND_EXP,
+  UNPACK_EXP,
+  PROC_EXP,
+  CALL_EXP,
+  LETREC_EXP,
+};
 
 struct ConstExp {
   Int num;
@@ -40,5 +54,11 @@ using Expression_ = std::variant<ConstExp,
 
 using Expression = std::shared_ptr<Expression_>;
 std::ostream& operator << (std::ostream& os, const Expression& exp);
+
+// constructors for Expression
+template<typename T>
+Expression to_exp (T&& exp) {
+  return std::make_shared<Expression_>(std::forward<T>(exp));
+}
 
 }

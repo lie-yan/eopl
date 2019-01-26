@@ -5,7 +5,7 @@
 #pragma once
 
 #include <optional>
-#include "value.h"
+#include "value_fwd.h"
 
 namespace eopl::built_in {
 
@@ -15,7 +15,7 @@ using BuiltInFun = std::function<Value (const std::vector<Value>&)>;
  * @brief Given a fixed symbol, return the function corresponding to
  *        the symbol if any; otherwise return None.
  *
- * @param name the name to searched for
+ * @param name the name to search for
  * @return the function if any, or None
  */
 std::optional<BuiltInFun> find_built_in (const Symbol& name);

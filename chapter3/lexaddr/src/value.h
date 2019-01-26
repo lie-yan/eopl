@@ -300,9 +300,6 @@ struct Proc {
   friend std::ostream& operator << (std::ostream& os, const Proc& proc);
 };
 
-// observer for Value -> Proc
-const Proc& to_proc (const Value& value);
-Proc& to_proc (Value& value);
 
 ///// constructors for `Value` below
 //template<typename T>
@@ -317,5 +314,7 @@ const String& to_string (const Value& value);
 const Symbol& to_symbol (const Value& value);
 const Pair& to_pair (const Value& value);
 const Array& to_array (const Value& value);
+const Proc& to_proc (const Value& value);
+Proc& to_proc (Value& value);
 
 }
