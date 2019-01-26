@@ -9,7 +9,7 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <numeric>
-#include "expr.h"
+#include "value_fwd.h"
 
 namespace eopl {
 
@@ -107,47 +107,47 @@ private:
   std::variant<ForOrd, ForRec> bound_record_;
 };
 
-using Env = Environment<Symbol, Value, Expression>;
-using SpEnv = Env::SpEnv;
-
-struct Proc {
-  const std::vector<Symbol>& params;
-  Expression body;
-  SpEnv saved_env;
-
-  friend bool operator == (const Proc& lhs, const Proc& rhs) {
-    return lhs.params == rhs.params &&
-           lhs.body == rhs.body &&
-           lhs.saved_env == rhs.saved_env;
-  }
-  friend bool operator != (const Proc& lhs, const Proc& rhs) {
-    return !(rhs == lhs);
-  }
-  friend bool operator < (const Proc& lhs, const Proc& rhs) {
-    if (lhs.params < rhs.params)
-      return true;
-    if (rhs.params < lhs.params)
-      return false;
-    if (lhs.body < rhs.body)
-      return true;
-    if (rhs.body < lhs.body)
-      return false;
-    return lhs.saved_env < rhs.saved_env;
-  }
-  friend bool operator > (const Proc& lhs, const Proc& rhs) {
-    return rhs < lhs;
-  }
-  friend bool operator <= (const Proc& lhs, const Proc& rhs) {
-    return !(rhs < lhs);
-  }
-  friend bool operator >= (const Proc& lhs, const Proc& rhs) {
-    return !(lhs < rhs);
-  }
-  friend std::ostream& operator << (std::ostream& os, const Proc& proc);
-};
-
-// observer for Value -> Proc
-const Proc& to_proc (const Value& value);
-Proc& to_proc (Value& value);
+//using Env = Environment<Symbol, Value, Expression>;
+//using SpEnv = Env::SpEnv;
+//
+//struct Proc {
+//  const std::vector<Symbol>& params;
+//  Expression body;
+//  SpEnv saved_env;
+//
+//  friend bool operator == (const Proc& lhs, const Proc& rhs) {
+//    return lhs.params == rhs.params &&
+//           lhs.body == rhs.body &&
+//           lhs.saved_env == rhs.saved_env;
+//  }
+//  friend bool operator != (const Proc& lhs, const Proc& rhs) {
+//    return !(rhs == lhs);
+//  }
+//  friend bool operator < (const Proc& lhs, const Proc& rhs) {
+//    if (lhs.params < rhs.params)
+//      return true;
+//    if (rhs.params < lhs.params)
+//      return false;
+//    if (lhs.body < rhs.body)
+//      return true;
+//    if (rhs.body < lhs.body)
+//      return false;
+//    return lhs.saved_env < rhs.saved_env;
+//  }
+//  friend bool operator > (const Proc& lhs, const Proc& rhs) {
+//    return rhs < lhs;
+//  }
+//  friend bool operator <= (const Proc& lhs, const Proc& rhs) {
+//    return !(rhs < lhs);
+//  }
+//  friend bool operator >= (const Proc& lhs, const Proc& rhs) {
+//    return !(lhs < rhs);
+//  }
+//  friend std::ostream& operator << (std::ostream& os, const Proc& proc);
+//};
+//
+//// observer for Value -> Proc
+//const Proc& to_proc (const Value& value);
+//Proc& to_proc (Value& value);
 
 }
