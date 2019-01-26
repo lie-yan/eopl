@@ -6,7 +6,12 @@
 
 namespace eopl {
 
-// visitor for std::variant
+/**
+ * @brief Convenient visitor for <code>std::variant</code>.
+ *  See also <a href="https://en.cppreference.com/w/cpp/utility/variant/visit">
+ *  https://en.cppreference.com/w/cpp/utility/variant/visit</a>
+ * @tparam Ts
+ */
 template<class... Ts>
 struct overloaded : Ts ... { using Ts::operator ()...; };
 template<class... Ts> overloaded (Ts...) -> overloaded<Ts...>;
