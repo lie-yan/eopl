@@ -9,7 +9,7 @@ namespace eopl {
 /**
  * @brief Convenient visitor for <code>std::variant</code>.
  *  See also <a href="https://en.cppreference.com/w/cpp/utility/variant/visit">
- *  https://en.cppreference.com/w/cpp/utility/variant/visit</a>
+ *  https://en.cppreference.com/w/cpp/utility/variant/visit</a>.
  * @tparam Ts
  */
 template<class... Ts>

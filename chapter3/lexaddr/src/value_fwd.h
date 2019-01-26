@@ -5,6 +5,7 @@
 #pragma once
 
 #include <boost/variant.hpp>
+#include <ostream>
 
 namespace eopl {
 
@@ -44,6 +45,10 @@ struct Nil {
   }
   friend bool operator != (const Nil& lhs, const Nil& rhs) {
     return !(rhs == lhs);
+  }
+  friend std::ostream& operator << (std::ostream& os, const Nil& nil) {
+    os << "()";
+    return os;
   }
 };
 
@@ -186,6 +191,7 @@ public:
     os << anInt.val;
     return os;
   }
+
 private:
   int val;
 };
@@ -219,6 +225,7 @@ public:
     os << aDouble.val;
     return os;
   }
+
 private:
   double val;
 };
