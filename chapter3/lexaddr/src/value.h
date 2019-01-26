@@ -25,7 +25,9 @@ struct Pair {
   }
 };
 
-struct Array : std::vector<Value> { using std::vector<Value>::vector; };
+struct Array : std::vector<Value> {
+  using std::vector<Value>::vector;
+};
 
 struct Proc {
   const std::vector<Symbol>& params;

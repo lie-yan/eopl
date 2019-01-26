@@ -42,7 +42,7 @@ using eopl::CondExp;
 using eopl::ProcExp;
 using eopl::CallExp;
 using eopl::LetrecExp;
-using eopl::LetrecProc;
+using eopl::LetrecProcSpec;
 using eopl::Program;
 using eopl::to_exp;
 
@@ -73,8 +73,8 @@ using eopl::to_exp;
 %type <bool> let_opt_star
 %type <std::vector<eopl::Symbol>> id_list
 %type <std::vector<eopl::Symbol>> param_list
-%type <eopl::LetrecProc> proc_def
-%type <std::vector<eopl::LetrecProc>> proc_def_nlist
+%type <eopl::LetrecProcSpec> proc_def
+%type <std::vector<eopl::LetrecProcSpec>> proc_def_nlist
 %%
 
 program : expression { result = Program{std::move($1)}; }
@@ -122,12 +122,12 @@ let_opt_star : LET { $$ = false; }
              | LET_STAR { $$ = true; }
              ;
 
-proc_def_nlist : proc_def { $$ = std::vector<eopl::LetrecProc>{std::move($1)}; }
+proc_def_nlist : proc_def { $$ = std::vector<eopl::LetrecProcSpec>{std::move($1)}; }
                | proc_def_nlist proc_def { $1.push_back(std::move($2)); $$ = std::move($1); }
                ;
 
 proc_def : IDENTIFIER '(' param_list ')' '=' expression
-           { $$ = LetrecProc{std::move($1), std::move($3), std::move($6)}; }
+           { $$ = LetrecProcSpec{std::move($1), std::move($3), std::move($6)}; }
          ;
 
 id_list : %empty { $$ = std::vector<eopl::Symbol>(); }

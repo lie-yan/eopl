@@ -162,7 +162,7 @@ Value value_of (const LetrecExp& exp, SpEnv env) {
   SpEnv new_env = std::accumulate(std::begin(exp.procs),
                                   std::end(exp.procs),
                                   std::move(env),
-                                  [&saved] (SpEnv acc, const LetrecProc& proc) {
+                                  [&saved] (SpEnv acc, const LetrecProcSpec& proc) {
                                     auto p = to_value(Proc{proc.params, proc.body, acc});
                                     saved.push_back(p);
                                     return Env::extend(acc, proc.name, p);

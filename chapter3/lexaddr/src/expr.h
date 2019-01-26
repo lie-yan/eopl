@@ -59,16 +59,16 @@ struct CallExp {
   friend std::ostream& operator << (std::ostream& os, const CallExp& callExp);
 };
 
-struct LetrecProc {
+struct LetrecProcSpec {
   Symbol name;
   std::vector<Symbol> params;
   Expression body;
 
-  friend std::ostream& operator << (std::ostream& os, const LetrecProc& def);
+  friend std::ostream& operator << (std::ostream& os, const LetrecProcSpec& def);
 };
 
 struct LetrecExp {
-  std::vector<LetrecProc> procs;
+  std::vector<LetrecProcSpec> procs;
   Expression body;
 
   friend std::ostream& operator << (std::ostream& os, const LetrecExp& letrecExp);

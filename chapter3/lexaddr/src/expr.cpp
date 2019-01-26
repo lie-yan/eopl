@@ -102,8 +102,8 @@ std::ostream& operator << (std::ostream& os, const CallExp& callExp) {
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const LetrecProc& def) {
-  os << "LetrecProc(name: " << def.name
+std::ostream& operator << (std::ostream& os, const LetrecProcSpec& def) {
+  os << "LetrecProcSpec(name: " << def.name
      << ", params: " << def.params
      << ", body: " << def.body << ")";
   return os;
