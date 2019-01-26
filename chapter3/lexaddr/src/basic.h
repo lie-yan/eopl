@@ -6,6 +6,11 @@
 
 namespace eopl {
 
+// visitor for std::variant
+template<class... Ts>
+struct overloaded : Ts ... { using Ts::operator ()...; };
+template<class... Ts> overloaded (Ts...) -> overloaded<Ts...>;
+
 /**
  * @brief Apply function <code>f</code> on the elements of range
  *        <code>[first, last)</code> successively. Between consecutive calls to
