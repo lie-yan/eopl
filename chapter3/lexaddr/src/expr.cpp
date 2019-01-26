@@ -3,8 +3,7 @@
 //
 
 #include "expr.h"
-#include "value.h"
-#include "env.h"
+
 #include "basic.h"
 
 namespace eopl {
@@ -100,13 +99,6 @@ std::ostream& operator << (std::ostream& os, const CallExp& callExp) {
   os << "CallExp(rator: " << callExp.rator
      << ", rands: " << callExp.rands
      << ")";
-  return os;
-}
-
-std::ostream& operator << (std::ostream& os, const Proc& proc) {
-  os << "Proc(params: " << proc.params
-     << ", body: " << proc.body
-     << ", saved_env: " << proc.saved_env << ")";
   return os;
 }
 

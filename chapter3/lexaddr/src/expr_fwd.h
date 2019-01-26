@@ -6,7 +6,7 @@
 
 #include "value_fwd.h"
 
-#include <iostream>
+#include <ostream>
 
 namespace eopl {
 

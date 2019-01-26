@@ -3,6 +3,7 @@
 //
 
 #include "value.h"
+
 #include "expr.h"
 #include "basic.h"
 #include <stack>
@@ -137,6 +138,13 @@ const Proc& to_proc (const Value& value) {
 
 Proc& to_proc (Value& value) {
   return std::get<RwProc>(*value).get();
+}
+
+std::ostream& operator << (std::ostream& os, const Proc& proc) {
+  os << "Proc(params: " << proc.params
+     << ", body: " << proc.body
+     << ", saved_env: " << proc.saved_env << ")";
+  return os;
 }
 
 }

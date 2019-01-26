@@ -21,18 +21,11 @@ template<typename Symbol, typename Value, typename Expression>
 class Environment {
 public:
 
-  struct ForOrd {
+  struct SvPair {
     Symbol symbol;
     Value value;
   };
 
-  struct ForRec {
-    Symbol proc_name;
-    std::vector<Symbol> bound_vars;
-    Expression body;
-  };
-
-  using SVPair = std::pair<Symbol, Value>;
   using SpEnv = std::shared_ptr<Environment>;
 
   Environment () = default;
@@ -41,20 +34,17 @@ public:
   Environment (Environment&&) = delete;
   Environment& operator = (Environment&&) = delete;
 
-  Environment (SpEnv parent, ForOrd pair)
+  Environment (SpEnv parent, SvPair pair)
       : parent_(std::move(parent)), bound_record_(std::move(pair)) { }
-
-  Environment (SpEnv parent, ForRec triple)
-      : parent_(std::move(parent)), bound_record_(std::move(triple)) { }
 
   static SpEnv make_empty () { return SpEnv(); }
 
-  static SpEnv extend (Environment::SpEnv parent, Symbol sym, Value value) {
+  static SpEnv extend (SpEnv parent, Symbol sym, Value value) {
     return std::make_shared<Environment>(std::move(parent),
-                                         ForOrd{std::move(sym), std::move(value)});
+                                         SvPair{std::move(sym), std::move(value)});
   }
 
-  static SpEnv extend (Environment::SpEnv parent,
+  static SpEnv extend (SpEnv parent,
                        std::vector<Symbol> syms,
                        std::vector<Value> values) {
     assert(syms.size() == values.size());
@@ -68,31 +58,16 @@ public:
                                               std::move(pair.value));
                               },
                               [] (auto&& sym, auto&& val) {
-                                return ForOrd{std::forward<decltype(sym)>(sym),
+                                return SvPair{std::forward<decltype(sym)>(sym),
                                               std::forward<decltype(val)>(val)};
                               });
-  }
-
-  static SpEnv extend_rec (Environment::SpEnv parent, Symbol proc_name,
-                           std::vector<Symbol> bound_vars, Expression body) {
-    return std::make_shared<Environment>(std::move(parent),
-                                         ForRec{std::move(proc_name),
-                                                std::move(bound_vars),
-                                                std::move(body)});
   }
 
   static Value apply (Environment::SpEnv env, const Symbol& sym) {
 
     for (auto p = env; p; p = p->parent_) {
-      auto& bound_record = p->bound_record_;
-      if (std::holds_alternative<ForOrd>(bound_record)) {
-        if (auto& ord = std::get<ForOrd>(bound_record); ord.symbol == sym) {
-          return ord.value;
-        }
-      } else if (std::holds_alternative<ForRec>(bound_record)) {
-        if (auto& rec = std::get<ForRec>(bound_record); rec.proc_name == sym) {
-          return to_value(Proc{rec.bound_vars, rec.body, env});
-        }
+      if (p->bound_record_.symbol == sym) {
+        return p->bound_record_.value;
       }
     }
     throw SymbolNotFoundError(fmt::format("Symbol {} not found.", sym));
@@ -100,8 +75,7 @@ public:
 
 private:
   SpEnv parent_;
-
-  std::variant<ForOrd, ForRec> bound_record_;
+  SvPair bound_record_;
 };
 
 }
