@@ -6,6 +6,10 @@
 
 #include "env.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+#include <numeric>
+
 namespace eopl {
 
 Env::Env (SpEnv parent, Env::SvPair pair)

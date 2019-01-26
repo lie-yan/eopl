@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <sstream>
 #include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include "parser.tab.hpp"
 #include "interpreter.h"
 

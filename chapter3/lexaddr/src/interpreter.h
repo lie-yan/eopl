@@ -23,7 +23,6 @@ Value value_of (const LetrecExp& exp, SpEnv env);
 
 std::vector<Value> value_of (const std::vector<Expression>& exps, SpEnv env);
 
-SpEnv make_initial_env ();
 Value eval (const std::string& s);
 
 }
