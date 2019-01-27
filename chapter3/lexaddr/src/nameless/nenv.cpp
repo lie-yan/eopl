@@ -37,7 +37,6 @@ Value NamelessEnv::apply (SpNamelessEnv env, LexicalAddr lexicalAddr) {
   }
 
   // assert (n == 0 || !env)
-
   if (n == 0 && env) {
     return env->values_.at(lexicalAddr.entry_index);
   } else { // assert (!env)

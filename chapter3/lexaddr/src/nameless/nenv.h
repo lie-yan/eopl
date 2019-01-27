@@ -13,8 +13,8 @@ namespace eopl {
 using SpNamelessEnv = std::shared_ptr<struct NamelessEnv>;
 using WpNamelessEnv = std::weak_ptr<struct NamelessEnv>;
 
-struct NamelessEnv {
-
+class NamelessEnv {
+public:
   NamelessEnv () = default;
   NamelessEnv (const NamelessEnv&) = delete;
   NamelessEnv (NamelessEnv&&) = delete;
