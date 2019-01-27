@@ -149,8 +149,8 @@ Value value_of (const CallExp& exp, SpEnv env) {
       auto& proc = to_proc(rator);
       auto args = value_of(exp.rands, env);
 
-      auto new_env = Env::extend(proc.saved_env, std::move(proc.params), std::move(args));
-      return value_of(proc.body, new_env);
+      auto new_env = Env::extend(proc.saved_env(), std::move(proc.params()), std::move(args));
+      return value_of(proc.body(), new_env);
     } else {
       std::string msg = "the rator should be a Proc object";
       throw std::runtime_error(msg);
@@ -181,11 +181,14 @@ Value value_of (const LetrecExp& exp, SpEnv env) {
                                     saved.push_back(p);
                                     return Env::extend(acc, proc.name, p);
                                   });
-  for (auto& v : saved) to_proc(v).saved_env = new_env;
+  for (auto& v : saved) to_proc(v).saved_env(new_env);
   return value_of(exp.body, new_env);
 }
 
-static
+Value value_of (const NamelessLetrecExp& exp, SpEnv env) {
+  throw std::runtime_error("NamelessLetrecExp should not appear here");
+}
+
 SpEnv make_initial_env () {
   auto ret = Env::make_empty();
   ret = Env::extend(ret, Symbol{"emptylist"}, to_value(Nil()));

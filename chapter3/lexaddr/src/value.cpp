@@ -99,10 +99,10 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
       os << ']';
     }
     void operator () (const Proc& proc) {
-      os << "<proc " << proc.params << ">";
+      os << "<proc " << proc.params() << ">";
     }
     void operator () (const NamelessProc& proc) {
-      os << "<nameless-proc " << proc.body << ">";
+      os << "<nameless-proc " << proc.body() << ">";
     }
   };
 
@@ -150,17 +150,38 @@ const NamelessProc& to_nameless_proc (const Value& value) {
   return std::get<RwNamelessProc>(*value).get();
 }
 
+NamelessProc& to_nameless_proc (Value& value) {
+  return std::get<RwNamelessProc>(*value).get();
+}
+
 std::ostream& operator << (std::ostream& os, const Proc& proc) {
-  os << "Proc(params: " << proc.params
-     << ", body: " << proc.body
-     << ", saved_env: " << proc.saved_env << ")";
+  os << "Proc(params_: " << proc.params_
+     << ", body: " << proc.body_
+     << ", saved_env: " << proc.saved_env() << ")";
   return os;
 }
 
+Proc::Proc (const std::vector<Symbol>& params, Expression body, SpEnv saved_env)
+    : params_(params), body_(std::move(body)), saved_env_(saved_env) { }
+
 std::ostream& operator << (std::ostream& os, const NamelessProc& proc) {
-  os << "NamelessProc(body: " << proc.body
-     << ", saved_env: " << proc.saved_env << ")";
+  os << "NamelessProc(body: " << proc.body()
+     << ", saved_env: " << proc.saved_env() << ")";
   return os;
+}
+SpNamelessEnv NamelessProc::saved_env () const {
+  return saved_env_.lock();
+}
+
+NamelessProc::NamelessProc (Expression body, SpNamelessEnv saved_env)
+    : body_(std::move(body)), saved_env_(std::move(saved_env)) { }
+
+const Expression& NamelessProc::body () const {
+  return body_;
+}
+
+void NamelessProc::saved_env (const WpNamelessEnv& saved_env) {
+  saved_env_ = saved_env;
 }
 
 

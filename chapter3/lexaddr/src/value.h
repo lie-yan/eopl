@@ -30,35 +30,51 @@ struct Array : std::vector<Value> {
   using std::vector<Value>::vector;
 };
 
-struct Proc {
-  const std::vector<Symbol>& params;
-  Expression body;
-  SpEnv saved_env;
+class Proc {
+public:
+  Proc (const std::vector<Symbol>& params, Expression body, SpEnv saved_env);
 
   friend bool operator == (const Proc& lhs, const Proc& rhs) {
-    return lhs.params == rhs.params &&
-           lhs.body == rhs.body &&
-           lhs.saved_env == rhs.saved_env;
+    return lhs.params_ == rhs.params_ &&
+           lhs.body_ == rhs.body_ &&
+           lhs.saved_env() == rhs.saved_env();
   }
   friend bool operator != (const Proc& lhs, const Proc& rhs) {
     return !(rhs == lhs);
   }
+
   friend std::ostream& operator << (std::ostream& os, const Proc& proc);
+
+  const std::vector<Symbol>& params () const { return params_; }
+  const Expression& body () const { return body_; }
+  SpEnv saved_env () const { return saved_env_.lock(); }
+  void saved_env (SpEnv env) { saved_env_ = env; }
+private:
+  const std::vector<Symbol>& params_;
+  Expression body_;
+  WpEnv saved_env_;
 };
 
-struct NamelessProc {
-  Expression body;
-  SpNamelessEnv saved_env;
-
+class NamelessProc {
+public:
+  NamelessProc (Expression body, SpNamelessEnv saved_env);
   friend bool operator == (const NamelessProc& lhs, const NamelessProc& rhs) {
-    return lhs.body == rhs.body &&
-           lhs.saved_env == rhs.saved_env;
+    return lhs.body_ == rhs.body_ &&
+           lhs.saved_env() == rhs.saved_env();
   }
   friend bool operator != (const NamelessProc& lhs, const NamelessProc& rhs) {
     return !(rhs == lhs);
   }
 
   friend std::ostream& operator << (std::ostream& os, const NamelessProc& proc);
+
+  SpNamelessEnv saved_env () const;
+  void saved_env (const WpNamelessEnv& saved_env);
+  const Expression& body () const;
+
+private:
+  Expression body_;
+  WpNamelessEnv saved_env_;
 };
 
 /// observers for `Value` below
@@ -73,5 +89,6 @@ const Array& to_array (const Value& value);
 const Proc& to_proc (const Value& value);
 Proc& to_proc (Value& value);
 const NamelessProc& to_nameless_proc (const Value& value);
+NamelessProc& to_nameless_proc (Value& value);
 
 }

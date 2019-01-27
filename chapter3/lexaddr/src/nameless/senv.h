@@ -12,9 +12,9 @@ namespace eopl {
 using SpStaticEnv = std::shared_ptr<struct StaticEnv>;
 
 struct LexicalAddr {
-  size_t senv_index;
-  size_t entry_index;
-
+  size_t senv_index = 0;
+  size_t entry_index = 0;
+  bool bound_by_letrec = false;
   friend std::ostream& operator << (std::ostream& os, const LexicalAddr& addr);
 };
 
@@ -27,16 +27,17 @@ struct StaticEnv {
   StaticEnv& operator = (StaticEnv&&) = delete;
 
   StaticEnv (SpStaticEnv parent, Symbol sym);
-  StaticEnv (SpStaticEnv parent, std::vector<Symbol> syms);
+  StaticEnv (SpStaticEnv parent, std::vector<Symbol> syms, bool bound_by_letrec);
 
   static SpStaticEnv make_empty ();
   static SpStaticEnv extend (SpStaticEnv parent, Symbol sym);
-  static SpStaticEnv extend (SpStaticEnv parent, std::vector<Symbol> syms);
+  static SpStaticEnv extend (SpStaticEnv parent, std::vector<Symbol> syms, bool bound_by_letrec = false);
   static LexicalAddr apply (SpStaticEnv env, const Symbol& sym);
 
 private:
   SpStaticEnv parent_;
   std::vector<Symbol> vars_;
+  bool bound_by_letrec_ = false;
 };
 
 

@@ -25,6 +25,7 @@ Value nameless_value_of (const ProcExp& exp, const SpNamelessEnv& nenv);
 Value nameless_value_of (const NamelessProcExp& exp, const SpNamelessEnv& nenv);
 Value nameless_value_of (const CallExp& exp, const SpNamelessEnv& nenv);
 Value nameless_value_of (const LetrecExp& exp, const SpNamelessEnv& nenv);
+Value nameless_value_of (const NamelessLetrecExp& exp, const SpNamelessEnv& nenv);
 
 std::vector<Value> nameless_value_of (const std::vector<Expression>& exps, const SpNamelessEnv& nenv);
 

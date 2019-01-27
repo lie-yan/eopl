@@ -108,7 +108,6 @@ Expression translation_of (const NamelessUnpackExp& exp, const SpStaticEnv& senv
 }
 
 Expression translation_of (const ProcExp& exp, const SpStaticEnv& senv) {
-
   return to_exp(NamelessProcExp{
       translation_of(exp.body, StaticEnv::extend(senv, exp.params))
   });
@@ -126,7 +125,34 @@ Expression translation_of (const CallExp& exp, const SpStaticEnv& senv) {
 }
 
 Expression translation_of (const LetrecExp& exp, const SpStaticEnv& senv) {
-  throw std::runtime_error("translation_of LetrecExp not implemented yet");
+  std::vector<Symbol> names;
+  std::transform(std::begin(exp.procs), std::end(exp.procs),
+                 std::back_inserter(names),
+                 [] (const LetrecProcSpec& spec) {
+                   return spec.name;
+                 });
+  auto letrec_senv = StaticEnv::extend(senv, std::move(names));
+
+  auto to_nameless = [&letrec_senv] (const LetrecProcSpec& spec) {
+    auto new_senv = StaticEnv::extend(letrec_senv, spec.params);
+
+    return NamelessLetrecProcSpec{
+        spec.params.size(),
+        translation_of(spec.body, new_senv)
+    };
+  };
+
+  std::vector<NamelessLetrecProcSpec> procs;
+  std::transform(std::begin(exp.procs), std::end(exp.procs),
+                 std::back_inserter(procs),
+                 to_nameless);
+  auto body = translation_of(exp.body, letrec_senv);
+
+  return to_exp(NamelessLetrecExp{std::move(procs), std::move(body)});
+}
+
+Expression translation_of (const NamelessLetrecExp& exp, const SpStaticEnv& senv) {
+  throw std::runtime_error("NamelessLetrecExp should not appear here");
 }
 
 std::vector<Expression> translation_of (const std::vector<Expression>& exps, const SpStaticEnv& senv) {
@@ -139,5 +165,6 @@ std::vector<Expression> translation_of (const std::vector<Expression>& exps, con
                  });
   return target;
 }
+
 
 }

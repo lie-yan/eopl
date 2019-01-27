@@ -247,8 +247,7 @@ using Value_ = std::variant<Nil,
                             RwNamelessProc>;
 
 /**
- * @brief
- *  <code>Value</code> is <code>EqualityComparable</code>
+ * @brief <code>Value</code> is <code>EqualityComparable</code>
  */
 using Value = std::shared_ptr<Value_>;
 

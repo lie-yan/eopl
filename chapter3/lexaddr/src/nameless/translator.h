@@ -24,6 +24,7 @@ Expression translation_of (const ProcExp& exp, const SpStaticEnv& senv);
 Expression translation_of (const NamelessProcExp& exp, const SpStaticEnv& senv);
 Expression translation_of (const CallExp& exp, const SpStaticEnv& senv);
 Expression translation_of (const LetrecExp& exp, const SpStaticEnv& senv);
+Expression translation_of (const NamelessLetrecExp& exp, const SpStaticEnv& senv);
 
 std::vector<Expression> translation_of (const std::vector<Expression>& exps, const SpStaticEnv& senv);
 

@@ -5,6 +5,7 @@
 #include "expr.h"
 
 #include "basic.h"
+#include "expr_fwd.h"
 
 namespace eopl {
 
@@ -33,13 +34,19 @@ std::ostream& operator << (std::ostream& os, const VarExp& varExp) {
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const NamelessVarExp& varExp) {
-  os << "NamelessVarExp(" << varExp.lexicalAddr << ")";
+std::ostream& operator << (std::ostream& os, const NamelessVarExp& exp) {
+  os << "NamelessVarExp(" << exp.addr << ")";
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const IfExp& ifExp) {
-  os << "IfExp(" << ifExp.cond << ", " << ifExp.then_ << ", " << ifExp.else_ << ")";
+std::ostream& operator << (std::ostream& os, const NamelessLetrecVarExp& exp) {
+  os << "NamelessLetrecVarExp(addr: " << exp.addr
+     << ", saved_env: " << exp.saved_env << ")";
+  return os;
+}
+
+std::ostream& operator << (std::ostream& os, const IfExp& exp) {
+  os << "IfExp(" << exp.cond << ", " << exp.then_ << ", " << exp.else_ << ")";
   return os;
 }
 
@@ -129,6 +136,18 @@ std::ostream& operator << (std::ostream& os, const LetrecExp& letrecExp) {
   return os;
 }
 
+std::ostream& operator << (std::ostream& os, const NamelessLetrecProcSpec& spec) {
+  os << "NamelessLetrecProcSpec(param_num: " << spec.param_num
+     << ", body: " << spec.body << ")";
+  return os;
+}
+
+std::ostream& operator << (std::ostream& os, const NamelessLetrecExp& letrecExp) {
+  os << "NamelessLetrecExp(procs: " << letrecExp.procs
+     << ", body: " << letrecExp.body << ")";
+  return os;
+}
+
 ExpType type_of (const Expression& expression) {
   struct TypeVisitor {
     ExpType operator () (const ConstExp&) { return ExpType::CONST_EXP; }
@@ -144,6 +163,7 @@ ExpType type_of (const Expression& expression) {
     ExpType operator () (const RwNamelessProcExp&) { return ExpType::NAMELESS_PROC_EXP; }
     ExpType operator () (const RwCallExp&) { return ExpType::CALL_EXP; }
     ExpType operator () (const RwLetrecExp&) { return ExpType::LETREC_EXP; }
+    ExpType operator () (const RwNamelessLetrecExp&) { return ExpType::NAMELESS_LETREC_EXP; }
   };
 
   return std::visit(TypeVisitor{}, *expression);
@@ -201,5 +221,8 @@ const NamelessUnpackExp& to_nameless_unpack_exp (const Expression& expression) {
   return std::get<RwNamelessUnpackExp>(*expression).get();
 }
 
+const NamelessLetrecExp& to_nameless_letrec_exp (const Expression& expression) {
+  return std::get<RwNamelessLetrecExp>(*expression).get();
+}
 
 }

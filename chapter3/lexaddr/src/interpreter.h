@@ -25,6 +25,7 @@ Value value_of (const ProcExp& exp, SpEnv env);
 Value value_of (const NamelessProcExp& exp, SpEnv env);
 Value value_of (const CallExp& exp, SpEnv env);
 Value value_of (const LetrecExp& exp, SpEnv env);
+Value value_of (const NamelessLetrecExp& exp, SpEnv env);
 
 std::vector<Value> value_of (const std::vector<Expression>& exps, SpEnv env);
 

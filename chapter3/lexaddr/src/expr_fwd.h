@@ -6,6 +6,7 @@
 
 #include "value_fwd.h"
 #include "nameless/senv.h"
+#include "nameless/nenv.h"
 
 #include <ostream>
 
@@ -15,6 +16,7 @@ enum class ExpType {
   CONST_EXP,
   VAR_EXP,
   NAMELESS_VAR_EXP,
+  NAMELESS_LETREC_VAR_EXP,
   IF_EXP,
   LET_EXP,
   NAMELESS_LET_EXP,
@@ -25,6 +27,7 @@ enum class ExpType {
   NAMELESS_PROC_EXP,
   CALL_EXP,
   LETREC_EXP,
+  NAMELESS_LETREC_EXP,
 };
 
 struct ConstExp {
@@ -40,9 +43,16 @@ struct VarExp {
 };
 
 struct NamelessVarExp {
-  LexicalAddr lexicalAddr;
+  LexicalAddr addr;
 
   friend std::ostream& operator << (std::ostream& os, const NamelessVarExp& varExp);
+};
+
+struct NamelessLetrecVarExp {
+  LexicalAddr addr;
+  SpNamelessEnv saved_env;
+
+  friend std::ostream& operator << (std::ostream& os, const NamelessLetrecVarExp& varExp);
 };
 
 using RwIfExp = boost::recursive_wrapper<struct IfExp>;
@@ -55,6 +65,8 @@ using RwProcExp = boost::recursive_wrapper<struct ProcExp>;
 using RwNamelessProcExp = boost::recursive_wrapper<struct NamelessProcExp>;
 using RwCallExp = boost::recursive_wrapper<struct CallExp>;
 using RwLetrecExp = boost::recursive_wrapper<struct LetrecExp>;
+using RwNamelessLetrecExp = boost::recursive_wrapper<struct NamelessLetrecExp>;
+
 
 using Expression_ = std::variant<ConstExp,
                                  VarExp,
@@ -68,7 +80,8 @@ using Expression_ = std::variant<ConstExp,
                                  RwProcExp,
                                  RwNamelessProcExp,
                                  RwCallExp,
-                                 RwLetrecExp>;
+                                 RwLetrecExp,
+                                 RwNamelessLetrecExp>;
 
 using Expression = std::shared_ptr<Expression_>;
 std::ostream& operator << (std::ostream& os, const Expression& exp);

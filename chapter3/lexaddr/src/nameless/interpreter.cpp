@@ -40,7 +40,7 @@ Value nameless_value_of (const VarExp& exp, const SpNamelessEnv& nenv) {
 }
 
 Value nameless_value_of (const NamelessVarExp& exp, const SpNamelessEnv& nenv) {
-  return NamelessEnv::apply(nenv, exp.lexicalAddr);
+  return NamelessEnv::apply(nenv, exp.addr);
 }
 
 Value nameless_value_of (const IfExp& exp, const SpNamelessEnv& nenv) {
@@ -95,14 +95,14 @@ Value nameless_value_of (const UnpackExp& exp, const SpNamelessEnv& nenv) {
   throw std::runtime_error("nameless_value_of for unpack has not been implemented yet");
 }
 
-Value nameless_value_of (const NamelessUnpackExp& exp, const SpNamelessEnv& nenv) {
+std::vector<Value> unpack (Value pack, size_t n) {
+
   static const std::string msg = "the size of identifier list and that of the pack "
                                  "does not match";
 
-  Value pack = nameless_value_of(exp.pack, nenv);
   std::vector<Value> unpacked;
   std::generate_n(std::back_inserter(unpacked),
-                  exp.var_num,
+                  n,
                   [&pack] () -> Value {
                     if (type_of(pack) == ValueType::PAIR) {
                       auto& pair = to_pair(pack);
@@ -113,12 +113,19 @@ Value nameless_value_of (const NamelessUnpackExp& exp, const SpNamelessEnv& nenv
                       throw std::runtime_error(msg);
                     }
                   });
+
   if (type_of(pack) != ValueType::NIL) {
     throw std::runtime_error(msg);
   } else {
-    return nameless_value_of(exp.body,
-                             NamelessEnv::extend(nenv, std::move(unpacked)));
+    return unpacked;
   }
+}
+
+Value nameless_value_of (const NamelessUnpackExp& exp, const SpNamelessEnv& nenv) {
+  Value pack = nameless_value_of(exp.pack, nenv);
+  std::vector<Value> unpacked = unpack(pack, exp.var_num);
+  return nameless_value_of(exp.body,
+                           NamelessEnv::extend(nenv, std::move(unpacked)));
 }
 
 Value nameless_value_of (const ProcExp& exp, const SpNamelessEnv& nenv) {
@@ -137,8 +144,8 @@ Value nameless_value_of (const CallExp& exp, const SpNamelessEnv& nenv) {
       auto& proc = to_nameless_proc(rator);
       auto args = nameless_value_of(exp.rands, env);
 
-      auto new_env = NamelessEnv::extend(proc.saved_env, std::move(args));
-      return nameless_value_of(proc.body, new_env);
+      auto new_env = NamelessEnv::extend(proc.saved_env(), std::move(args));
+      return nameless_value_of(proc.body(), new_env);
     } else {
       std::string msg = "the rator should be a NamelessProc object";
       throw std::runtime_error(msg);
@@ -160,8 +167,21 @@ Value nameless_value_of (const CallExp& exp, const SpNamelessEnv& nenv) {
 }
 
 Value nameless_value_of (const LetrecExp& exp, const SpNamelessEnv& nenv) {
-  //TODO: give a real implementation
-  throw std::runtime_error("nameless_value_of for letrec has not been implemented yet");
+  throw std::runtime_error("LetrecExp should not appear in the expression for nameless_value_of()");
+}
+
+Value nameless_value_of (const NamelessLetrecExp& exp, const SpNamelessEnv& nenv) {
+  std::vector<Value> saved;
+
+  std::transform(std::begin(exp.procs), std::end(exp.procs),
+                 std::back_inserter(saved),
+                 [] (const NamelessLetrecProcSpec& spec) {
+                   return to_value(NamelessProc{spec.body, {}});
+                 });
+  auto new_nenv = NamelessEnv::extend(nenv, saved);
+  for (auto& v : saved) to_nameless_proc(v).saved_env(new_nenv);
+
+  return nameless_value_of(exp.body, new_nenv);
 }
 
 std::vector<Value> nameless_value_of (const std::vector<Expression>& exps, const SpNamelessEnv& nenv) {
@@ -191,6 +211,5 @@ Value nameless_eval (const std::string& s) {
   Program program = translation_of(result, make_initial_senv());
   return nameless_value_of(program, make_initial_nenv());
 }
-
 
 }
