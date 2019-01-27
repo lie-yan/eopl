@@ -5,6 +5,7 @@
 #pragma once
 
 #include "value_fwd.h"
+#include "nameless/senv.h"
 
 #include <ostream>
 
@@ -13,11 +14,14 @@ namespace eopl {
 enum class ExpType {
   CONST_EXP,
   VAR_EXP,
+  NAMELESS_VAR_EXP,
   IF_EXP,
   LET_EXP,
+  NAMELESS_LET_EXP,
   COND_EXP,
   UNPACK_EXP,
   PROC_EXP,
+  NAMELESS_PROC_EXP,
   CALL_EXP,
   LETREC_EXP,
 };
@@ -34,21 +38,32 @@ struct VarExp {
   friend std::ostream& operator << (std::ostream& os, const VarExp& varExp);
 };
 
+struct NamelessVarExp {
+  LexicalAddr lexicalAddr;
+
+  friend std::ostream& operator << (std::ostream& os, const NamelessVarExp& varExp);
+};
+
 using RwIfExp = boost::recursive_wrapper<struct IfExp>;
 using RwLetExp = boost::recursive_wrapper<struct LetExp>;
+using RwNamelessLetExp = boost::recursive_wrapper<struct NamelessLetExp>;
 using RwCondExp = boost::recursive_wrapper<struct CondExp>;
 using RwUnpackExp = boost::recursive_wrapper<struct UnpackExp>;
 using RwProcExp = boost::recursive_wrapper<struct ProcExp>;
+using RwNamelessProcExp = boost::recursive_wrapper<struct NamelessProcExp>;
 using RwCallExp = boost::recursive_wrapper<struct CallExp>;
 using RwLetrecExp = boost::recursive_wrapper<struct LetrecExp>;
 
 using Expression_ = std::variant<ConstExp,
                                  VarExp,
+                                 NamelessVarExp,
                                  RwIfExp,
                                  RwLetExp,
+                                 RwNamelessLetExp,
                                  RwCondExp,
                                  RwUnpackExp,
                                  RwProcExp,
+                                 RwNamelessProcExp,
                                  RwCallExp,
                                  RwLetrecExp>;
 

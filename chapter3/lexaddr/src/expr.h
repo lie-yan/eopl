@@ -29,6 +29,14 @@ struct LetExp {
   friend std::ostream& operator << (std::ostream& os, const LetExp& letExp);
 };
 
+struct NamelessLetExp {
+  std::vector<Expression> clauses;
+  Expression body;
+  bool star = false;
+
+  friend std::ostream& operator << (std::ostream& os, const NamelessLetExp& letExp);
+};
+
 struct UnpackExp {
   std::vector<Symbol> vars;
   Expression pack;
@@ -50,6 +58,12 @@ struct ProcExp {
   Expression body;
 
   friend std::ostream& operator << (std::ostream& os, const ProcExp& procExp);
+};
+
+struct NamelessProcExp {
+  Expression body;
+
+  friend std::ostream& operator << (std::ostream& os, const NamelessProcExp& procExp);
 };
 
 struct CallExp {
@@ -84,11 +98,14 @@ struct Program {
 ExpType type_of (const Expression& expression);
 const ConstExp& to_const_exp (const Expression& expression);
 const VarExp& to_var_exp (const Expression& expression);
+const NamelessVarExp& to_nameless_var_exp (const Expression& expression);
 const IfExp& to_if_exp (const Expression& expression);
 const LetExp& to_let_exp (const Expression& expression);
+const NamelessLetExp& to_nameless_let_exp (const Expression& expression);
 const CondExp& to_cond_exp (const Expression& expression);
 const UnpackExp& to_unpack_exp (const Expression& expression);
 const ProcExp& to_proc_exp (const Expression& expression);
+const NamelessProcExp& to_nameless_proc_exp (const Expression& expression);
 const CallExp& to_call_exp (const Expression& expression);
 const LetrecExp& to_letrec_exp (const Expression& expression);
 

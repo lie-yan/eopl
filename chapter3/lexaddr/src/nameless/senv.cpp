@@ -43,5 +43,9 @@ LexicalAddr StaticEnv::apply (SpStaticEnv env, const Symbol& sym) {
   throw SymbolNotFoundError(fmt::format("Symbol {} not found", sym));
 }
 
-
+std::ostream& operator << (std::ostream& os, const LexicalAddr& addr) {
+  os << "LexicalAddr(senv_index: " << addr.senv_index
+     << ", entry_index: " << addr.entry_index << ")";
+  return os;
+}
 }

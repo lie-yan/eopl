@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <ostream>
 #include "value_fwd.h"
 
 namespace eopl {
@@ -13,6 +14,8 @@ using SpStaticEnv = std::shared_ptr<struct StaticEnv>;
 struct LexicalAddr {
   size_t senv_index;
   size_t entry_index;
+
+  friend std::ostream& operator << (std::ostream& os, const LexicalAddr& addr);
 };
 
 struct StaticEnv {

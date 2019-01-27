@@ -23,11 +23,14 @@ Value value_of (const Expression& exp, SpEnv env) {
     const SpEnv& env;
     Value operator () (const ConstExp& exp) { return value_of(exp, env); }
     Value operator () (const VarExp& exp) { return value_of(exp, env); }
+    Value operator () (const NamelessVarExp& exp) { return value_of(exp, env); }
     Value operator () (const RwIfExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwLetExp& exp) { return value_of(exp.get(), env); }
+    Value operator () (const RwNamelessLetExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwCondExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwUnpackExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwProcExp& exp) { return value_of(exp.get(), env); }
+    Value operator () (const RwNamelessProcExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwCallExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwLetrecExp& exp) { return value_of(exp.get(), env); }
   };
@@ -40,6 +43,10 @@ Value value_of (const ConstExp& exp, SpEnv env) {
 
 Value value_of (const VarExp& exp, SpEnv env) {
   return Env::apply(std::move(env), exp.var);
+}
+
+Value value_of (const NamelessVarExp& exp, SpEnv env) {
+  throw std::runtime_error("NamelessVarExp should not appear here");
 }
 
 Value value_of (const IfExp& exp, SpEnv env) {
@@ -69,6 +76,10 @@ Value value_of (const LetExp& exp, SpEnv env) {
                                    });
     return value_of(exp.body, std::move(new_env));
   }
+}
+
+Value value_of (const NamelessLetExp& exp, SpEnv env) {
+  throw std::runtime_error("NamelessLetExp should not appear here");
 }
 
 Value value_of (const CondExp& exp, SpEnv env) {
@@ -113,6 +124,10 @@ Value value_of (const UnpackExp& exp, SpEnv env) {
 
 Value value_of (const ProcExp& exp, SpEnv env) {
   return to_value(Proc{exp.params, exp.body, std::move(env)});
+}
+
+Value value_of (const NamelessProcExp& exp, SpEnv env) {
+  throw std::runtime_error("NamelessProcExp should not appear here");
 }
 
 std::vector<Value> value_of (const std::vector<Expression>& exps, SpEnv env) {
@@ -187,5 +202,6 @@ Value eval (const std::string& s) {
 
   return value_of(result, make_initial_env());
 }
+
 
 }
