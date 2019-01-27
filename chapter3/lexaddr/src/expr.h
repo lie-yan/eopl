@@ -90,7 +90,7 @@ struct LetrecProcSpec {
 };
 
 struct LetrecExp {
-  std::vector<LetrecProcSpec> procs;
+  std::vector<LetrecProcSpec> proc_list;
   Expression body;
 
   friend std::ostream& operator << (std::ostream& os, const LetrecExp& letrecExp);

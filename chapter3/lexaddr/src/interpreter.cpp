@@ -173,8 +173,8 @@ Value value_of (const CallExp& exp, SpEnv env) {
 
 Value value_of (const LetrecExp& exp, SpEnv env) {
   std::vector<Value> saved;
-  SpEnv new_env = std::accumulate(std::begin(exp.procs),
-                                  std::end(exp.procs),
+  SpEnv new_env = std::accumulate(std::begin(exp.proc_list),
+                                  std::end(exp.proc_list),
                                   std::move(env),
                                   [&saved] (SpEnv acc, const LetrecProcSpec& proc) {
                                     auto p = to_value(Proc{proc.params, proc.body, acc});

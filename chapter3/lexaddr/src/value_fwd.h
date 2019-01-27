@@ -23,7 +23,7 @@ enum class ValueType {
 };
 
 /**
- * @brief Nil is EqualityComparable
+ * @brief <code>Nil</code> is EqualityComparable
  */
 struct Nil {
   friend bool operator == (const Nil& lhs, const Nil& rhs) {
