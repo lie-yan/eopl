@@ -11,8 +11,8 @@ namespace eopl {
 using SpStaticEnv = std::shared_ptr<struct StaticEnv>;
 
 struct LexicalAddr {
-  int senv_index;
-  long entry_index;
+  size_t senv_index;
+  size_t entry_index;
 };
 
 struct StaticEnv {

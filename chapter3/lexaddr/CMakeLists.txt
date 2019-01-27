@@ -31,8 +31,9 @@ set(SOURCES
         ${SOURCE_DIR}/value.cpp
         ${SOURCE_DIR}/expr.cpp
         ${SOURCE_DIR}/env.cpp
-        ${SOURCE_DIR}/senv.cpp
-        ${SOURCE_DIR}/translator.cpp
+        ${SOURCE_DIR}/nameless/senv.cpp
+        ${SOURCE_DIR}/nameless/nenv.cpp
+        ${SOURCE_DIR}/nameless/translator.cpp
         ${SOURCE_DIR}/interpreter.cpp
         ${SOURCE_DIR}/built_in.cpp
         ${FLEX_Scanner_OUTPUTS}
