@@ -57,7 +57,7 @@ Expression translation_of (const VarExp& exp, const SpStaticEnv& senv) {
 }
 
 static std::string error_message_for_nameless (const std::string& s) {
-  return fmt::format("{} should not appear in the argument of translation_of()");
+  return fmt::format("{} should not appear in the argument of translation_of()", s);
 }
 
 Expression translation_of (const NamelessVarExp& exp, const SpStaticEnv& senv) {

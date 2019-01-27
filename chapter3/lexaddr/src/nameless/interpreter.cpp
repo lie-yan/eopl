@@ -10,6 +10,7 @@
 #include "translator.h"
 
 #include <numeric>
+#include <fmt/ostream.h>
 
 namespace eopl {
 
@@ -35,8 +36,12 @@ Value nameless_value_of (const ConstExp& exp, const SpNamelessEnv& nenv) {
   return to_value(exp.num);
 }
 
+static std::string error_message (const std::string& s) {
+  return fmt::format("{} should not appear in a nameless program", s);
+}
+
 Value nameless_value_of (const VarExp& exp, const SpNamelessEnv& nenv) {
-  throw std::runtime_error("VarExp should not appear in a nameless program");
+  throw std::runtime_error(error_message("VarExp"));
 }
 
 Value nameless_value_of (const NamelessVarExp& exp, const SpNamelessEnv& nenv) {
@@ -51,7 +56,7 @@ Value nameless_value_of (const IfExp& exp, const SpNamelessEnv& nenv) {
 }
 
 Value nameless_value_of (const LetExp& exp, const SpNamelessEnv& nenv) {
-  throw std::runtime_error("LetExp should not appear in a nameless program");
+  throw std::runtime_error(error_message("LetExp"));
 }
 
 Value nameless_value_of (const NamelessLetExp& exp, const SpNamelessEnv& nenv) {
@@ -91,8 +96,7 @@ Value nameless_value_of (const CondExp& exp, const SpNamelessEnv& nenv) {
 }
 
 Value nameless_value_of (const UnpackExp& exp, const SpNamelessEnv& nenv) {
-  //TODO: give a real implementation
-  throw std::runtime_error("nameless_value_of for unpack has not been implemented yet");
+  throw std::runtime_error(error_message("UnpackExp"));
 }
 
 std::vector<Value> unpack (Value pack, size_t n) {
@@ -105,9 +109,9 @@ std::vector<Value> unpack (Value pack, size_t n) {
                   n,
                   [&pack] () -> Value {
                     if (type_of(pack) == ValueType::PAIR) {
-                      auto& pair = to_pair(pack);
-                      Value ret = pair.first;
-                      pack = pair.second;
+                      auto& p = to_pair(pack);
+                      Value ret = p.first;
+                      pack = p.second;
                       return ret;
                     } else {
                       throw std::runtime_error(msg);
@@ -129,7 +133,7 @@ Value nameless_value_of (const NamelessUnpackExp& exp, const SpNamelessEnv& nenv
 }
 
 Value nameless_value_of (const ProcExp& exp, const SpNamelessEnv& nenv) {
-  throw std::runtime_error("ProcExp should not appear in a nameless program");
+  throw std::runtime_error(error_message("ProcExp"));
 }
 
 Value nameless_value_of (const NamelessProcExp& exp, const SpNamelessEnv& nenv) {
@@ -137,6 +141,7 @@ Value nameless_value_of (const NamelessProcExp& exp, const SpNamelessEnv& nenv) 
 }
 
 Value nameless_value_of (const CallExp& exp, const SpNamelessEnv& nenv) {
+  // TODO: refactor the processing of CallExp
   auto eval_proc = [] (const CallExp& exp, auto env) {
     if (auto rator = nameless_value_of(exp.rator, env);
         type_of(rator) == ValueType::NAMELESS_PROC) {
@@ -167,7 +172,7 @@ Value nameless_value_of (const CallExp& exp, const SpNamelessEnv& nenv) {
 }
 
 Value nameless_value_of (const LetrecExp& exp, const SpNamelessEnv& nenv) {
-  throw std::runtime_error("LetrecExp should not appear in the expression for nameless_value_of()");
+  throw std::runtime_error(error_message("LetrecExp"));
 }
 
 Value nameless_value_of (const NamelessLetrecExp& exp, const SpNamelessEnv& nenv) {
@@ -184,9 +189,9 @@ Value nameless_value_of (const NamelessLetrecExp& exp, const SpNamelessEnv& nenv
   return nameless_value_of(exp.body, new_nenv);
 }
 
-std::vector<Value> nameless_value_of (const std::vector<Expression>& exps, const SpNamelessEnv& nenv) {
+std::vector<Value> nameless_value_of (const std::vector<Expression>& exp_list, const SpNamelessEnv& nenv) {
   std::vector<Value> values;
-  std::transform(std::begin(exps), std::end(exps),
+  std::transform(std::begin(exp_list), std::end(exp_list),
                  std::back_inserter(values),
                  [&nenv] (const Expression& e) {
                    return nameless_value_of(e, nenv);
@@ -195,9 +200,11 @@ std::vector<Value> nameless_value_of (const std::vector<Expression>& exps, const
 }
 
 SpNamelessEnv make_initial_nenv () {
-  auto ret = NamelessEnv::make_empty();
-  ret = NamelessEnv::extend(ret, to_value(Nil()));
-  return ret;
+  return
+      NamelessEnv::extend(
+          NamelessEnv::make_empty(),
+          to_value(Nil())
+      );
 }
 
 Value nameless_eval (const std::string& s) {
