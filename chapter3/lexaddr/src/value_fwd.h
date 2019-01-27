@@ -22,6 +22,9 @@ enum class ValueType {
   NAMELESS_PROC,
 };
 
+/**
+ * @brief Nil is EqualityComparable
+ */
 struct Nil {
   friend bool operator == (const Nil& lhs, const Nil& rhs) {
     return true;
@@ -243,6 +246,10 @@ using Value_ = std::variant<Nil,
                             RwProc,
                             RwNamelessProc>;
 
+/**
+ * @brief
+ *  <code>Value</code> is <code>EqualityComparable</code>
+ */
 using Value = std::shared_ptr<Value_>;
 
 bool operator == (const Value& lhs, const Value& rhs);

@@ -20,6 +20,7 @@ enum class ExpType {
   NAMELESS_LET_EXP,
   COND_EXP,
   UNPACK_EXP,
+  NAMELESS_UNPACK_EXP,
   PROC_EXP,
   NAMELESS_PROC_EXP,
   CALL_EXP,
@@ -49,6 +50,7 @@ using RwLetExp = boost::recursive_wrapper<struct LetExp>;
 using RwNamelessLetExp = boost::recursive_wrapper<struct NamelessLetExp>;
 using RwCondExp = boost::recursive_wrapper<struct CondExp>;
 using RwUnpackExp = boost::recursive_wrapper<struct UnpackExp>;
+using RwNamelessUnpackExp = boost::recursive_wrapper<struct NamelessUnpackExp>;
 using RwProcExp = boost::recursive_wrapper<struct ProcExp>;
 using RwNamelessProcExp = boost::recursive_wrapper<struct NamelessProcExp>;
 using RwCallExp = boost::recursive_wrapper<struct CallExp>;
@@ -62,6 +64,7 @@ using Expression_ = std::variant<ConstExp,
                                  RwNamelessLetExp,
                                  RwCondExp,
                                  RwUnpackExp,
+                                 RwNamelessUnpackExp,
                                  RwProcExp,
                                  RwNamelessProcExp,
                                  RwCallExp,

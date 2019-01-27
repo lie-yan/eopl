@@ -45,6 +45,14 @@ struct UnpackExp {
   friend std::ostream& operator << (std::ostream& os, const UnpackExp& unpackExp);
 };
 
+struct NamelessUnpackExp {
+  size_t var_num;
+  Expression pack;
+  Expression body;
+
+  friend std::ostream& operator << (std::ostream& os, const NamelessUnpackExp& unpackExp);
+};
+
 struct CondExp {
   using Clause = std::pair<Expression, Expression>;
   using ClauseList = std::vector<Clause>;
@@ -108,5 +116,5 @@ const ProcExp& to_proc_exp (const Expression& expression);
 const NamelessProcExp& to_nameless_proc_exp (const Expression& expression);
 const CallExp& to_call_exp (const Expression& expression);
 const LetrecExp& to_letrec_exp (const Expression& expression);
-
+const NamelessUnpackExp& to_nameless_unpack_exp (const Expression& expression);
 }

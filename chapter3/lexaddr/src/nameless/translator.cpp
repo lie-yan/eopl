@@ -44,7 +44,7 @@ Expression translation_of (const VarExp& exp, const SpStaticEnv& senv) {
 }
 
 Expression translation_of (const NamelessVarExp& exp, const SpStaticEnv& senv) {
-  throw std::runtime_error("NamelessVarExp should not appear here");
+  throw std::runtime_error("NamelessVarExp should not appear in the expression for translation_of()");
 }
 
 Expression translation_of (const IfExp& exp, const SpStaticEnv& senv) {
@@ -78,7 +78,7 @@ Expression translation_of (const LetExp& exp, const SpStaticEnv& senv) {
 }
 
 Expression translation_of (const NamelessLetExp& exp, const SpStaticEnv& senv) {
-  throw std::runtime_error("NamelessLetExp should not appear here");
+  throw std::runtime_error("NamelessLetExp should not appear in the expression for translation_of()");
 }
 
 Expression translation_of (const CondExp& exp, const SpStaticEnv& senv) {
@@ -97,7 +97,14 @@ Expression translation_of (const CondExp& exp, const SpStaticEnv& senv) {
 }
 
 Expression translation_of (const UnpackExp& exp, const SpStaticEnv& senv) {
-  throw std::runtime_error("translation_of UnpackExp not implemented yet");
+  Expression pack = translation_of(exp.pack, senv);
+  Expression body = translation_of(exp.body, StaticEnv::extend(senv, exp.vars));
+
+  return to_exp(NamelessUnpackExp{exp.vars.size(), pack, body});
+}
+
+Expression translation_of (const NamelessUnpackExp& exp, const SpStaticEnv& senv) {
+  throw std::runtime_error("NamelessUnpackExp should not appear here");
 }
 
 Expression translation_of (const ProcExp& exp, const SpStaticEnv& senv) {
@@ -132,4 +139,5 @@ std::vector<Expression> translation_of (const std::vector<Expression>& exps, con
                  });
   return target;
 }
+
 }

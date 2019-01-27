@@ -2,12 +2,14 @@
 // Created by Lie Yan on 2019-01-27.
 //
 
-#include <numeric>
-#include <built_in.h>
 #include "interpreter.h"
+
+#include "built_in.h"
 
 #include "lex.yy.h"
 #include "translator.h"
+
+#include <numeric>
 
 namespace eopl {
 
@@ -93,6 +95,32 @@ Value nameless_value_of (const UnpackExp& exp, const SpNamelessEnv& nenv) {
   throw std::runtime_error("nameless_value_of for unpack has not been implemented yet");
 }
 
+Value nameless_value_of (const NamelessUnpackExp& exp, const SpNamelessEnv& nenv) {
+  static const std::string msg = "the size of identifier list and that of the pack "
+                                 "does not match";
+
+  Value pack = nameless_value_of(exp.pack, nenv);
+  std::vector<Value> unpacked;
+  std::generate_n(std::back_inserter(unpacked),
+                  exp.var_num,
+                  [&pack] () -> Value {
+                    if (type_of(pack) == ValueType::PAIR) {
+                      auto& pair = to_pair(pack);
+                      Value ret = pair.first;
+                      pack = pair.second;
+                      return ret;
+                    } else {
+                      throw std::runtime_error(msg);
+                    }
+                  });
+  if (type_of(pack) != ValueType::NIL) {
+    throw std::runtime_error(msg);
+  } else {
+    return nameless_value_of(exp.body,
+                             NamelessEnv::extend(nenv, std::move(unpacked)));
+  }
+}
+
 Value nameless_value_of (const ProcExp& exp, const SpNamelessEnv& nenv) {
   throw std::runtime_error("ProcExp should not appear in a nameless program");
 }
@@ -163,5 +191,6 @@ Value nameless_eval (const std::string& s) {
   Program program = translation_of(result, make_initial_senv());
   return nameless_value_of(program, make_initial_nenv());
 }
+
 
 }

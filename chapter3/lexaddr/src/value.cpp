@@ -158,7 +158,8 @@ std::ostream& operator << (std::ostream& os, const Proc& proc) {
 }
 
 std::ostream& operator << (std::ostream& os, const NamelessProc& proc) {
-  os << "NamelessProc(body: " << proc.body << ", saved_env: " << proc.saved_env << ")";
+  os << "NamelessProc(body: " << proc.body
+     << ", saved_env: " << proc.saved_env << ")";
   return os;
 }
 

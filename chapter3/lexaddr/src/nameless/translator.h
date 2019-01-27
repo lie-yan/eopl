@@ -19,6 +19,7 @@ Expression translation_of (const LetExp& exp, const SpStaticEnv& senv);
 Expression translation_of (const NamelessLetExp& exp, const SpStaticEnv& senv);
 Expression translation_of (const CondExp& exp, const SpStaticEnv& senv);
 Expression translation_of (const UnpackExp& exp, const SpStaticEnv& senv);
+Expression translation_of (const NamelessUnpackExp& exp, const SpStaticEnv& senv);
 Expression translation_of (const ProcExp& exp, const SpStaticEnv& senv);
 Expression translation_of (const NamelessProcExp& exp, const SpStaticEnv& senv);
 Expression translation_of (const CallExp& exp, const SpStaticEnv& senv);

@@ -14,7 +14,7 @@ NamelessEnv::NamelessEnv (SpNamelessEnv parent, std::vector<Value> values)
     : parent_(std::move(parent)), values_(std::move(values)) { }
 
 SpNamelessEnv NamelessEnv::make_empty () {
-  return std::make_shared<NamelessEnv>();
+  return SpNamelessEnv();
 }
 
 SpNamelessEnv NamelessEnv::extend (SpNamelessEnv parent, Value value) {

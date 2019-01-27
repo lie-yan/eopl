@@ -91,6 +91,13 @@ std::ostream& operator << (std::ostream& os, const UnpackExp& unpackExp) {
   return os;
 }
 
+std::ostream& operator << (std::ostream& os, const NamelessUnpackExp& unpackExp) {
+  os << "NamelessUnpackExp(var_num: " << unpackExp.var_num
+     << ", pack: " << unpackExp.pack
+     << ", body: " << unpackExp.body << ")";
+  return os;
+}
+
 std::ostream& operator << (std::ostream& os, const ProcExp& procExp) {
   os << "ProcExp(params: " << procExp.params
      << ", body: " << procExp.body << ")";
@@ -132,6 +139,7 @@ ExpType type_of (const Expression& expression) {
     ExpType operator () (const RwLetExp&) { return ExpType::LET_EXP; }
     ExpType operator () (const RwNamelessLetExp&) { return ExpType::NAMELESS_LET_EXP; }
     ExpType operator () (const RwUnpackExp&) { return ExpType::UNPACK_EXP; }
+    ExpType operator () (const RwNamelessUnpackExp&) { return ExpType::NAMELESS_UNPACK_EXP; }
     ExpType operator () (const RwProcExp&) { return ExpType::PROC_EXP; }
     ExpType operator () (const RwNamelessProcExp&) { return ExpType::NAMELESS_PROC_EXP; }
     ExpType operator () (const RwCallExp&) { return ExpType::CALL_EXP; }
@@ -187,6 +195,10 @@ const CallExp& to_call_exp (const Expression& expression) {
 
 const LetrecExp& to_letrec_exp (const Expression& expression) {
   return std::get<RwLetrecExp>(*expression).get();
+}
+
+const NamelessUnpackExp& to_nameless_unpack_exp (const Expression& expression) {
+  return std::get<RwNamelessUnpackExp>(*expression).get();
 }
 
 

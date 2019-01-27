@@ -117,6 +117,10 @@ Value value_of (const UnpackExp& exp, SpEnv env) {
   }
 }
 
+Value value_of (const NamelessUnpackExp& exp, SpEnv env) {
+  throw std::runtime_error("NamelessUnpackExp should not appear here");
+}
+
 Value value_of (const ProcExp& exp, SpEnv env) {
   return to_value(Proc{exp.params, exp.body, std::move(env)});
 }
@@ -198,6 +202,5 @@ Value eval (const std::string& s) {
 
   return value_of(result, make_initial_env());
 }
-
 
 }

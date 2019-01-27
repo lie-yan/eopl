@@ -146,15 +146,15 @@ TEST(let_lang, let) {
 
 }
 
-//TEST(let_lang, unpack) {
-//  using namespace eopl;
-//
-//  EXPECT_EQ(nameless_eval("let u = 7 in unpack x y = (cons u (cons 3 emptylist)) in (- x y)"), to_value(Int{4}));
-//  EXPECT_THROW(
-//      nameless_eval("let u = 7 in unpack x y z = (cons u (cons 3 emptylist)) in (- x y)"),
-//      std::runtime_error
-//  );
-//}
+TEST(let_lang, unpack) {
+  using namespace eopl;
+
+  EXPECT_EQ(nameless_eval("let u = 7 in unpack x y = (cons u (cons 3 emptylist)) in (- x y)"), to_value(Int{4}));
+  EXPECT_THROW(
+      nameless_eval("let u = 7 in unpack x y z = (cons u (cons 3 emptylist)) in (- x y)"),
+      std::runtime_error
+  );
+}
 
 TEST(proc_lang, basic) {
   using namespace eopl;
