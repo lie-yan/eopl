@@ -96,7 +96,7 @@ Value value_of (const UnpackExp& exp, SpEnv env) {
                         std::end(exp.vars),
                         P(lst, env),
                         [] (P acc, const Symbol& s) -> P {
-                          if (auto type = type_of(acc.first); type == ValueType::PAIR) {
+                          if (type_of(acc.first) == ValueType::PAIR) {
                             auto& pair = to_pair(acc.first);
                             auto new_env = Env::extend(std::move(acc.second), s, pair.first);
                             return std::pair(pair.second, std::move(new_env));
@@ -104,7 +104,7 @@ Value value_of (const UnpackExp& exp, SpEnv env) {
                             throw std::runtime_error(msg);
                           }
                         });
-  if (auto type = type_of(p.first); type != ValueType::NIL) {
+  if (type_of(p.first) != ValueType::NIL) {
     throw std::runtime_error(msg);
   } else {
     return value_of(exp.body, std::move(p.second));

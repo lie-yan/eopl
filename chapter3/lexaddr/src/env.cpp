@@ -12,7 +12,7 @@
 
 namespace eopl {
 
-Env::Env (SpEnv parent, Env::SvPair pair)
+Env::Env (SpEnv parent, SvPair pair)
     : parent_(std::move(parent)), bound_record_(std::move(pair)) { }
 
 SpEnv Env::make_empty () { return SpEnv(); }

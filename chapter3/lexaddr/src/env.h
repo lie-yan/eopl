@@ -15,13 +15,13 @@ struct SymbolNotFoundError : std::runtime_error {
 
 using SpEnv = std::shared_ptr<struct Env>;
 
+struct SvPair {
+  Symbol symbol;
+  Value value;
+};
+
 class Env {
 public:
-
-  struct SvPair {
-    Symbol symbol;
-    Value value;
-  };
 
   Env () = default;
   Env (const Env&) = delete;
@@ -33,9 +33,7 @@ public:
 
   static SpEnv make_empty ();
   static SpEnv extend (SpEnv parent, Symbol sym, Value value);
-  static SpEnv extend (SpEnv parent,
-                       std::vector<Symbol> syms,
-                       std::vector<Value> values);
+  static SpEnv extend (SpEnv parent, std::vector<Symbol> syms, std::vector<Value> values);
 
   static Value apply (SpEnv env, const Symbol& sym);
 
