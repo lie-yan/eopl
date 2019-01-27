@@ -18,23 +18,18 @@ Value value_of (const Program& program, SpEnv env) {
   return value_of(program.exp1, std::move(env));
 }
 
+struct ValueOfVisitor {
+  const SpEnv& env;
+
+  template<typename T>
+  Value operator () (const boost::recursive_wrapper<T>& exp) { return value_of(exp.get(), env); }
+
+  template<typename T>
+  Value operator () (const T& exp) { return value_of(exp, env); }
+};
+
 Value value_of (const Expression& exp, SpEnv env) {
-  struct EvalVisitor {
-    const SpEnv& env;
-    Value operator () (const ConstExp& exp) { return value_of(exp, env); }
-    Value operator () (const VarExp& exp) { return value_of(exp, env); }
-    Value operator () (const NamelessVarExp& exp) { return value_of(exp, env); }
-    Value operator () (const RwIfExp& exp) { return value_of(exp.get(), env); }
-    Value operator () (const RwLetExp& exp) { return value_of(exp.get(), env); }
-    Value operator () (const RwNamelessLetExp& exp) { return value_of(exp.get(), env); }
-    Value operator () (const RwCondExp& exp) { return value_of(exp.get(), env); }
-    Value operator () (const RwUnpackExp& exp) { return value_of(exp.get(), env); }
-    Value operator () (const RwProcExp& exp) { return value_of(exp.get(), env); }
-    Value operator () (const RwNamelessProcExp& exp) { return value_of(exp.get(), env); }
-    Value operator () (const RwCallExp& exp) { return value_of(exp.get(), env); }
-    Value operator () (const RwLetrecExp& exp) { return value_of(exp.get(), env); }
-  };
-  return std::visit(EvalVisitor{env}, *exp);
+  return std::visit(ValueOfVisitor{env}, *exp);
 }
 
 Value value_of (const ConstExp& exp, SpEnv env) {
@@ -186,6 +181,7 @@ Value value_of (const LetrecExp& exp, SpEnv env) {
   return value_of(exp.body, new_env);
 }
 
+static
 SpEnv make_initial_env () {
   auto ret = Env::make_empty();
   ret = Env::extend(ret, Symbol{"emptylist"}, to_value(Nil()));

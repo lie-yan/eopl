@@ -8,33 +8,18 @@
 
 namespace eopl {
 
-std::ostream& operator << (std::ostream& os, const Expression& exp) {
-  struct OutputVisitor {
-    std::ostream& os;
+struct ExpressionOutputVisitor {
+  std::ostream& os;
 
-    void operator () (const ConstExp& e) { os << e; }
-    void operator () (const IfExp& e) { os << e; }
-    void operator () (const VarExp& e) { os << e; }
-    void operator () (const NamelessVarExp& e) { os << e; }
-    void operator () (const LetExp& e) { os << e; }
-    void operator () (const NamelessLetExp& e) { os << e; }
-    void operator () (const CondExp& e) { os << e; }
-    void operator () (const UnpackExp& e) { os << e; }
-    void operator () (const ProcExp& e) { os << e; }
-    void operator () (const NamelessProcExp& e) { os << e; }
-    void operator () (const CallExp& e) { os << e; }
-    void operator () (const LetrecExp& e) { os << e; }
-    void operator () (const RwIfExp& e) { (*this)(e.get()); }
-    void operator () (const RwLetExp& e) { (*this)(e.get()); }
-    void operator () (const RwNamelessLetExp& e) { (*this)(e.get()); }
-    void operator () (const RwCondExp& e) { (*this)(e.get()); }
-    void operator () (const RwUnpackExp& e) { (*this)(e.get()); }
-    void operator () (const RwProcExp& e) { (*this)(e.get()); }
-    void operator () (const RwNamelessProcExp& e) { (*this)(e.get()); }
-    void operator () (const RwCallExp& e) { (*this)(e.get()); }
-    void operator () (const RwLetrecExp& e) { (*this)(e.get()); }
-  };
-  std::visit(OutputVisitor{os}, *exp);
+  template<typename T>
+  void operator () (const boost::recursive_wrapper<T>& exp) { os << exp.get(); }
+
+  template<typename T>
+  void operator () (const T& exp) { os << exp; }
+};
+
+std::ostream& operator << (std::ostream& os, const Expression& exp) {
+  std::visit(ExpressionOutputVisitor{os}, *exp);
   return os;
 }
 
