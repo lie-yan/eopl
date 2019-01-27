@@ -5,6 +5,7 @@
 //
 
 #include "env.h"
+#include "exception.h"
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -12,39 +13,58 @@
 
 namespace eopl {
 
-Env::Env (SpEnv parent, SvPair pair)
-    : parent_(std::move(parent)), bound_record_(std::move(pair)) { }
+Ribcage::Ribcage (std::vector<Symbol> vars, std::vector<Value> values)
+    : vars(std::move(vars)), values(std::move(values)) {
+
+  assert(this->vars.size() == this->values.size());
+}
+
+std::optional<std::pair<Value, int>> Ribcage::find (const Symbol& var) const {
+
+  auto it = std::begin(values);
+  std::find_if(std::begin(vars),
+               std::end(vars),
+               [&it, &var] (const Symbol& symbol) {
+                 if (symbol == var) {
+                   return true;
+                 } else {
+                   it++;
+                   return false;
+                 }
+               });
+  if (it == std::end(values)) {
+    return {};
+  } else {
+    return {{*it, std::distance(std::begin(values), it)}};
+  }
+}
+
+Value Ribcage::operator [] (int index) const {
+  return values[index];
+}
+
+Env::Env (SpEnv parent, Symbol sym, Value val)
+    : parent_(std::move(parent)), ribcage_{{std::move(sym)},
+                                           {std::move(val)}} { }
+
+Env::Env (SpEnv parent, std::vector<Symbol> syms, std::vector<Value> values)
+    : parent_(std::move(parent)), ribcage_{std::move(syms), std::move(values)} { }
 
 SpEnv Env::make_empty () { return SpEnv(); }
 
 SpEnv Env::extend (SpEnv parent, Symbol sym, Value value) {
-  return std::make_shared<Env>(std::move(parent),
-                               SvPair{std::move(sym), std::move(value)});
+  return std::make_shared<Env>(std::move(parent), std::move(sym), std::move(value));
 }
 
 SpEnv Env::extend (SpEnv parent, std::vector<Symbol> syms, std::vector<Value> values) {
-  assert(syms.size() == values.size());
-  return std::inner_product(std::begin(syms),
-                            std::end(syms),
-                            std::begin(values),
-                            std::move(parent),
-                            [] (auto&& acc, auto&& pair) {
-                              return extend(std::forward<decltype(acc)>(acc),
-                                            std::move(pair.symbol),
-                                            std::move(pair.value));
-                            },
-                            [] (auto&& sym, auto&& val) {
-                              return SvPair{std::forward<decltype(sym)>(sym),
-                                            std::forward<decltype(val)>(val)};
-                            });
+  return std::make_shared<Env>(std::move(parent), std::move(syms), std::move(values));
 }
 
 Value Env::apply (SpEnv env, const Symbol& sym) {
 
   for (auto p = env; p; p = p->parent_) {
-    if (p->bound_record_.symbol == sym) {
-      return p->bound_record_.value;
-    }
+    auto found = p->ribcage_.find(sym);
+    if (found) return found->first;
   }
   throw SymbolNotFoundError(fmt::format("Symbol {} not found.", sym));
 }

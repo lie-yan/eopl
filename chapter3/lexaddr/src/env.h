@@ -9,15 +9,23 @@
 
 namespace eopl {
 
-struct SymbolNotFoundError : std::runtime_error {
-  using std::runtime_error::runtime_error;
-};
-
 using SpEnv = std::shared_ptr<struct Env>;
 
-struct SvPair {
-  Symbol symbol;
-  Value value;
+struct Ribcage {
+
+  Ribcage () = default;
+  Ribcage (const Ribcage&) = default;
+  Ribcage (Ribcage&&) = default;
+  Ribcage& operator = (const Ribcage&) = default;
+  Ribcage& operator = (Ribcage&&) = default;
+
+  Ribcage (std::vector<Symbol> vars, std::vector<Value> values);
+  std::optional<std::pair<Value, int>> find (const Symbol& var) const;
+  Value operator [] (int index) const;
+
+private:
+  std::vector<Symbol> vars;
+  std::vector<Value> values;
 };
 
 class Env {
@@ -29,17 +37,17 @@ public:
   Env (Env&&) = delete;
   Env& operator = (Env&&) = delete;
 
-  Env (SpEnv parent, SvPair pair);
+  Env (SpEnv parent, Symbol sym, Value val);
+  Env (SpEnv parent, std::vector<Symbol> syms, std::vector<Value> values);
 
   static SpEnv make_empty ();
   static SpEnv extend (SpEnv parent, Symbol sym, Value value);
   static SpEnv extend (SpEnv parent, std::vector<Symbol> syms, std::vector<Value> values);
-
   static Value apply (SpEnv env, const Symbol& sym);
 
 private:
   SpEnv parent_;
-  SvPair bound_record_;
+  Ribcage ribcage_;
 };
 
 }
