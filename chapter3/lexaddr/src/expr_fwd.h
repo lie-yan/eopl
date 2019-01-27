@@ -16,7 +16,6 @@ enum class ExpType {
   CONST_EXP,
   VAR_EXP,
   NAMELESS_VAR_EXP,
-  NAMELESS_LETREC_VAR_EXP,
   IF_EXP,
   LET_EXP,
   NAMELESS_LET_EXP,
@@ -46,13 +45,6 @@ struct NamelessVarExp {
   LexicalAddr addr;
 
   friend std::ostream& operator << (std::ostream& os, const NamelessVarExp& varExp);
-};
-
-struct NamelessLetrecVarExp {
-  LexicalAddr addr;
-  SpNamelessEnv saved_env;
-
-  friend std::ostream& operator << (std::ostream& os, const NamelessLetrecVarExp& varExp);
 };
 
 using RwIfExp = boost::recursive_wrapper<struct IfExp>;

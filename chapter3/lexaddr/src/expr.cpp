@@ -39,12 +39,6 @@ std::ostream& operator << (std::ostream& os, const NamelessVarExp& exp) {
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const NamelessLetrecVarExp& exp) {
-  os << "NamelessLetrecVarExp(addr: " << exp.addr
-     << ", saved_env: " << exp.saved_env << ")";
-  return os;
-}
-
 std::ostream& operator << (std::ostream& os, const IfExp& exp) {
   os << "IfExp(" << exp.cond << ", " << exp.then_ << ", " << exp.else_ << ")";
   return os;

@@ -48,7 +48,7 @@ public:
   const std::vector<Symbol>& params () const { return params_; }
   const Expression& body () const { return body_; }
   SpEnv saved_env () const { return saved_env_.lock(); }
-  void saved_env (SpEnv env) { saved_env_ = env; }
+  void saved_env (const WpEnv& env) { saved_env_ = env; }
 private:
   const std::vector<Symbol>& params_;
   Expression body_;
