@@ -30,11 +30,13 @@ ValueType type_of (const Value& value) {
     ValueType operator () (const RwPair&) { return ValueType::PAIR; }
     ValueType operator () (const RwArray&) { return ValueType::ARRAY; }
     ValueType operator () (const RwProc&) { return ValueType::PROC; }
+    ValueType operator () (const RwNamelessProc&) { return ValueType::NAMELESS_PROC; }
     ValueType operator () (const String&) { return ValueType::STRING; }
     ValueType operator () (const Symbol&) { return ValueType::SYMBOL; }
     ValueType operator () (const Pair&) { return ValueType::PAIR; }
     ValueType operator () (const Array&) { return ValueType::ARRAY; }
     ValueType operator () (const Proc&) { return ValueType::PROC; }
+    ValueType operator () (const NamelessProc&) { return ValueType::NAMELESS_PROC; }
   };
 
   return std::visit(TypeVisitor{}, *value);
@@ -63,6 +65,7 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     void operator () (const RwPair& pair) { (*this)(pair.get()); }
     void operator () (const RwArray& array) { (*this)(array.get()); }
     void operator () (const RwProc& proc) { (*this)(proc.get()); }
+    void operator () (const RwNamelessProc& proc) { (*this)(proc.get()); }
     void operator () (const String& str) { os << std::quoted(str.get()); }
     void operator () (const Symbol& sym) { os << sym; }
     void operator () (const Pair& pair) {
@@ -97,6 +100,9 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     }
     void operator () (const Proc& proc) {
       os << "<proc " << proc.params << ">";
+    }
+    void operator () (const NamelessProc& proc) {
+      os << "<nameless-proc " << proc.body << ">";
     }
   };
 
@@ -140,11 +146,21 @@ Proc& to_proc (Value& value) {
   return std::get<RwProc>(*value).get();
 }
 
+const NamelessProc& to_nameless_proc (const Value& value) {
+  return std::get<RwNamelessProc>(*value).get();
+}
+
 std::ostream& operator << (std::ostream& os, const Proc& proc) {
   os << "Proc(params: " << proc.params
      << ", body: " << proc.body
      << ", saved_env: " << proc.saved_env << ")";
   return os;
 }
+
+std::ostream& operator << (std::ostream& os, const NamelessProc& proc) {
+  os << "NamelessProc(body: " << proc.body << ", saved_env: " << proc.saved_env << ")";
+  return os;
+}
+
 
 }

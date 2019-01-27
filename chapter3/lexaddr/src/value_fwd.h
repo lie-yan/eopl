@@ -19,6 +19,7 @@ enum class ValueType {
   PAIR,
   ARRAY,
   PROC,
+  NAMELESS_PROC,
 };
 
 struct Nil {
@@ -217,6 +218,7 @@ using RwSymbol = boost::recursive_wrapper<struct Symbol>;
 using RwArray = boost::recursive_wrapper<struct Array>;
 using RwPair = boost::recursive_wrapper<struct Pair>;
 using RwProc = boost::recursive_wrapper<struct Proc>;
+using RwNamelessProc = boost::recursive_wrapper<struct NamelessProc>;
 
 template<typename T>
 bool operator == (const boost::recursive_wrapper<T>& lhs,
@@ -238,7 +240,8 @@ using Value_ = std::variant<Nil,
                             RwSymbol,
                             RwPair,
                             RwArray,
-                            RwProc>;
+                            RwProc,
+                            RwNamelessProc>;
 
 using Value = std::shared_ptr<Value_>;
 

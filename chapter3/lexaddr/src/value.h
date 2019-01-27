@@ -7,6 +7,7 @@
 #include "expr_fwd.h"
 #include "value_fwd.h"
 #include "env.h"
+#include "nameless/nenv.h"
 
 #include <ostream>
 
@@ -45,6 +46,21 @@ struct Proc {
   friend std::ostream& operator << (std::ostream& os, const Proc& proc);
 };
 
+struct NamelessProc {
+  Expression body;
+  SpNamelessEnv saved_env;
+
+  friend bool operator == (const NamelessProc& lhs, const NamelessProc& rhs) {
+    return lhs.body == rhs.body &&
+           lhs.saved_env == rhs.saved_env;
+  }
+  friend bool operator != (const NamelessProc& lhs, const NamelessProc& rhs) {
+    return !(rhs == lhs);
+  }
+
+  friend std::ostream& operator << (std::ostream& os, const NamelessProc& proc);
+};
+
 /// observers for `Value` below
 ValueType type_of (const Value& value);
 Int to_int (const Value& value);
@@ -56,5 +72,6 @@ const Pair& to_pair (const Value& value);
 const Array& to_array (const Value& value);
 const Proc& to_proc (const Value& value);
 Proc& to_proc (Value& value);
+const NamelessProc& to_nameless_proc (const Value& value);
 
 }
