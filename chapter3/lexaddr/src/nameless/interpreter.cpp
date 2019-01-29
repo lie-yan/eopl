@@ -62,24 +62,27 @@ Value nameless_value_of (const LetExp& exp, const SpNamelessEnv& nenv) {
   throw std::runtime_error(error_message("LetExp"));
 }
 
+Value nameless_value_of (const NamelessLetExp& exp, const SpNamelessEnv& nenv, std::false_type) {
+  std::vector<Value> vals = nameless_value_of(exp.clauses, nenv);
+  auto new_env = NamelessEnv::extend(nenv, std::move(vals));
+  return nameless_value_of(exp.body, new_env);
+}
+
+Value nameless_value_of (const NamelessLetExp& exp, const SpNamelessEnv& nenv, std::true_type) {
+  auto new_nenv = std::accumulate(std::begin(exp.clauses), std::end(exp.clauses),
+                                  nenv,
+                                  [] (SpNamelessEnv acc, const Expression& c) {
+                                    auto val = nameless_value_of(c, acc);
+                                    return NamelessEnv::extend(std::move(acc), std::move(val));
+                                  });
+  return nameless_value_of(exp.body, new_nenv);
+}
+
 Value nameless_value_of (const NamelessLetExp& exp, const SpNamelessEnv& nenv) {
   if (exp.star) {
-//    auto new_env = std::accumulate(std::begin(exp.clauses),
-//                                   std::end(exp.clauses),
-//                                   env,
-//                                   [] (SpEnv acc, const LetExp::Clause& c) -> SpEnv {
-//                                     auto res = value_of(c.second, acc);
-//                                     return Env::extend(std::move(acc), c.first, std::move(res));
-//                                   });
-//    return value_of(exp.body, std::move(new_env));
-
-    //TODO: give a real implementation
-    throw std::runtime_error("nameless_value_of for let* has not been implemented yet");
-
+    return nameless_value_of(exp, nenv, std::true_type());
   } else {
-    std::vector<Value> vals = nameless_value_of(exp.clauses, nenv);
-    auto new_env = NamelessEnv::extend(nenv, std::move(vals));
-    return nameless_value_of(exp.body, new_env);
+    return nameless_value_of(exp, nenv, std::false_type());
   }
 }
 

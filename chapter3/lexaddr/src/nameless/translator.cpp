@@ -7,6 +7,7 @@
 #include "built_in.h"
 #include <fmt/ostream.h>
 #include <boost/type_index.hpp>
+#include <numeric>
 
 namespace eopl {
 
@@ -35,7 +36,9 @@ struct TranslationOfVisitor {
   const SpStaticEnv& senv;
 
   template<typename T>
-  Expression operator () (const boost::recursive_wrapper<T>& e) { return translation_of(e.get(), senv); }
+  Expression operator () (const boost::recursive_wrapper<T>& e) {
+    return translation_of(e.get(), senv);
+  }
 
   template<typename T>
   Expression operator () (const T& e) { return translation_of(e, senv); }
@@ -75,7 +78,8 @@ Expression translation_of (const IfExp& exp, const SpStaticEnv& senv) {
   });
 }
 
-Expression translation_of (const LetExp& exp, const SpStaticEnv& senv) {
+Expression translation_of (const LetExp& exp, const SpStaticEnv& senv, std::false_type) {
+  assert(!exp.star);
 
   std::vector<Symbol> vars;
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
@@ -96,6 +100,34 @@ Expression translation_of (const LetExp& exp, const SpStaticEnv& senv) {
               translation_of(exp.body, StaticEnv::extend(senv, std::move(vars))),
               exp.star
           });
+}
+
+Expression translation_of (const LetExp& exp, const SpStaticEnv& senv, std::true_type) {
+  assert(exp.star);
+
+  auto[new_senv, tr_exp_list] = std::accumulate(std::begin(exp.clauses), std::end(exp.clauses),
+                                                std::pair(senv, std::vector<Expression>()),
+                                                [] (auto& p, const LetExp::Clause& c) {
+                                                  Expression e = translation_of(c.second, p.first);
+                                                  auto se = StaticEnv::extend(p.first, c.first);
+                                                  p.second.push_back(e);
+                                                  return std::pair(se, std::move(p.second));
+                                                });
+  return
+      to_exp(
+          NamelessLetExp{
+              tr_exp_list,
+              translation_of(exp.body, new_senv),
+              exp.star
+          });
+}
+
+Expression translation_of (const LetExp& exp, const SpStaticEnv& senv) {
+  if (exp.star) {
+    return translation_of(exp, senv, std::true_type());
+  } else {
+    return translation_of(exp, senv, std::false_type());
+  }
 }
 
 Expression translation_of (const NamelessLetExp& exp, const SpStaticEnv& senv) {
@@ -202,6 +234,5 @@ std::vector<Expression> translation_of (const std::vector<Expression>& exp_list,
                  });
   return ret;
 }
-
 
 }

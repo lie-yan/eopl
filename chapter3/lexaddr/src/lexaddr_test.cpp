@@ -139,10 +139,10 @@ TEST(let_lang, let) {
                           "       y = (- x 2)"
                           "in (- x y)"), to_value(Int{1}));
 
-//  EXPECT_EQ(nameless_eval("let x = 30"
-//                          "in let* x = (- x 1)"
-//                          "        y = (- x 2)"
-//                          "in (- x y)"), to_value(Int{2}));
+  EXPECT_EQ(nameless_eval("let x = 30"
+                          "in let* x = (- x 1)"
+                          "        y = (- x 2)"
+                          "in (- x y)"), to_value(Int{2}));
 
 }
 

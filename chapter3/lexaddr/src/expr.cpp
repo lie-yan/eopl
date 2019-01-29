@@ -62,64 +62,64 @@ std::ostream& operator << (std::ostream& os, const CondExp::Clause& clause) {
   return os;
 }
 
+std::ostream& operator << (std::ostream& os, const CondExp& exp) {
+  os << "CondExp(" << exp.clauses << ")";
+  return os;
+}
+
 std::ostream& operator << (std::ostream& os, const LetExp::Clause& clause) {
   os << "(" << clause.first << " = " << clause.second << ")";
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const CondExp& condExp) {
-  os << "CondExp(" << condExp.clauses << ")";
+std::ostream& operator << (std::ostream& os, const LetExp& exp) {
+  os << "LetExp(clauses: " << exp.clauses << ", body: " << exp.body << ")";
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const LetExp& letExp) {
-  os << "LetExp(clauses: " << letExp.clauses << ", body: " << letExp.body << ")";
+std::ostream& operator << (std::ostream& os, const NamelessLetExp& exp) {
+  os << "NamelessLetExp(clauses: " << exp.clauses
+     << ", body: " << exp.body
+     << ", star: " << std::boolalpha << exp.star << ")";
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const NamelessLetExp& letExp) {
-  os << "NamelessLetExp(clauses: " << letExp.clauses
-     << ", body: " << letExp.body
-     << ", star: " << letExp.star << ")";
+std::ostream& operator << (std::ostream& os, const UnpackExp& exp) {
+  os << "UnpackExp(vars: " << exp.vars
+     << ", pack: " << exp.pack
+     << ", body: " << exp.body << ")";
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const UnpackExp& unpackExp) {
-  os << "UnpackExp(vars: " << unpackExp.vars
-     << ", pack: " << unpackExp.pack
-     << ", body: " << unpackExp.body << ")";
+std::ostream& operator << (std::ostream& os, const NamelessUnpackExp& exp) {
+  os << "NamelessUnpackExp(var_num: " << exp.var_num
+     << ", pack: " << exp.pack
+     << ", body: " << exp.body << ")";
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const NamelessUnpackExp& unpackExp) {
-  os << "NamelessUnpackExp(var_num: " << unpackExp.var_num
-     << ", pack: " << unpackExp.pack
-     << ", body: " << unpackExp.body << ")";
+std::ostream& operator << (std::ostream& os, const ProcExp& exp) {
+  os << "ProcExp(params: " << exp.params
+     << ", body: " << exp.body << ")";
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const ProcExp& procExp) {
-  os << "ProcExp(params: " << procExp.params
-     << ", body: " << procExp.body << ")";
+std::ostream& operator << (std::ostream& os, const NamelessProcExp& exp) {
+  os << "NamelessProcExp(" << exp.body << ")";
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const NamelessProcExp& procExp) {
-  os << "NamelessProcExp(" << procExp.body << ")";
-  return os;
-}
-
-std::ostream& operator << (std::ostream& os, const CallExp& callExp) {
-  os << "CallExp(rator: " << callExp.rator
-     << ", rands: " << callExp.rands
+std::ostream& operator << (std::ostream& os, const CallExp& exp) {
+  os << "CallExp(rator: " << exp.rator
+     << ", rands: " << exp.rands
      << ")";
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const LetrecProcSpec& def) {
-  os << "LetrecProcSpec(name: " << def.name
-     << ", params: " << def.params
-     << ", body: " << def.body << ")";
+std::ostream& operator << (std::ostream& os, const LetrecProcSpec& spec) {
+  os << "LetrecProcSpec(name: " << spec.name
+     << ", params: " << spec.params
+     << ", body: " << spec.body << ")";
   return os;
 }
 
@@ -135,9 +135,9 @@ std::ostream& operator << (std::ostream& os, const NamelessLetrecProcSpec& spec)
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const NamelessLetrecExp& letrecExp) {
-  os << "NamelessLetrecExp(procs: " << letrecExp.procs
-     << ", body: " << letrecExp.body << ")";
+std::ostream& operator << (std::ostream& os, const NamelessLetrecExp& exp) {
+  os << "NamelessLetrecExp(procs: " << exp.procs
+     << ", body: " << exp.body << ")";
   return os;
 }
 
