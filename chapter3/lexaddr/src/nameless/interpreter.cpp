@@ -11,8 +11,15 @@
 
 #include <numeric>
 #include <fmt/ostream.h>
+#include <boost/type_index.hpp>
 
 namespace eopl {
+
+template<typename T>
+std::string error_message (const T& t) {
+  return fmt::format("{} should not appear in the program for nameless_value_of()",
+                     boost::typeindex::type_id<T>().pretty_name());
+}
 
 Value nameless_value_of (const Program& program, const SpNamelessEnv& nenv) {
   return nameless_value_of(program.exp1, nenv);
@@ -34,10 +41,6 @@ Value nameless_value_of (const Expression& exp, const SpNamelessEnv& nenv) {
 
 Value nameless_value_of (const ConstExp& exp, const SpNamelessEnv& nenv) {
   return to_value(exp.num);
-}
-
-static std::string error_message (const std::string& s) {
-  return fmt::format("{} should not appear in a nameless program", s);
 }
 
 Value nameless_value_of (const VarExp& exp, const SpNamelessEnv& nenv) {

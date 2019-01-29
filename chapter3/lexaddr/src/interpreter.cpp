@@ -10,12 +10,18 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <numeric>
-#include <utility>
+#include <boost/type_index.hpp>
 
 namespace eopl {
 
-Value value_of (const Program& program, SpEnv env) {
-  return value_of(program.exp1, std::move(env));
+template<typename T>
+std::string error_message (const T& exp) {
+  return fmt::format("{} should not appear in the program for value_of()",
+                     boost::typeindex::type_id<T>().pretty_name());
+}
+
+Value value_of (const Program& program, const SpEnv& env) {
+  return value_of(program.exp1, env);
 }
 
 struct ValueOfVisitor {
@@ -28,30 +34,30 @@ struct ValueOfVisitor {
   Value operator () (const T& exp) { return value_of(exp, env); }
 };
 
-Value value_of (const Expression& exp, SpEnv env) {
+Value value_of (const Expression& exp, const SpEnv& env) {
   return std::visit(ValueOfVisitor{env}, *exp);
 }
 
-Value value_of (const ConstExp& exp, SpEnv env) {
+Value value_of (const ConstExp& exp, const SpEnv& env) {
   return to_value(exp.num);
 }
 
-Value value_of (const VarExp& exp, SpEnv env) {
-  return Env::apply(std::move(env), exp.var);
+Value value_of (const VarExp& exp, const SpEnv& env) {
+  return Env::apply(env, exp.var);
 }
 
-Value value_of (const NamelessVarExp& exp, SpEnv env) {
-  throw std::runtime_error("NamelessVarExp should not appear here");
+Value value_of (const NamelessVarExp& exp, const SpEnv& env) {
+  throw std::runtime_error(error_message(exp));
 }
 
-Value value_of (const IfExp& exp, SpEnv env) {
+Value value_of (const IfExp& exp, const SpEnv& env) {
   Value val1 = value_of(exp.cond, env);
   bool b1 = to_bool(val1).get();
-  if (b1) return value_of(exp.then_, std::move(env));
-  else return value_of(exp.else_, std::move(env));
+  if (b1) return value_of(exp.then_, env);
+  else return value_of(exp.else_, env);
 }
 
-Value value_of (const LetExp& exp, SpEnv env) {
+Value value_of (const LetExp& exp, const SpEnv& env) {
   if (exp.star) {
     auto new_env = std::accumulate(std::begin(exp.clauses),
                                    std::end(exp.clauses),
@@ -60,7 +66,7 @@ Value value_of (const LetExp& exp, SpEnv env) {
                                      auto res = value_of(c.second, acc);
                                      return Env::extend(std::move(acc), c.first, std::move(res));
                                    });
-    return value_of(exp.body, std::move(new_env));
+    return value_of(exp.body, new_env);
   } else {
     auto new_env = std::accumulate(std::begin(exp.clauses),
                                    std::end(exp.clauses),
@@ -69,15 +75,15 @@ Value value_of (const LetExp& exp, SpEnv env) {
                                      auto res = value_of(c.second, env);
                                      return Env::extend(std::move(acc), c.first, std::move(res));
                                    });
-    return value_of(exp.body, std::move(new_env));
+    return value_of(exp.body, new_env);
   }
 }
 
-Value value_of (const NamelessLetExp& exp, SpEnv env) {
-  throw std::runtime_error("NamelessLetExp should not appear here");
+Value value_of (const NamelessLetExp& exp, const SpEnv& env) {
+  throw std::runtime_error(error_message(exp));
 }
 
-Value value_of (const CondExp& exp, SpEnv env) {
+Value value_of (const CondExp& exp, const SpEnv& env) {
   auto it = std::find_if(std::begin(exp.clauses),
                          std::end(exp.clauses),
                          [env] (const CondExp::Clause& c) -> bool {
@@ -92,7 +98,7 @@ Value value_of (const CondExp& exp, SpEnv env) {
   }
 }
 
-Value value_of (const UnpackExp& exp, SpEnv env) {
+Value value_of (const UnpackExp& exp, const SpEnv& env) {
   static const std::string msg = "the size of identifier list and that of the pack "
                                  "does not match";
 
@@ -113,23 +119,23 @@ Value value_of (const UnpackExp& exp, SpEnv env) {
   if (type_of(p.first) != ValueType::NIL) {
     throw std::runtime_error(msg);
   } else {
-    return value_of(exp.body, std::move(p.second));
+    return value_of(exp.body, p.second);
   }
 }
 
-Value value_of (const NamelessUnpackExp& exp, SpEnv env) {
-  throw std::runtime_error("NamelessUnpackExp should not appear here");
+Value value_of (const NamelessUnpackExp& exp, const SpEnv& env) {
+  throw std::runtime_error(error_message(exp));
 }
 
-Value value_of (const ProcExp& exp, SpEnv env) {
-  return to_value(Proc{exp.params, exp.body, std::move(env)});
+Value value_of (const ProcExp& exp, const SpEnv& env) {
+  return to_value(Proc{exp.params, exp.body, env});
 }
 
-Value value_of (const NamelessProcExp& exp, SpEnv env) {
-  throw std::runtime_error("NamelessProcExp should not appear here");
+Value value_of (const NamelessProcExp& exp, const SpEnv& env) {
+  throw std::runtime_error(error_message(exp));
 }
 
-std::vector<Value> value_of (const std::vector<Expression>& exps, SpEnv env) {
+std::vector<Value> value_of (const std::vector<Expression>& exps, const SpEnv& env) {
   std::vector<Value> results;
   std::transform(std::begin(exps),
                  std::end(exps),
@@ -140,7 +146,7 @@ std::vector<Value> value_of (const std::vector<Expression>& exps, SpEnv env) {
   return results;
 }
 
-Value value_of (const CallExp& exp, SpEnv env) {
+Value value_of (const CallExp& exp, const SpEnv& env) {
 
   auto eval_proc = [] (const auto& exp, auto env) {
     if (auto rator = value_of(exp.rator, env);
@@ -171,12 +177,12 @@ Value value_of (const CallExp& exp, SpEnv env) {
   }
 }
 
-Value value_of (const LetrecExp& exp, SpEnv env) {
+Value value_of (const LetrecExp& exp, const SpEnv& env) {
   std::vector<Value> saved;
   SpEnv new_env = std::accumulate(std::begin(exp.proc_list),
                                   std::end(exp.proc_list),
-                                  std::move(env),
-                                  [&saved] (SpEnv acc, const LetrecProcSpec& proc) {
+                                  env,
+                                  [&saved] (const SpEnv& acc, const LetrecProcSpec& proc) {
                                     auto p = to_value(Proc{proc.params, proc.body, acc});
                                     saved.push_back(p);
                                     return Env::extend(acc, proc.name, p);
@@ -185,14 +191,17 @@ Value value_of (const LetrecExp& exp, SpEnv env) {
   return value_of(exp.body, new_env);
 }
 
-Value value_of (const NamelessLetrecExp& exp, SpEnv env) {
-  throw std::runtime_error("NamelessLetrecExp should not appear here");
+Value value_of (const NamelessLetrecExp& exp, const SpEnv& env) {
+  throw std::runtime_error(error_message(exp));
 }
 
 SpEnv make_initial_env () {
-  auto ret = Env::make_empty();
-  ret = Env::extend(ret, Symbol{"emptylist"}, to_value(Nil()));
-  return ret;
+  return
+      Env::extend(
+          Env::make_empty(),
+          Symbol{"emptylist"},
+          to_value(Nil())
+      );
 }
 
 Value eval (const std::string& s) {

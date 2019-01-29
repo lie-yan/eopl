@@ -6,8 +6,15 @@
 
 #include "built_in.h"
 #include <fmt/ostream.h>
+#include <boost/type_index.hpp>
 
 namespace eopl {
+
+template<typename T>
+std::string error_message (const T& t) {
+  return fmt::format("{} should not appear in the program for translation_of()",
+                     boost::typeindex::type_id<T>().pretty_name());
+}
 
 SpStaticEnv make_initial_senv () {
   return
@@ -56,12 +63,8 @@ Expression translation_of (const VarExp& exp, const SpStaticEnv& senv) {
   }
 }
 
-static std::string error_message_for_nameless (const std::string& s) {
-  return fmt::format("{} should not appear in the argument of translation_of()", s);
-}
-
 Expression translation_of (const NamelessVarExp& exp, const SpStaticEnv& senv) {
-  throw std::runtime_error(error_message_for_nameless("NamelessVarExp"));
+  throw std::runtime_error(error_message(exp));
 }
 
 Expression translation_of (const IfExp& exp, const SpStaticEnv& senv) {
@@ -96,7 +99,7 @@ Expression translation_of (const LetExp& exp, const SpStaticEnv& senv) {
 }
 
 Expression translation_of (const NamelessLetExp& exp, const SpStaticEnv& senv) {
-  throw std::runtime_error(error_message_for_nameless("NamelessLetExp"));
+  throw std::runtime_error(error_message(exp));
 }
 
 Expression translation_of (const CondExp& exp, const SpStaticEnv& senv) {
@@ -130,7 +133,7 @@ Expression translation_of (const UnpackExp& exp, const SpStaticEnv& senv) {
 }
 
 Expression translation_of (const NamelessUnpackExp& exp, const SpStaticEnv& senv) {
-  throw std::runtime_error(error_message_for_nameless("NamelessUnpackExp"));
+  throw std::runtime_error(error_message(exp));
 }
 
 Expression translation_of (const ProcExp& exp, const SpStaticEnv& senv) {
@@ -142,7 +145,7 @@ Expression translation_of (const ProcExp& exp, const SpStaticEnv& senv) {
 }
 
 Expression translation_of (const NamelessProcExp& exp, const SpStaticEnv& senv) {
-  throw std::runtime_error(error_message_for_nameless("NamelessProcExp"));
+  throw std::runtime_error(error_message(exp));
 }
 
 Expression translation_of (const CallExp& exp, const SpStaticEnv& senv) {
@@ -186,7 +189,7 @@ Expression translation_of (const LetrecExp& exp, const SpStaticEnv& senv) {
 }
 
 Expression translation_of (const NamelessLetrecExp& exp, const SpStaticEnv& senv) {
-  throw std::runtime_error(error_message_for_nameless("NamelessLetrecExp"));
+  throw std::runtime_error(error_message(exp));
 }
 
 std::vector<Expression> translation_of (const std::vector<Expression>& exp_list, const SpStaticEnv& senv) {

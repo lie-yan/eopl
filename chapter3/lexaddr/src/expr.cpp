@@ -5,7 +5,6 @@
 #include "expr.h"
 
 #include "basic.h"
-#include "expr_fwd.h"
 
 namespace eopl {
 
