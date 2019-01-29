@@ -32,13 +32,13 @@ SpStaticEnv StaticEnv::extend (SpStaticEnv parent, std::vector<Symbol> syms) {
  */
 LexicalAddr StaticEnv::apply (const SpStaticEnv& env, const Symbol& sym) {
 
-  auto error_message = [&sym] () { return fmt::format("Symbol {} not found", sym); };
+  auto error_message = [] (auto& sym) { return fmt::format("Symbol {} not found", sym); };
 
-  if (!env) throw SymbolNotFoundError(error_message());
+  if (!env) throw SymbolNotFoundError(error_message(sym));
 
-  int senv_index = 0;
-  auto p = env;
-
+  auto[senv_index, p] = std::pair(0, env);
+  // Inv: distance(env, p) = senv_index
+  // bound: distance(env, empty) - distance(env, p)
   do {
     auto it = std::find(std::begin(p->vars_), std::end(p->vars_), sym);
     if (it != std::end(p->vars_)) {
@@ -50,7 +50,7 @@ LexicalAddr StaticEnv::apply (const SpStaticEnv& env, const Symbol& sym) {
     }
   } while (p);
 
-  throw SymbolNotFoundError(error_message());
+  throw SymbolNotFoundError(error_message(sym));
 }
 
 std::ostream& operator << (std::ostream& os, const LexicalAddr& addr) {

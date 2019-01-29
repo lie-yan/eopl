@@ -13,34 +13,25 @@
 
 namespace eopl {
 
-Ribcage::Ribcage (std::vector<Symbol> vars, std::vector<Value> values)
-    : vars(std::move(vars)), values(std::move(values)) {
+Ribcage::Ribcage (std::vector<Symbol> variables, std::vector<Value> values)
+    : variables_(std::move(variables)), values_(std::move(values)) {
 
-  assert(this->vars.size() == this->values.size());
+  assert(this->variables_.size() == this->values_.size());
 }
 
-std::optional<std::pair<Value, int>> Ribcage::find (const Symbol& var) const {
+std::optional<std::pair<Value, long>> Ribcage::find (const Symbol& var) const {
 
-  auto it = std::begin(values);
-  std::find_if(std::begin(vars),
-               std::end(vars),
-               [&it, &var] (const Symbol& symbol) {
-                 if (symbol == var) {
-                   return true;
-                 } else {
-                   it++;
-                   return false;
-                 }
-               });
-  if (it == std::end(values)) {
+  auto found = std::find(std::begin(variables_), std::end(variables_), var);
+  if (found == std::end(variables_)) {
     return {};
   } else {
-    return {{*it, std::distance(std::begin(values), it)}};
+    auto index = std::distance(std::begin(variables_), found);
+    return {{values_[index], index}};
   }
 }
 
 Value Ribcage::operator [] (int index) const {
-  return values[index];
+  return values_[index];
 }
 
 Env::Env (SpEnv parent, Symbol sym, Value val)
@@ -62,10 +53,12 @@ SpEnv Env::extend (SpEnv parent, std::vector<Symbol> syms, std::vector<Value> va
 
 Value Env::apply (SpEnv env, const Symbol& sym) {
 
-  for (auto p = env; p; p = p->parent_) {
-    auto found = p->ribcage_.find(sym);
+  while (env) {
+    auto found = env->ribcage_.find(sym);
     if (found) return found->first;
+    env = env->parent_;
   }
+
   throw SymbolNotFoundError(fmt::format("Symbol {} not found.", sym));
 }
 

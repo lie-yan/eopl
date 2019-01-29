@@ -20,13 +20,13 @@ struct Ribcage {
   Ribcage& operator = (const Ribcage&) = default;
   Ribcage& operator = (Ribcage&&) = default;
 
-  Ribcage (std::vector<Symbol> vars, std::vector<Value> values);
-  std::optional<std::pair<Value, int>> find (const Symbol& var) const;
+  Ribcage (std::vector<Symbol> variables, std::vector<Value> values);
+  std::optional<std::pair<Value, long>> find (const Symbol& var) const;
   Value operator [] (int index) const;
 
 private:
-  std::vector<Symbol> vars;
-  std::vector<Value> values;
+  std::vector<Symbol> variables_;
+  std::vector<Value> values_;
 };
 
 class Env {
