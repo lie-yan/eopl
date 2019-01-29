@@ -179,7 +179,7 @@ TEST(letrec_lang, basic) {
 
   EXPECT_EQ(
       nameless_eval("letrec double(x) = if (zero? x) then 0 else (- (double (- x 1)) -2) "
-           "in (double 6)"),
+                    "in (double 6)"),
       to_value(Int{12}));
 }
 
@@ -188,10 +188,10 @@ TEST(letrec_lang, mutual_recursive) {
 
   EXPECT_EQ(
       nameless_eval("letrec "
-           "even(x) = if (zero? x) then 1 else (odd (- x 1)) "
-           "odd(x) = if (zero? x) then 0 else (even (- x 1)) "
-           "in let even = proc(x) (* x x) "
-           "in (odd 13)"),
+                    "even(x) = if (zero? x) then 1 else (odd (- x 1)) "
+                    "odd(x) = if (zero? x) then 0 else (even (- x 1)) "
+                    "in let even = proc(x) (* x x) "
+                    "in (odd 13)"),
       to_value(Int{1}));
 }
 

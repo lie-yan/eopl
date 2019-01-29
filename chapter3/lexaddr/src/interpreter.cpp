@@ -57,25 +57,33 @@ Value value_of (const IfExp& exp, const SpEnv& env) {
   else return value_of(exp.else_, env);
 }
 
+Value value_of (const LetExp& exp, const SpEnv& env, std::true_type) {
+  auto new_env = std::accumulate(std::begin(exp.clauses),
+                                 std::end(exp.clauses),
+                                 env,
+                                 [] (SpEnv acc, const LetExp::Clause& c) -> SpEnv {
+                                   auto res = value_of(c.second, acc);
+                                   return Env::extend(std::move(acc), c.first, std::move(res));
+                                 });
+  return value_of(exp.body, new_env);
+}
+
+Value value_of (const LetExp& exp, const SpEnv& env, std::false_type) {
+  auto new_env = std::accumulate(std::begin(exp.clauses),
+                                 std::end(exp.clauses),
+                                 env,
+                                 [&env] (SpEnv acc, const LetExp::Clause& c) -> SpEnv {
+                                   auto res = value_of(c.second, env);
+                                   return Env::extend(std::move(acc), c.first, std::move(res));
+                                 });
+  return value_of(exp.body, new_env);
+}
+
 Value value_of (const LetExp& exp, const SpEnv& env) {
   if (exp.star) {
-    auto new_env = std::accumulate(std::begin(exp.clauses),
-                                   std::end(exp.clauses),
-                                   env,
-                                   [] (SpEnv acc, const LetExp::Clause& c) -> SpEnv {
-                                     auto res = value_of(c.second, acc);
-                                     return Env::extend(std::move(acc), c.first, std::move(res));
-                                   });
-    return value_of(exp.body, new_env);
+    return value_of(exp, env, std::true_type());
   } else {
-    auto new_env = std::accumulate(std::begin(exp.clauses),
-                                   std::end(exp.clauses),
-                                   env,
-                                   [&env] (SpEnv acc, const LetExp::Clause& c) -> SpEnv {
-                                     auto res = value_of(c.second, env);
-                                     return Env::extend(std::move(acc), c.first, std::move(res));
-                                   });
-    return value_of(exp.body, new_env);
+    return value_of(exp, env, std::false_type());
   }
 }
 
