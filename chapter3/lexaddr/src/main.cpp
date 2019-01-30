@@ -1,0 +1,23 @@
+#include <algorithm>
+#include <sstream>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
+#include "nameless/interpreter.h"
+
+#include "parser.tab.hpp"
+
+int main () {
+  using eopl::nameless_eval, eopl::Int, eopl::Bool, eopl::Value;
+  try {
+    auto res = nameless_eval("let f = proc (x) (- x 11) in (f (f 77))");
+    std::cout << res << std::endl;
+
+    res = nameless_eval("(proc (f) (f (f 77)) proc (x) (- x 11))");
+    std::cout << res << std::endl;
+  } catch (const yy::parser::syntax_error& e) {
+    fmt::print("The program came into an error around {}. Detail: {}.\n", e.location, e.what());
+  } catch (const std::runtime_error& e) {
+    fmt::print("The program came into a runtime error: {}.\n", e.what());
+  }
+}
