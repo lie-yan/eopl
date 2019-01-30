@@ -61,7 +61,7 @@ Value value_of (const LetExp& exp, const SpEnv& env, std::true_type) {
   auto new_env = std::accumulate(std::begin(exp.clauses),
                                  std::end(exp.clauses),
                                  env,
-                                 [] (SpEnv acc, const LetExp::Clause& c) -> SpEnv {
+                                 [] (SpEnv& acc, const LetExp::Clause& c) -> SpEnv {
                                    auto res = value_of(c.exp, acc);
                                    return Env::extend(std::move(acc), c.var, std::move(res));
                                  });
@@ -72,7 +72,7 @@ Value value_of (const LetExp& exp, const SpEnv& env, std::false_type) {
   auto new_env = std::accumulate(std::begin(exp.clauses),
                                  std::end(exp.clauses),
                                  env,
-                                 [&env] (SpEnv acc, const LetExp::Clause& c) -> SpEnv {
+                                 [&env] (SpEnv& acc, const LetExp::Clause& c) -> SpEnv {
                                    auto res = value_of(c.exp, env);
                                    return Env::extend(std::move(acc), c.var, std::move(res));
                                  });
@@ -107,28 +107,17 @@ Value value_of (const CondExp& exp, const SpEnv& env) {
 }
 
 Value value_of (const UnpackExp& exp, const SpEnv& env) {
-  static const std::string msg = "the size of identifier list and that of the pack "
-                                 "does not match";
 
   auto lst = value_of(exp.pack, env);
-  using P = decltype(std::pair(lst, env));
-  P p = std::accumulate(std::begin(exp.vars),
-                        std::end(exp.vars),
-                        P(lst, env),
-                        [] (P acc, const Symbol& s) -> P {
-                          if (type_of(acc.first) == ValueType::PAIR) {
-                            auto& pair = to_pair(acc.first);
-                            auto new_env = Env::extend(std::move(acc.second), s, pair.first);
-                            return std::pair(pair.second, std::move(new_env));
-                          } else {
-                            throw std::runtime_error(msg);
-                          }
-                        });
-  if (type_of(p.first) != ValueType::NIL) {
-    throw std::runtime_error(msg);
+  std::vector<Value> values = flatten(lst);
+  if (values.size() == exp.vars.size()) {
+    return value_of(exp.body,
+                    Env::extend(env, exp.vars, values));
   } else {
-    return value_of(exp.body, p.second);
+    throw std::runtime_error("the size of identifier list and that of the pack "
+                             "does not match");
   }
+
 }
 
 Value value_of (const NamelessUnpackExp& exp, const SpEnv& env) {
@@ -190,10 +179,10 @@ Value value_of (const LetrecExp& exp, const SpEnv& env) {
   SpEnv new_env = std::accumulate(std::begin(exp.proc_list),
                                   std::end(exp.proc_list),
                                   env,
-                                  [&saved] (const SpEnv& acc, const LetrecProcSpec& proc) {
+                                  [&saved] (SpEnv& acc, const LetrecProcSpec& proc) {
                                     auto p = to_value(Proc{proc.params, proc.body, acc});
                                     saved.push_back(p);
-                                    return Env::extend(acc, proc.name, p);
+                                    return Env::extend(std::move(acc), proc.name, p);
                                   });
   for (auto& v : saved) to_proc(v).saved_env(new_env);
   return value_of(exp.body, new_env);

@@ -57,7 +57,7 @@ private:
 
 class NamelessProc {
 public:
-  NamelessProc (Expression body, SpNamelessEnv saved_env);
+  NamelessProc (Expression body, const SpNamelessEnv& saved_env);
   friend bool operator == (const NamelessProc& lhs, const NamelessProc& rhs) {
     return lhs.body_ == rhs.body_ &&
            lhs.saved_env() == rhs.saved_env();
@@ -90,5 +90,7 @@ const Proc& to_proc (const Value& value);
 Proc& to_proc (Value& value);
 const NamelessProc& to_nameless_proc (const Value& value);
 NamelessProc& to_nameless_proc (Value& value);
+
+std::vector<Value> flatten (Value lst);
 
 }

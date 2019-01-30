@@ -71,7 +71,7 @@ Value nameless_value_of (const NamelessLetExp& exp, const SpNamelessEnv& nenv, s
 Value nameless_value_of (const NamelessLetExp& exp, const SpNamelessEnv& nenv, std::true_type) {
   auto new_nenv = std::accumulate(std::begin(exp.clauses), std::end(exp.clauses),
                                   nenv,
-                                  [] (SpNamelessEnv acc, const Expression& c) {
+                                  [] (SpNamelessEnv& acc, const Expression& c) {
                                     auto val = nameless_value_of(c, acc);
                                     return NamelessEnv::extend(std::move(acc), std::move(val));
                                   });
@@ -105,37 +105,18 @@ Value nameless_value_of (const UnpackExp& exp, const SpNamelessEnv& nenv) {
   throw std::runtime_error(error_message(exp));
 }
 
-std::vector<Value> unpack (Value pack, size_t n) {
-
-  static const std::string msg = "the size of identifier list and that of the pack "
-                                 "does not match";
-
-  std::vector<Value> unpacked;
-  std::generate_n(std::back_inserter(unpacked),
-                  n,
-                  [&pack] () -> Value {
-                    if (type_of(pack) == ValueType::PAIR) {
-                      auto& p = to_pair(pack);
-                      Value ret = p.first;
-                      pack = p.second;
-                      return ret;
-                    } else {
-                      throw std::runtime_error(msg);
-                    }
-                  });
-
-  if (type_of(pack) != ValueType::NIL) {
-    throw std::runtime_error(msg);
-  } else {
-    return unpacked;
-  }
-}
-
 Value nameless_value_of (const NamelessUnpackExp& exp, const SpNamelessEnv& nenv) {
   Value pack = nameless_value_of(exp.pack, nenv);
-  std::vector<Value> unpacked = unpack(pack, exp.var_num);
-  return nameless_value_of(exp.body,
-                           NamelessEnv::extend(nenv, std::move(unpacked)));
+  std::vector<Value> unpacked = flatten(pack);
+
+  if (unpacked.size() == exp.var_num) {
+    return nameless_value_of(exp.body,
+                             NamelessEnv::extend(nenv, std::move(unpacked)));
+  } else {
+    throw std::runtime_error("the size of identifier list and that of the pack "
+                             "does not match");
+  }
+
 }
 
 Value nameless_value_of (const ProcExp& exp, const SpNamelessEnv& nenv) {

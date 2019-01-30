@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 #include "nameless/interpreter.h"
+#include "interpreter.h"
 
 TEST(let_lang, arithmetic_operations) {
   using namespace eopl;

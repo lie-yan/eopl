@@ -145,7 +145,7 @@ Value list (const std::vector<Value>& args) {
   Value res = std::accumulate(std::rbegin(args),
                               std::rend(args),
                               to_value(Nil()),
-                              [] (Value acc, Value value) -> Value {
+                              [] (Value& acc, Value value) -> Value {
                                 auto t = Pair{std::move(value), std::move(acc)};
                                 return to_value(std::move(t));
                               });

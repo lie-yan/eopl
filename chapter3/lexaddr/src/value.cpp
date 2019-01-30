@@ -173,8 +173,8 @@ SpNamelessEnv NamelessProc::saved_env () const {
   return saved_env_.lock();
 }
 
-NamelessProc::NamelessProc (Expression body, SpNamelessEnv saved_env)
-    : body_(std::move(body)), saved_env_(std::move(saved_env)) { }
+NamelessProc::NamelessProc (Expression body, const SpNamelessEnv& saved_env)
+    : body_(std::move(body)), saved_env_(saved_env) { }
 
 const Expression& NamelessProc::body () const {
   return body_;
@@ -184,5 +184,20 @@ void NamelessProc::saved_env (const WpNamelessEnv& saved_env) {
   saved_env_ = saved_env;
 }
 
+std::vector<Value> flatten (Value lst) {
+  std::vector<Value> values;
+  while (true) {
+    if (auto type = type_of(lst); type == ValueType::PAIR) {
+      auto& pair = to_pair(lst);
+      values.push_back(pair.first);
+      lst = pair.second;
+    } else if (type == ValueType::NIL) {
+      break;
+    } else {
+      throw std::runtime_error("expect a list");
+    }
+  }
+  return values;
+}
 
 }
