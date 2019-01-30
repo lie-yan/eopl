@@ -107,11 +107,13 @@ Value nameless_value_of (const UnpackExp& exp, const SpNamelessEnv& nenv) {
 
 Value nameless_value_of (const NamelessUnpackExp& exp, const SpNamelessEnv& nenv) {
   Value pack = nameless_value_of(exp.pack, nenv);
-  std::vector<Value> unpacked = flatten(pack);
+  std::optional<std::vector<Value>> unpacked = flatten(pack);
 
-  if (unpacked.size() == exp.var_num) {
+  if (!unpacked) {
+    throw std::runtime_error("list expected");
+  } else if (unpacked->size() == exp.var_num) {
     return nameless_value_of(exp.body,
-                             NamelessEnv::extend(nenv, std::move(unpacked)));
+                             NamelessEnv::extend(nenv, *unpacked));
   } else {
     throw std::runtime_error("the size of identifier list and that of the pack "
                              "does not match");

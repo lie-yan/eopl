@@ -184,7 +184,7 @@ void NamelessProc::saved_env (const WpNamelessEnv& saved_env) {
   saved_env_ = saved_env;
 }
 
-std::vector<Value> flatten (Value lst) {
+std::optional<std::vector<Value>> flatten (Value lst) {
   std::vector<Value> values;
   while (true) {
     if (auto type = type_of(lst); type == ValueType::PAIR) {
@@ -197,7 +197,7 @@ std::vector<Value> flatten (Value lst) {
       throw std::runtime_error("expect a list");
     }
   }
-  return values;
+  return {std::move(values)};
 }
 
 }

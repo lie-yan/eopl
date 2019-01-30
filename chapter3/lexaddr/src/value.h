@@ -91,6 +91,6 @@ Proc& to_proc (Value& value);
 const NamelessProc& to_nameless_proc (const Value& value);
 NamelessProc& to_nameless_proc (Value& value);
 
-std::vector<Value> flatten (Value lst);
+std::optional<std::vector<Value>> flatten (Value lst);
 
 }

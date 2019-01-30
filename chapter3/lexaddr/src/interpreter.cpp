@@ -109,10 +109,13 @@ Value value_of (const CondExp& exp, const SpEnv& env) {
 Value value_of (const UnpackExp& exp, const SpEnv& env) {
 
   auto lst = value_of(exp.pack, env);
-  std::vector<Value> values = flatten(lst);
-  if (values.size() == exp.vars.size()) {
+  std::optional<std::vector<Value>> values = flatten(lst);
+
+  if (!values) {
+    throw std::runtime_error("list expected");
+  } else if (values->size() == exp.vars.size()) {
     return value_of(exp.body,
-                    Env::extend(env, exp.vars, values));
+                    Env::extend(env, exp.vars, *values));
   } else {
     throw std::runtime_error("the size of identifier list and that of the pack "
                              "does not match");
