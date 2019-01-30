@@ -58,7 +58,7 @@ std::ostream& operator << (std::ostream& os, const std::vector<T>& ts) {
 }
 
 std::ostream& operator << (std::ostream& os, const CondExp::Clause& clause) {
-  os << "(" << clause.first << " ==> " << clause.second << ")";
+  os << "(" << clause.cond << " ==> " << clause.body << ")";
   return os;
 }
 
@@ -68,7 +68,7 @@ std::ostream& operator << (std::ostream& os, const CondExp& exp) {
 }
 
 std::ostream& operator << (std::ostream& os, const LetExp::Clause& clause) {
-  os << "(" << clause.first << " = " << clause.second << ")";
+  os << "(" << clause.var << " = " << clause.exp << ")";
   return os;
 }
 

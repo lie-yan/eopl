@@ -19,7 +19,10 @@ struct IfExp {
 };
 
 struct LetExp {
-  using Clause = std::pair<Symbol, Expression>;
+  struct Clause {
+    Symbol var;
+    Expression exp;
+  };
   using ClauseList = std::vector<Clause>;
 
   ClauseList clauses;
@@ -54,7 +57,10 @@ struct NamelessUnpackExp {
 };
 
 struct CondExp {
-  using Clause = std::pair<Expression, Expression>;
+  struct Clause {
+    Expression cond;
+    Expression body;
+  };
   using ClauseList = std::vector<Clause>;
   ClauseList clauses;
 

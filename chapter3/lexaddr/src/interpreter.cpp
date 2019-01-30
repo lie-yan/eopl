@@ -62,8 +62,8 @@ Value value_of (const LetExp& exp, const SpEnv& env, std::true_type) {
                                  std::end(exp.clauses),
                                  env,
                                  [] (SpEnv acc, const LetExp::Clause& c) -> SpEnv {
-                                   auto res = value_of(c.second, acc);
-                                   return Env::extend(std::move(acc), c.first, std::move(res));
+                                   auto res = value_of(c.exp, acc);
+                                   return Env::extend(std::move(acc), c.var, std::move(res));
                                  });
   return value_of(exp.body, new_env);
 }
@@ -73,8 +73,8 @@ Value value_of (const LetExp& exp, const SpEnv& env, std::false_type) {
                                  std::end(exp.clauses),
                                  env,
                                  [&env] (SpEnv acc, const LetExp::Clause& c) -> SpEnv {
-                                   auto res = value_of(c.second, env);
-                                   return Env::extend(std::move(acc), c.first, std::move(res));
+                                   auto res = value_of(c.exp, env);
+                                   return Env::extend(std::move(acc), c.var, std::move(res));
                                  });
   return value_of(exp.body, new_env);
 }
@@ -95,14 +95,14 @@ Value value_of (const CondExp& exp, const SpEnv& env) {
   auto it = std::find_if(std::begin(exp.clauses),
                          std::end(exp.clauses),
                          [env] (const CondExp::Clause& c) -> bool {
-                           auto b = value_of(c.first, env);
+                           auto b = value_of(c.cond, env);
                            return to_bool(b).get();
                          });
   if (it == std::end(exp.clauses)) {
     throw std::runtime_error("at least one clause should be true for the "
                              "cond expression, but none were found");
   } else {
-    return value_of(it->second, env);
+    return value_of(it->body, env);
   }
 }
 

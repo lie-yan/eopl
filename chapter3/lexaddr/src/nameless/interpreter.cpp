@@ -90,14 +90,14 @@ Value nameless_value_of (const CondExp& exp, const SpNamelessEnv& nenv) {
   auto it = std::find_if(std::begin(exp.clauses),
                          std::end(exp.clauses),
                          [nenv] (const CondExp::Clause& c) -> bool {
-                           auto b = nameless_value_of(c.first, nenv);
+                           auto b = nameless_value_of(c.cond, nenv);
                            return to_bool(b).get();
                          });
   if (it == std::end(exp.clauses)) {
     throw std::runtime_error("at least one clause should be true for the "
                              "cond expression, but none were found");
   } else {
-    return nameless_value_of(it->second, nenv);
+    return nameless_value_of(it->body, nenv);
   }
 }
 

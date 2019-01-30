@@ -85,13 +85,13 @@ Expression translation_of (const LetExp& exp, const SpStaticEnv& senv, std::fals
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
                  std::back_inserter(vars),
                  [] (const LetExp::Clause& c) {
-                   return c.first;
+                   return c.var;
                  });
   std::vector<Expression> exp_list;
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
                  std::back_inserter(exp_list),
                  [] (const LetExp::Clause& c) {
-                   return c.second;
+                   return c.exp;
                  });
   return
       to_exp(
@@ -105,18 +105,18 @@ Expression translation_of (const LetExp& exp, const SpStaticEnv& senv, std::fals
 Expression translation_of (const LetExp& exp, const SpStaticEnv& senv, std::true_type) {
   assert(exp.star);
 
-  auto[new_senv, tr_exp_list] = std::accumulate(std::begin(exp.clauses), std::end(exp.clauses),
-                                                std::pair(senv, std::vector<Expression>()),
-                                                [] (auto& p, const LetExp::Clause& c) {
-                                                  Expression e = translation_of(c.second, p.first);
-                                                  auto se = StaticEnv::extend(p.first, c.first);
-                                                  p.second.push_back(e);
-                                                  return std::pair(se, std::move(p.second));
-                                                });
+  std::vector<Expression> exp_list{};
+  auto new_senv = std::accumulate(std::begin(exp.clauses), std::end(exp.clauses),
+                                  senv,
+                                  [&exp_list] (SpStaticEnv& p, const LetExp::Clause& c) {
+                                    Expression e = translation_of(c.exp, p);
+                                    exp_list.push_back(e);
+                                    return StaticEnv::extend(p, c.var);
+                                  });
   return
       to_exp(
           NamelessLetExp{
-              tr_exp_list,
+              exp_list,
               translation_of(exp.body, new_senv),
               exp.star
           });
@@ -140,8 +140,8 @@ Expression translation_of (const CondExp& exp, const SpStaticEnv& senv) {
                  std::back_inserter(target),
                  [&senv] (const CondExp::Clause& c) {
                    return CondExp::Clause{
-                       translation_of(c.first, senv),
-                       translation_of(c.second, senv)};
+                       translation_of(c.cond, senv),
+                       translation_of(c.body, senv)};
                  });
 
   return
