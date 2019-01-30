@@ -140,8 +140,7 @@ Value nameless_value_of (const CallExp& exp, const SpNamelessEnv& nenv) {
       auto new_env = NamelessEnv::extend(proc.saved_env(), std::move(args));
       return nameless_value_of(proc.body(), new_env);
     } else {
-      std::string msg = "the rator should be a NamelessProc object";
-      throw std::runtime_error(msg);
+      throw std::runtime_error("branch0: this should not happen");
     }
   } else {
     auto& op_name = to_var_exp(exp.rator).var;
@@ -150,7 +149,7 @@ Value nameless_value_of (const CallExp& exp, const SpNamelessEnv& nenv) {
       auto args = nameless_value_of(exp.rands, nenv);
       return (*f_opt)(args);
     } else {
-      throw std::runtime_error("this should not happen");
+      throw std::runtime_error("branch1: this should not happen");
     }
   }
 }
