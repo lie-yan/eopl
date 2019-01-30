@@ -6,6 +6,7 @@
 
 #include "value.h"
 #include <numeric>
+#include <gsl/gsl>
 
 namespace eopl::built_in {
 
@@ -35,14 +36,14 @@ std::optional<BuiltInFun> find_built_in (const Symbol& name) {
 }
 
 Value minus (const std::vector<Value>& args) {
-  assert(args.size() == 1);
+  Expects(args.size() == 1);
   auto i = to_int(args[0]);
   auto res = Int{-i.get()};
   return to_value(res);
 }
 
 Value diff (const std::vector<Value>& args) {
-  assert(args.size() == 2);
+  Expects(args.size() == 2);
   auto i1 = to_int(args[0]);
   auto i2 = to_int(args[1]);
   auto res = Int{i1.get() - i2.get()};
@@ -50,7 +51,7 @@ Value diff (const std::vector<Value>& args) {
 }
 
 Value sum (const std::vector<Value>& args) {
-  assert(args.size() >= 2);
+  Expects(args.size() >= 2);
   int res = std::accumulate(std::begin(args),
                             std::end(args),
                             0,
@@ -61,7 +62,7 @@ Value sum (const std::vector<Value>& args) {
 }
 
 Value mult (const std::vector<Value>& args) {
-  assert(args.size() >= 2);
+  Expects(args.size() >= 2);
   int res = std::accumulate(std::begin(args),
                             std::end(args),
                             1,
@@ -72,7 +73,7 @@ Value mult (const std::vector<Value>& args) {
 }
 
 Value divide (const std::vector<Value>& args) {
-  assert(args.size() == 2);
+  Expects(args.size() == 2);
   auto i1 = to_int(args[0]);
   auto i2 = to_int(args[1]);
   auto res = Int{i1.get() / i2.get()};
@@ -80,14 +81,14 @@ Value divide (const std::vector<Value>& args) {
 }
 
 Value zero_test (const std::vector<Value>& args) {
-  assert(args.size() == 1);
+  Expects(args.size() == 1);
   auto i = to_int(args[0]);
   auto res = Bool{i.get() == 0};
   return to_value(res);
 }
 
 Value equal_test (const std::vector<Value>& args) {
-  assert(args.size() == 2);
+  Expects(args.size() == 2);
   auto i1 = to_int(args[0]);
   auto i2 = to_int(args[1]);
   auto res = Bool{i1.get() == i2.get()};
@@ -95,7 +96,7 @@ Value equal_test (const std::vector<Value>& args) {
 }
 
 Value greater_test (const std::vector<Value>& args) {
-  assert(args.size() == 2);
+  Expects(args.size() == 2);
   auto i1 = to_int(args[0]);
   auto i2 = to_int(args[1]);
   auto res = Bool{i1.get() > i2.get()};
@@ -103,7 +104,7 @@ Value greater_test (const std::vector<Value>& args) {
 }
 
 Value less_test (const std::vector<Value>& args) {
-  assert(args.size() == 2);
+  Expects(args.size() == 2);
   auto i1 = to_int(args[0]);
   auto i2 = to_int(args[1]);
   auto res = Bool{i1.get() < i2.get()};
@@ -111,13 +112,13 @@ Value less_test (const std::vector<Value>& args) {
 }
 
 Value cons (const std::vector<Value>& args) {
-  assert(args.size() == 2);
+  Expects(args.size() == 2);
   auto res = Pair{args[0], args[1]};
   return to_value(std::move(res));
 }
 
 Value car (const std::vector<Value>& args) {
-  assert(args.size() == 1);
+  Expects(args.size() == 1);
   if (type_of(args[0]) == ValueType::PAIR) {
     return to_pair(args[0]).first;
   } else {
@@ -126,7 +127,7 @@ Value car (const std::vector<Value>& args) {
 }
 
 Value cdr (const std::vector<Value>& args) {
-  assert(args.size() == 1);
+  Expects(args.size() == 1);
   if (type_of(args[0]) == ValueType::PAIR) {
     return to_pair(args[0]).second;
   } else {
@@ -135,7 +136,7 @@ Value cdr (const std::vector<Value>& args) {
 }
 
 Value null_test (const std::vector<Value>& args) {
-  assert(args.size() == 1);
+  Expects(args.size() == 1);
   auto res = Bool{type_of(args[0]) == ValueType::NIL};
   return to_value(res);
 }

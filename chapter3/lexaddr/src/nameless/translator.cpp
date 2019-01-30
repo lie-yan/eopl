@@ -8,6 +8,7 @@
 #include <fmt/ostream.h>
 #include <boost/type_index.hpp>
 #include <numeric>
+#include <gsl/gsl>
 
 namespace eopl {
 
@@ -71,19 +72,21 @@ Expression translation_of (const NamelessVarExp& exp, const SpStaticEnv& senv) {
 }
 
 Expression translation_of (const IfExp& exp, const SpStaticEnv& senv) {
-  return to_exp(IfExp{
-      translation_of(exp.cond, senv),
-      translation_of(exp.then_, senv),
-      translation_of(exp.else_, senv)
-  });
+  return
+      to_exp(
+          IfExp{
+              translation_of(exp.cond, senv),
+              translation_of(exp.then_, senv),
+              translation_of(exp.else_, senv)
+          });
 }
 
 Expression translation_of (const LetExp& exp, const SpStaticEnv& senv, std::false_type) {
-  assert(!exp.star);
+  Expects(!exp.star);
 
-  std::vector<Symbol> vars;
+  std::vector<Symbol> var_list;
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
-                 std::back_inserter(vars),
+                 std::back_inserter(var_list),
                  [] (const LetExp::Clause& c) {
                    return c.var;
                  });
@@ -97,21 +100,20 @@ Expression translation_of (const LetExp& exp, const SpStaticEnv& senv, std::fals
       to_exp(
           NamelessLetExp{
               translation_of(exp_list, senv),
-              translation_of(exp.body, StaticEnv::extend(senv, std::move(vars))),
+              translation_of(exp.body, StaticEnv::extend(senv, std::move(var_list))),
               exp.star
           });
 }
 
 Expression translation_of (const LetExp& exp, const SpStaticEnv& senv, std::true_type) {
-  assert(exp.star);
+  Expects(exp.star);
 
   std::vector<Expression> exp_list{};
   auto new_senv = std::accumulate(std::begin(exp.clauses), std::end(exp.clauses),
                                   senv,
-                                  [&exp_list] (SpStaticEnv& p, const LetExp::Clause& c) {
-                                    Expression e = translation_of(c.exp, p);
-                                    exp_list.push_back(e);
-                                    return StaticEnv::extend(p, c.var);
+                                  [&exp_list] (SpStaticEnv& acc, const LetExp::Clause& c) {
+                                    exp_list.push_back(translation_of(c.exp, acc));
+                                    return StaticEnv::extend(std::move(acc), c.var);
                                   });
   return
       to_exp(

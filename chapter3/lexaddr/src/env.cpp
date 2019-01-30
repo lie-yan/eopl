@@ -10,13 +10,14 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <numeric>
+#include <gsl/gsl>
 
 namespace eopl {
 
 Ribcage::Ribcage (std::vector<Symbol> variables, std::vector<Value> values)
     : variables_(std::move(variables)), values_(std::move(values)) {
 
-  assert(this->variables_.size() == this->values_.size());
+  Expects(this->variables_.size() == this->values_.size());
 }
 
 std::optional<std::pair<Value, long>> Ribcage::find (const Symbol& var) const {
