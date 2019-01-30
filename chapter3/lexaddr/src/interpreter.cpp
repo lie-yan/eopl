@@ -115,7 +115,7 @@ Value value_of (const UnpackExp& exp, const SpEnv& env) {
     throw std::runtime_error("list expected");
   } else if (values->size() == exp.vars.size()) {
     return value_of(exp.body,
-                    Env::extend(env, exp.vars, std::move(*values)));
+                    Env::extend(env, exp.vars, *std::move(values)));
   } else {
     throw std::runtime_error("the size of identifier list and that of the pack "
                              "does not match");
