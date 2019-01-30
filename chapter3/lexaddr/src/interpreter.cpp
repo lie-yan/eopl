@@ -145,32 +145,33 @@ std::vector<Value> value_of (const std::vector<Expression>& exps, const SpEnv& e
 
 Value value_of (const CallExp& exp, const SpEnv& env) {
 
-  auto eval_proc = [] (const auto& exp, auto env) {
-    if (auto rator = value_of(exp.rator, env);
-        type_of(rator) == ValueType::PROC) {
-
-      auto& proc = to_proc(rator);
-      auto args = value_of(exp.rands, env);
-
-      auto new_env = Env::extend(proc.saved_env(), std::move(proc.params()), std::move(args));
-      return value_of(proc.body(), new_env);
-    } else {
-      std::string msg = "the rator should be a Proc object";
-      throw std::runtime_error(msg);
-    }
-  };
-
-  if (type_of(exp.rator) == ExpType::VAR_EXP) {
-    auto& op_name = to_var_exp(exp.rator).var;
+  if (type_of(exp.rator) != ExpType::VAR_EXP) {
+    goto eval_proc;
+  } else {
+    const auto& op_name = to_var_exp(exp.rator).var;
     auto f_opt = built_in::find_built_in(op_name);
-    if (f_opt) {
+    if (!f_opt) {
+      goto eval_proc;
+    } else {
       auto args = value_of(exp.rands, env);
       return (*f_opt)(args);
-    } else {
-      return eval_proc(exp, env);
     }
+  }
+
+eval_proc:
+  if (auto rator = value_of(exp.rator, env);
+      type_of(rator) == ValueType::PROC) {
+
+    auto& proc = to_proc(rator);
+    auto args = value_of(exp.rands, env);
+
+    auto new_env = Env::extend(proc.saved_env(),
+                               proc.params(),
+                               std::move(args));
+    return value_of(proc.body(), new_env);
   } else {
-    return eval_proc(exp, env);
+    std::string msg = "the rator should be a Proc object";
+    throw std::runtime_error(msg);
   }
 }
 

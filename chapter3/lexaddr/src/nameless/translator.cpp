@@ -54,7 +54,6 @@ Expression translation_of (const ConstExp& exp, const SpStaticEnv& senv) {
 }
 
 Expression translation_of (const VarExp& exp, const SpStaticEnv& senv) {
-  // TODO: try to find an elegant usage of of built-in and user-defined procedures
   if (built_in::find_built_in(exp.var)) {
     return to_exp(exp);
   } else {
@@ -62,8 +61,7 @@ Expression translation_of (const VarExp& exp, const SpStaticEnv& senv) {
         to_exp(
             NamelessVarExp{
                 StaticEnv::apply(senv, exp.var)
-            }
-        );
+            });
   }
 }
 

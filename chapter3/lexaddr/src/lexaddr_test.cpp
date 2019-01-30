@@ -4,7 +4,9 @@
 
 #include <gtest/gtest.h>
 #include "nameless/interpreter.h"
-#include "interpreter.h"
+
+//#include "interpreter.h"
+//#define nameless_eval eval
 
 TEST(let_lang, arithmetic_operations) {
   using namespace eopl;
