@@ -44,7 +44,7 @@ Value nameless_value_of (const ConstExp& exp, const SpNamelessEnv& nenv) {
 }
 
 Value nameless_value_of (const VarExp& exp, const SpNamelessEnv& nenv) {
-  throw std::runtime_error(error_message("VarExp"));
+  throw std::runtime_error(error_message(exp));
 }
 
 Value nameless_value_of (const NamelessVarExp& exp, const SpNamelessEnv& nenv) {
@@ -59,7 +59,7 @@ Value nameless_value_of (const IfExp& exp, const SpNamelessEnv& nenv) {
 }
 
 Value nameless_value_of (const LetExp& exp, const SpNamelessEnv& nenv) {
-  throw std::runtime_error(error_message("LetExp"));
+  throw std::runtime_error(error_message(exp));
 }
 
 Value nameless_value_of (const NamelessLetExp& exp, const SpNamelessEnv& nenv, std::false_type) {
@@ -102,7 +102,7 @@ Value nameless_value_of (const CondExp& exp, const SpNamelessEnv& nenv) {
 }
 
 Value nameless_value_of (const UnpackExp& exp, const SpNamelessEnv& nenv) {
-  throw std::runtime_error(error_message("UnpackExp"));
+  throw std::runtime_error(error_message(exp));
 }
 
 std::vector<Value> unpack (Value pack, size_t n) {
@@ -139,7 +139,7 @@ Value nameless_value_of (const NamelessUnpackExp& exp, const SpNamelessEnv& nenv
 }
 
 Value nameless_value_of (const ProcExp& exp, const SpNamelessEnv& nenv) {
-  throw std::runtime_error(error_message("ProcExp"));
+  throw std::runtime_error(error_message(exp));
 }
 
 Value nameless_value_of (const NamelessProcExp& exp, const SpNamelessEnv& nenv) {
@@ -178,7 +178,7 @@ Value nameless_value_of (const CallExp& exp, const SpNamelessEnv& nenv) {
 }
 
 Value nameless_value_of (const LetrecExp& exp, const SpNamelessEnv& nenv) {
-  throw std::runtime_error(error_message("LetrecExp"));
+  throw std::runtime_error(error_message(exp));
 }
 
 Value nameless_value_of (const NamelessLetrecExp& exp, const SpNamelessEnv& nenv) {
