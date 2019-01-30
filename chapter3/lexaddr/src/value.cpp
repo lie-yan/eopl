@@ -194,7 +194,7 @@ std::optional<std::vector<Value>> flatten (Value lst) {
     } else if (type == ValueType::NIL) {
       break;
     } else {
-      throw std::runtime_error("expect a list");
+      return {};
     }
   }
   return {std::move(values)};
