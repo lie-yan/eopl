@@ -129,13 +129,13 @@ Value nameless_value_of (const NamelessProcExp& exp, const SpNamelessEnv& nenv) 
 }
 
 Value nameless_value_of (const CallExp& exp, const SpNamelessEnv& nenv) {
-  // TODO: refactor the processing of CallExp
-  auto eval_proc = [] (const CallExp& exp, auto env) {
-    if (auto rator = nameless_value_of(exp.rator, env);
+
+  if (type_of(exp.rator) != ExpType::VAR_EXP) {
+    if (auto rator = nameless_value_of(exp.rator, nenv);
         type_of(rator) == ValueType::NAMELESS_PROC) {
 
       auto& proc = to_nameless_proc(rator);
-      auto args = nameless_value_of(exp.rands, env);
+      auto args = nameless_value_of(exp.rands, nenv);
 
       auto new_env = NamelessEnv::extend(proc.saved_env(), std::move(args));
       return nameless_value_of(proc.body(), new_env);
@@ -143,9 +143,7 @@ Value nameless_value_of (const CallExp& exp, const SpNamelessEnv& nenv) {
       std::string msg = "the rator should be a NamelessProc object";
       throw std::runtime_error(msg);
     }
-  };
-
-  if (type_of(exp.rator) == ExpType::VAR_EXP) {
+  } else {
     auto& op_name = to_var_exp(exp.rator).var;
     auto f_opt = built_in::find_built_in(op_name);
     if (f_opt) {
@@ -154,8 +152,6 @@ Value nameless_value_of (const CallExp& exp, const SpNamelessEnv& nenv) {
     } else {
       throw std::runtime_error("this should not happen");
     }
-  } else {
-    return eval_proc(exp, nenv);
   }
 }
 
