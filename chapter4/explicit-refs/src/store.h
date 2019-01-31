@@ -5,14 +5,21 @@
 #pragma once
 
 #include <memory>
+#include "value_fwd.h"
 
 namespace eopl {
 
 using SpStore = std::shared_ptr<struct Store>;
 
-struct Store {
-  static SpStore make_empty ();
-  static SpStore get_store ();
+class Store {
+public:
+
+  static SpStore make_empty();
+  Value newref (Value value);
+  Value deref (Value value) const;
+  Value setref (Value ref, Value content);
+private:
+  std::vector<Value> store_;
 };
 
 }

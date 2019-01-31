@@ -26,6 +26,9 @@ std::optional<BuiltInFun> find_built_in (const Symbol& name) {
       {Symbol{"cdr"},      cdr},
       {Symbol{"null?"},    null_test},
       {Symbol{"list"},     list},
+      {Symbol{"newref"},   newref},
+      {Symbol{"deref"},    deref},
+      {Symbol{"setref"},   setref},
   };
 
   if (auto it = fun_table.find(name); it != std::end(fun_table)) {
@@ -35,14 +38,14 @@ std::optional<BuiltInFun> find_built_in (const Symbol& name) {
   }
 }
 
-Value minus (const std::vector<Value>& args) {
+Value minus (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 1);
   auto i = to_int(args[0]);
   auto res = Int{-i.get()};
   return to_value(res);
 }
 
-Value diff (const std::vector<Value>& args) {
+Value diff (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 2);
   auto i1 = to_int(args[0]);
   auto i2 = to_int(args[1]);
@@ -50,7 +53,7 @@ Value diff (const std::vector<Value>& args) {
   return to_value(res);
 }
 
-Value sum (const std::vector<Value>& args) {
+Value sum (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() >= 2);
   int res = std::accumulate(std::begin(args),
                             std::end(args),
@@ -61,7 +64,7 @@ Value sum (const std::vector<Value>& args) {
   return to_value(Int{res});
 }
 
-Value mult (const std::vector<Value>& args) {
+Value mult (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() >= 2);
   int res = std::accumulate(std::begin(args),
                             std::end(args),
@@ -72,7 +75,7 @@ Value mult (const std::vector<Value>& args) {
   return to_value(Int{res});
 }
 
-Value divide (const std::vector<Value>& args) {
+Value divide (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 2);
   auto i1 = to_int(args[0]);
   auto i2 = to_int(args[1]);
@@ -80,14 +83,14 @@ Value divide (const std::vector<Value>& args) {
   return to_value(res);
 }
 
-Value zero_test (const std::vector<Value>& args) {
+Value zero_test (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 1);
   auto i = to_int(args[0]);
   auto res = Bool{i.get() == 0};
   return to_value(res);
 }
 
-Value equal_test (const std::vector<Value>& args) {
+Value equal_test (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 2);
   auto i1 = to_int(args[0]);
   auto i2 = to_int(args[1]);
@@ -95,7 +98,7 @@ Value equal_test (const std::vector<Value>& args) {
   return to_value(res);
 }
 
-Value greater_test (const std::vector<Value>& args) {
+Value greater_test (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 2);
   auto i1 = to_int(args[0]);
   auto i2 = to_int(args[1]);
@@ -103,7 +106,7 @@ Value greater_test (const std::vector<Value>& args) {
   return to_value(res);
 }
 
-Value less_test (const std::vector<Value>& args) {
+Value less_test (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 2);
   auto i1 = to_int(args[0]);
   auto i2 = to_int(args[1]);
@@ -111,13 +114,13 @@ Value less_test (const std::vector<Value>& args) {
   return to_value(res);
 }
 
-Value cons (const std::vector<Value>& args) {
+Value cons (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 2);
   auto res = Pair{args[0], args[1]};
   return to_value(std::move(res));
 }
 
-Value car (const std::vector<Value>& args) {
+Value car (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 1);
   if (type_of(args[0]) == ValueType::PAIR) {
     return to_pair(args[0]).first;
@@ -126,7 +129,7 @@ Value car (const std::vector<Value>& args) {
   }
 }
 
-Value cdr (const std::vector<Value>& args) {
+Value cdr (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 1);
   if (type_of(args[0]) == ValueType::PAIR) {
     return to_pair(args[0]).second;
@@ -135,13 +138,13 @@ Value cdr (const std::vector<Value>& args) {
   }
 }
 
-Value null_test (const std::vector<Value>& args) {
+Value null_test (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 1);
   auto res = Bool{type_of(args[0]) == ValueType::NIL};
   return to_value(res);
 }
 
-Value list (const std::vector<Value>& args) {
+Value list (const std::vector<Value>& args, const SpStore& store) {
   Value res = std::accumulate(std::rbegin(args),
                               std::rend(args),
                               to_value(Nil()),
@@ -150,6 +153,21 @@ Value list (const std::vector<Value>& args) {
                                 return to_value(std::move(t));
                               });
   return res;
+}
+
+Value newref (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 1);
+  return store->newref(args[0]);
+}
+
+Value deref (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 1);
+  return store->deref(args[0]);
+}
+
+Value setref (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 2);
+  return store->setref(args[0], args[1]);
 }
 
 }

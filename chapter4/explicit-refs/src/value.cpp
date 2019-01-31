@@ -108,7 +108,7 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
       os << "<nameless-proc " << proc.body() << ">";
     }
     void operator () (const Ref& ref) {
-      os << "<ref " << ref.value().get() << ">";
+      os << "<ref " << ref.location() << ">";
     }
   };
 
@@ -160,6 +160,10 @@ NamelessProc& to_nameless_proc (Value& value) {
   return std::get<RwNamelessProc>(*value).get();
 }
 
+Ref& to_ref (Value& value) {
+  return std::get<RwRef>(*value).get();
+}
+
 std::ostream& operator << (std::ostream& os, const Proc& proc) {
   os << "Proc(params_: " << proc.params_
      << ", body: " << proc.body_
@@ -207,16 +211,12 @@ std::optional<std::vector<Value>> flatten (Value lst) {
 }
 
 std::ostream& operator << (std::ostream& os, const Ref& rhs) {
-  os << "Ref(" << rhs.value_ << ")";
+  os << "Ref(" << rhs.location() << ")";
   return os;
 }
 
-Value Ref::value () const {
-  return value_;
-}
-
-void Ref::value (Value value) {
-  value_ = std::move(value);
+int Ref::location () const {
+  return location_;
 }
 
 }

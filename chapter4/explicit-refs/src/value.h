@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "expr_fwd.h"
 #include "value_fwd.h"
+#include "expr_fwd.h"
 #include "env.h"
 #include "nameless/nenv.h"
 
@@ -79,21 +79,20 @@ private:
 
 class Ref {
 public:
-  Ref (Value value) : value_(std::move(value)) { }
+  explicit Ref (int location) : location_(location) { }
 
   friend bool operator == (const Ref& lhs, const Ref& rhs) {
-    return lhs.value_ == rhs.value_;
+    return lhs.location_ == rhs.location_;
   }
   friend bool operator != (const Ref& lhs, const Ref& rhs) {
     return !(rhs == lhs);
   }
   friend std::ostream& operator << (std::ostream& os, const Ref& rhs);
 
-  Value value () const;
-  void value (Value value);
+  int location () const;
 
 private:
-  Value value_;
+  int location_;
 };
 
 /// observers for `Value` below
@@ -109,6 +108,7 @@ const Proc& to_proc (const Value& value);
 Proc& to_proc (Value& value);
 const NamelessProc& to_nameless_proc (const Value& value);
 NamelessProc& to_nameless_proc (Value& value);
+Ref& to_ref (Value& value);
 
 std::optional<std::vector<Value>> flatten (Value lst);
 
