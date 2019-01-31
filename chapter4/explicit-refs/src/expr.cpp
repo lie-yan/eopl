@@ -141,6 +141,11 @@ std::ostream& operator << (std::ostream& os, const NamelessLetrecExp& exp) {
   return os;
 }
 
+std::ostream& operator << (std::ostream& os, const SequenceExp& sequenceExp) {
+  os << "SequenceExp(" << sequenceExp.exp_list << ")";
+  return os;
+}
+
 ExpType type_of (const Expression& expression) {
   struct TypeVisitor {
     ExpType operator () (const ConstExp&) { return ExpType::CONST_EXP; }
@@ -157,6 +162,7 @@ ExpType type_of (const Expression& expression) {
     ExpType operator () (const RwCallExp&) { return ExpType::CALL_EXP; }
     ExpType operator () (const RwLetrecExp&) { return ExpType::LETREC_EXP; }
     ExpType operator () (const RwNamelessLetrecExp&) { return ExpType::NAMELESS_LETREC_EXP; }
+    ExpType operator () (const RwSequenceExp&) { return ExpType::SEQUENCE_EXP; }
   };
 
   return std::visit(TypeVisitor{}, *expression);
@@ -217,5 +223,10 @@ const NamelessUnpackExp& to_nameless_unpack_exp (const Expression& expression) {
 const NamelessLetrecExp& to_nameless_letrec_exp (const Expression& expression) {
   return std::get<RwNamelessLetrecExp>(*expression).get();
 }
+
+const SequenceExp& to_sequence_exp (const Expression& expression) {
+  return std::get<RwSequenceExp>(*expression).get();
+}
+
 
 }

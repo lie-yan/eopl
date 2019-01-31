@@ -27,6 +27,7 @@ enum class ExpType {
   CALL_EXP,
   LETREC_EXP,
   NAMELESS_LETREC_EXP,
+  SEQUENCE_EXP,
 };
 
 struct ConstExp {
@@ -58,6 +59,7 @@ using RwNamelessProcExp = boost::recursive_wrapper<struct NamelessProcExp>;
 using RwCallExp = boost::recursive_wrapper<struct CallExp>;
 using RwLetrecExp = boost::recursive_wrapper<struct LetrecExp>;
 using RwNamelessLetrecExp = boost::recursive_wrapper<struct NamelessLetrecExp>;
+using RwSequenceExp = boost::recursive_wrapper<struct SequenceExp>;
 
 
 using Expression_ = std::variant<ConstExp,
@@ -73,7 +75,8 @@ using Expression_ = std::variant<ConstExp,
                                  RwNamelessProcExp,
                                  RwCallExp,
                                  RwLetrecExp,
-                                 RwNamelessLetrecExp>;
+                                 RwNamelessLetrecExp,
+                                 RwSequenceExp>;
 
 using Expression = std::shared_ptr<Expression_>;
 std::ostream& operator << (std::ostream& os, const Expression& exp);

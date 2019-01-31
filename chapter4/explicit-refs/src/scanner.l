@@ -124,6 +124,13 @@ integer [-+]?[[:digit:]]+
                   return yy::parser::token::RIGHT_ARROW;
                 }
 
+"begin"         {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::BEGIN_;
+                }
+
 "end"           {
                 #ifdef DEBUG
                   std::cout << "keyword: " << yytext << std::endl;

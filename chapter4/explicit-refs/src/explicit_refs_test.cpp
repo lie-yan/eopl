@@ -195,6 +195,22 @@ TEST(letrec_lang, mutual_recursive) {
       to_value(Int{1}));
 }
 
+TEST(explicit_refs, basic) {
+  using namespace eopl;
+
+  EXPECT_EQ(
+      eval("let g = let counter = (newref 0) in"
+           "        proc (dummy) "
+           "        begin (setref counter (- (deref counter) -1)); "
+           "              (deref counter) "
+           "        end "
+           "in let a = (g 11) "
+           "in let b = (g 11) "
+           "in (- a b)"),
+      to_value(Int{-1})
+  );
+}
+
 int main (int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

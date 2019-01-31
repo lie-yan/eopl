@@ -116,6 +116,12 @@ struct NamelessLetrecExp {
   friend std::ostream& operator << (std::ostream& os, const NamelessLetrecExp& exp);
 };
 
+struct SequenceExp {
+  std::vector<Expression> exp_list;
+
+  friend std::ostream& operator << (std::ostream& os, const SequenceExp& sequenceExp);
+};
+
 struct Program {
   Expression exp1;
 
@@ -138,5 +144,6 @@ const NamelessProcExp& to_nameless_proc_exp (const Expression& expression);
 const CallExp& to_call_exp (const Expression& expression);
 const LetrecExp& to_letrec_exp (const Expression& expression);
 const NamelessLetrecExp& to_nameless_letrec_exp (const Expression& expression);
+const SequenceExp& to_sequence_exp (const Expression& expression);
 
 }

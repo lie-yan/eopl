@@ -43,6 +43,7 @@ using eopl::ProcExp;
 using eopl::CallExp;
 using eopl::LetrecExp;
 using eopl::LetrecProcSpec;
+using eopl::SequenceExp;
 using eopl::Program;
 using eopl::to_exp;
 
@@ -60,12 +61,14 @@ using eopl::to_exp;
 %token                IN            "in"
 %token                COND          "cond"
 %token                RIGHT_ARROW   "==>"
+%token                BEGIN_        "begin"
 %token                END           "end"
 %token                PROC          "proc"
 %token                END_OF_FILE   "end of file"
 
 %type <eopl::Expression> expression
 %type <std::vector<eopl::Expression>> exp_nlist
+%type <std::vector<eopl::Expression>> coln_sep_exp_nlist
 %type <eopl::CondExp::ClauseList> cond_clause_list
 %type <eopl::CondExp::Clause> cond_clause
 %type <eopl::LetExp::ClauseList> let_clause_list
@@ -96,11 +99,17 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
               { $$ = to_exp(CallExp{std::move($2), std::move($3)}); }
             | LETREC proc_def_nlist IN expression
               { $$ = to_exp(LetrecExp{std::move($2), std::move($4)}); }
+            | BEGIN_ coln_sep_exp_nlist END
+              { $$ = to_exp(SequenceExp{std::move($2)}); }
             ;
 
 exp_nlist : expression  { $$ = {std::move($1)}; }
           | exp_nlist expression { $1.push_back(std::move($2)); $$ = std::move($1); }
           ;
+
+coln_sep_exp_nlist : expression { $$ = {std::move($1)}; }
+                   | coln_sep_exp_nlist ';' expression { $1.push_back(std::move($3)); $$ = std::move($1); }
+                   ;
 
 cond_clause_list : %empty { $$ = eopl::CondExp::ClauseList(); }
                  | cond_clause_list cond_clause { $1.push_back(std::move($2)); $$ = std::move($1); }

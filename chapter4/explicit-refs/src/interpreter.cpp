@@ -66,9 +66,7 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, std::
                                    auto res = value_of(c.exp, acc, store);
                                    return Env::extend(std::move(acc), c.var, std::move(res));
                                  });
-  return
-      value_of(exp
-                   .body, new_env, store);
+  return value_of(exp.body, new_env, store);
 }
 
 Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, std::false_type) {
@@ -197,6 +195,15 @@ Value value_of (const LetrecExp& exp, const SpEnv& env, const SpStore& store) {
 
 Value value_of (const NamelessLetrecExp& exp, const SpEnv& env, const SpStore& store) {
   throw std::runtime_error(error_message(exp));
+}
+
+Value value_of (const SequenceExp& exp, const SpEnv& env, const SpStore& store) {
+  std::vector<Value> results;
+  std::transform(std::begin(exp.exp_list), std::end(exp.exp_list), std::back_inserter(results),
+                 [&env, &store] (const Expression& expression) {
+                   return value_of(expression, env, store);
+                 });
+  return results.back();
 }
 
 SpEnv make_initial_env () {

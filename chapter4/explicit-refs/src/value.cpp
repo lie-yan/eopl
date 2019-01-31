@@ -172,7 +172,7 @@ std::ostream& operator << (std::ostream& os, const Proc& proc) {
 }
 
 Proc::Proc (const std::vector<Symbol>& params, Expression body, SpEnv saved_env)
-    : params_(params), body_(std::move(body)), saved_env_(saved_env) { }
+    : params_(params), body_(std::move(body)), saved_env_(std::move(saved_env)) { }
 
 std::ostream& operator << (std::ostream& os, const NamelessProc& proc) {
   os << "NamelessProc(body: " << proc.body()
@@ -180,7 +180,7 @@ std::ostream& operator << (std::ostream& os, const NamelessProc& proc) {
   return os;
 }
 SpNamelessEnv NamelessProc::saved_env () const {
-  return saved_env_.lock();
+  return saved_env_;
 }
 
 NamelessProc::NamelessProc (Expression body, const SpNamelessEnv& saved_env)
@@ -190,7 +190,7 @@ const Expression& NamelessProc::body () const {
   return body_;
 }
 
-void NamelessProc::saved_env (const WpNamelessEnv& saved_env) {
+void NamelessProc::saved_env (const SpNamelessEnv& saved_env) {
   saved_env_ = saved_env;
 }
 
