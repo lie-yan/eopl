@@ -170,7 +170,7 @@ std::ostream& operator << (std::ostream& os, const NamelessProc& proc) {
   return os;
 }
 SpNamelessEnv NamelessProc::saved_env () const {
-  return saved_env_.lock();
+  return saved_env_;
 }
 
 NamelessProc::NamelessProc (Expression body, const SpNamelessEnv& saved_env)
@@ -180,7 +180,7 @@ const Expression& NamelessProc::body () const {
   return body_;
 }
 
-void NamelessProc::saved_env (const WpNamelessEnv& saved_env) {
+void NamelessProc::saved_env (const SpNamelessEnv& saved_env) {
   saved_env_ = saved_env;
 }
 

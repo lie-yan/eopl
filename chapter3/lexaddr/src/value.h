@@ -47,12 +47,12 @@ public:
 
   const std::vector<Symbol>& params () const { return params_; }
   const Expression& body () const { return body_; }
-  SpEnv saved_env () const { return saved_env_.lock(); }
-  void saved_env (const WpEnv& env) { saved_env_ = env; }
+  SpEnv saved_env () const { return saved_env_; }
+  void saved_env (const SpEnv& env) { saved_env_ = env; }
 private:
   const std::vector<Symbol>& params_;
   Expression body_;
-  WpEnv saved_env_;
+  SpEnv saved_env_;
 };
 
 class NamelessProc {
@@ -69,12 +69,12 @@ public:
   friend std::ostream& operator << (std::ostream& os, const NamelessProc& proc);
 
   SpNamelessEnv saved_env () const;
-  void saved_env (const WpNamelessEnv& saved_env);
+  void saved_env (const SpNamelessEnv& saved_env);
   const Expression& body () const;
 
 private:
   Expression body_;
-  WpNamelessEnv saved_env_;
+  SpNamelessEnv saved_env_;
 };
 
 /// observers for `Value` below
