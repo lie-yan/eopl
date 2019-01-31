@@ -209,6 +209,27 @@ TEST(explicit_refs, basic) {
            "in (- a b)"),
       to_value(Int{-1})
   );
+
+  EXPECT_EQ(
+      eval(R"EOF(
+let g = proc (dummy)
+        let counter = (newref 0)
+        in begin (setref counter (- (deref counter) -1));
+                 (deref counter)
+           end
+in let a = (g 11)
+in let b = (g 11)
+in (- a b)
+)EOF"), to_value(Int{0}));
+
+  EXPECT_EQ(eval(R"EOF(
+let x = (newref (newref 0))
+in begin
+      (setref (deref x) 11);
+      (deref (deref x))
+end
+)EOF"), to_value(Int{11}));
+
 }
 
 int main (int argc, char** argv) {
