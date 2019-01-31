@@ -77,6 +77,25 @@ private:
   WpNamelessEnv saved_env_;
 };
 
+class Ref {
+public:
+  Ref (Value value) : value_(std::move(value)) { }
+
+  friend bool operator == (const Ref& lhs, const Ref& rhs) {
+    return lhs.value_ == rhs.value_;
+  }
+  friend bool operator != (const Ref& lhs, const Ref& rhs) {
+    return !(rhs == lhs);
+  }
+  friend std::ostream& operator << (std::ostream& os, const Ref& rhs);
+
+  Value value () const;
+  void value (Value value);
+
+private:
+  Value value_;
+};
+
 /// observers for `Value` below
 ValueType type_of (const Value& value);
 Int to_int (const Value& value);

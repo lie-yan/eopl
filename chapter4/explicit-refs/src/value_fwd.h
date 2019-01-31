@@ -20,6 +20,7 @@ enum class ValueType {
   ARRAY,
   PROC,
   NAMELESS_PROC,
+  REF,
 };
 
 /**
@@ -222,6 +223,7 @@ using RwArray = boost::recursive_wrapper<struct Array>;
 using RwPair = boost::recursive_wrapper<struct Pair>;
 using RwProc = boost::recursive_wrapper<struct Proc>;
 using RwNamelessProc = boost::recursive_wrapper<struct NamelessProc>;
+using RwRef = boost::recursive_wrapper<struct Ref>;
 
 template<typename T>
 bool operator == (const boost::recursive_wrapper<T>& lhs,
@@ -244,7 +246,8 @@ using Value_ = std::variant<Nil,
                             RwPair,
                             RwArray,
                             RwProc,
-                            RwNamelessProc>;
+                            RwNamelessProc,
+                            RwRef>;
 
 /**
  * @brief <code>Value</code> is <code>EqualityComparable</code>

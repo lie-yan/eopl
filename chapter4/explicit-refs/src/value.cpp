@@ -31,12 +31,14 @@ ValueType type_of (const Value& value) {
     ValueType operator () (const RwArray&) { return ValueType::ARRAY; }
     ValueType operator () (const RwProc&) { return ValueType::PROC; }
     ValueType operator () (const RwNamelessProc&) { return ValueType::NAMELESS_PROC; }
+    ValueType operator () (const RwRef&) { return ValueType::REF; }
     ValueType operator () (const String&) { return ValueType::STRING; }
     ValueType operator () (const Symbol&) { return ValueType::SYMBOL; }
     ValueType operator () (const Pair&) { return ValueType::PAIR; }
     ValueType operator () (const Array&) { return ValueType::ARRAY; }
     ValueType operator () (const Proc&) { return ValueType::PROC; }
     ValueType operator () (const NamelessProc&) { return ValueType::NAMELESS_PROC; }
+    ValueType operator () (const Ref&) { return ValueType::REF; }
   };
 
   return std::visit(TypeVisitor{}, *value);
@@ -66,6 +68,7 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     void operator () (const RwArray& array) { (*this)(array.get()); }
     void operator () (const RwProc& proc) { (*this)(proc.get()); }
     void operator () (const RwNamelessProc& proc) { (*this)(proc.get()); }
+    void operator () (const RwRef& ref) { (*this)(ref.get()); }
     void operator () (const String& str) { os << std::quoted(str.get()); }
     void operator () (const Symbol& sym) { os << sym; }
     void operator () (const Pair& pair) {
@@ -103,6 +106,9 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     }
     void operator () (const NamelessProc& proc) {
       os << "<nameless-proc " << proc.body() << ">";
+    }
+    void operator () (const Ref& ref) {
+      os << "<ref " << ref.value().get() << ">";
     }
   };
 
@@ -198,6 +204,19 @@ std::optional<std::vector<Value>> flatten (Value lst) {
     }
   }
   return {std::move(values)};
+}
+
+std::ostream& operator << (std::ostream& os, const Ref& rhs) {
+  os << "Ref(" << rhs.value_ << ")";
+  return os;
+}
+
+Value Ref::value () const {
+  return value_;
+}
+
+void Ref::value (Value value) {
+  value_ = std::move(value);
 }
 
 }

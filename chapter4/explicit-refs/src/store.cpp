@@ -6,4 +6,14 @@
 
 namespace eopl {
 
+SpStore Store::make_empty () {
+  return std::make_shared<Store>();
 }
+
+SpStore Store::get_store () {
+  return nullptr;
+}
+
+
+}
+
