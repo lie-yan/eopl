@@ -195,49 +195,12 @@ TEST(letrec_lang, mutual_recursive) {
       to_value(Int{1}));
 }
 
-TEST(explicit_refs, basic) {
-  using namespace eopl;
-
-  EXPECT_EQ(
-      eval("let g = let counter = (newref 0) in"
-           "        proc (dummy) "
-           "        begin (setref counter (- (deref counter) -1)); "
-           "              (deref counter) "
-           "        end "
-           "in let a = (g 11) "
-           "in let b = (g 11) "
-           "in (- a b)"),
-      to_value(Int{-1})
-  );
-
-  EXPECT_EQ(
-      eval(R"EOF(
-let g = proc (dummy)
-        let counter = (newref 0)
-        in begin (setref counter (- (deref counter) -1));
-                 (deref counter)
-           end
-in let a = (g 11)
-in let b = (g 11)
-in (- a b)
-)EOF"), to_value(Int{0}));
-
-  EXPECT_EQ(eval(R"EOF(
-let x = (newref (newref 0))
-in begin
-      (setref (deref x) 11);
-      (deref (deref x))
-end
-)EOF"), to_value(Int{11}));
-
-}
-
 TEST(implicit_refs, basic) {
   using namespace eopl;
 
   EXPECT_EQ(
       eval(R"EOF(
-let x = 0 in
+letmutable x = 0 in
 letrec even(dummy) = if (zero? x) then 1 else begin set x = (- x 1); (odd 888) end
         odd(dummy) = if (zero? x) then 0 else begin set x = (- x 1); (even 888) end
 in begin set x = 13; (odd -888) end
@@ -246,7 +209,7 @@ in begin set x = 13; (odd -888) end
 
   EXPECT_EQ(
       eval(R"EOF(
-let g = let count = 0
+let g = letmutable count = 0
         in proc (dummy)
         begin set count = (- count -1);
               count
@@ -258,7 +221,7 @@ in (- a b))EOF"),
 
   EXPECT_EQ(
       eval(R"EOF(
-let times4 = 0 in begin
+letmutable times4 = 0 in begin
 set times4 = proc (x)
 if (zero? x) then 0 else (- (times4 (- x 1)) -4); (times4 3) end)EOF"),
       to_value(Int{12}));

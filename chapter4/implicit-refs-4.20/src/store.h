@@ -15,7 +15,7 @@ class Store {
 public:
 
   static SpStore make_empty();
-  Value newref (Value value);
+  Value newref (Value value, bool mutable_=false);
   Value deref (Value value) const;
   Value setref (Value ref, Value content);
 private:

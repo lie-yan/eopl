@@ -81,6 +81,13 @@ integer [-+]?[[:digit:]]+
                   return yy::parser::token::LET;
                 }
 
+"letmutable"    {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::LETMUTABLE;
+                }
+
 "let*"          {
                 #ifdef DEBUG
                   std::cout << "keyword: " << yytext << std::endl;

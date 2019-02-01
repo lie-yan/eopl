@@ -83,7 +83,11 @@ Value value_of (const IfExp& exp, const SpEnv& env, const SpStore& store) {
   else return value_of(exp.else_, env, store);
 }
 
-Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, std::true_type) {
+struct let_tag { };
+struct let_star_tag { };
+struct letmutable_tag { };
+
+Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_star_tag) {
   auto new_env = std::accumulate(std::begin(exp.clauses),
                                  std::end(exp.clauses),
                                  env,
@@ -96,7 +100,7 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, std::
   return value_of(exp.body, new_env, store);
 }
 
-Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, std::false_type) {
+Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_tag) {
 
   std::vector<Symbol> vars;
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
@@ -108,8 +112,8 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, std::
   std::vector<Value> values;
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
                  std::back_inserter(values),
-                 [&env, &store] (const LetExp::Clause& c) -> Value {
-                   return store->newref(value_of(c.exp, env, store));
+                 [&env, &store, &exp] (const LetExp::Clause& c) -> Value {
+                   return store->newref(value_of(c.exp, env, store), exp.mutable_);
                  });
   return value_of(exp.body,
                   Env::extend(env, std::move(vars), std::move(values)),
@@ -118,9 +122,9 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, std::
 
 Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store) {
   if (exp.star) {
-    return value_of(exp, env, store, std::true_type());
+    return value_of(exp, env, store, let_star_tag());
   } else {
-    return value_of(exp, env, store, std::false_type());
+    return value_of(exp, env, store, let_tag());
   }
 }
 

@@ -10,9 +10,9 @@
 
 namespace eopl {
 
-Value Store::newref (Value value) {
+Value Store::newref (Value value, bool mutable_) {
   store_.emplace_back(value);
-  return to_value(Ref{int(store_.size() - 1)});
+  return to_value(Ref{int(store_.size() - 1), mutable_});
 }
 
 Value Store::deref (Value value) const {
@@ -22,6 +22,7 @@ Value Store::deref (Value value) const {
 
 Value Store::setref (Value ref, Value content) {
   Expects(type_of(ref) == ValueType::REF);
+  Expects(to_ref(ref).mutable_());
 
   store_[to_ref(ref).location()] = std::move(content);
   return to_value(Int{23});

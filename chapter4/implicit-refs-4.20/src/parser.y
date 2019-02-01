@@ -16,6 +16,8 @@ namespace yy {
   using Result = eopl::Program;
 }
 
+const int star_mask = 0b01;
+const int mutable_mask = 0b10;
 }
 
 // Construct parser object with lexer and result
@@ -58,6 +60,7 @@ using eopl::to_exp;
 %token                LET           "let"
 %token                LET_STAR      "let*"
 %token                LETREC        "letrec"
+%token                LETMUTABLE    "letmutable"
 %token                UNPACK        "unpack"
 %token                SET           "set"
 %token                IN            "in"
@@ -75,7 +78,7 @@ using eopl::to_exp;
 %type <eopl::CondExp::Clause> cond_clause
 %type <eopl::LetExp::ClauseList> let_clause_list
 %type <eopl::LetExp::Clause> let_clause
-%type <bool> let_opt_star
+%type <int> let_variant
 %type <std::vector<eopl::Symbol>> id_list
 %type <std::vector<eopl::Symbol>> param_list
 %type <eopl::LetrecProcSpec> proc_def
@@ -91,8 +94,8 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
               { $$ = to_exp(IfExp{std::move($2), std::move($4), std::move($6)}); }
             | COND cond_clause_list END
               { $$ = to_exp(CondExp{std::move($2)}); }
-            | let_opt_star let_clause_list IN expression
-              { $$ = to_exp(LetExp{std::move($2), std::move($4), $1}); }
+            | let_variant let_clause_list IN expression
+              { $$ = to_exp(LetExp{std::move($2), std::move($4), bool($1 & star_mask), bool($1 & mutable_mask)}); }
             | UNPACK id_list '=' expression IN expression
               { $$ = to_exp(UnpackExp{std::move($2), std::move($4), std::move($6)}); }
             | PROC '(' param_list ')' expression
@@ -131,9 +134,10 @@ let_clause : IDENTIFIER '=' expression
              { $$ = eopl::LetExp::Clause{std::move($1), std::move($3)}; }
            ;
 
-let_opt_star : LET { $$ = false; }
-             | LET_STAR { $$ = true; }
-             ;
+let_variant : LET { $$ = 0; }
+            | LET_STAR { $$ = star_mask; }
+            | LETMUTABLE { $$ = mutable_mask; }
+            ;
 
 proc_def_nlist : proc_def { $$ = std::vector<eopl::LetrecProcSpec>{std::move($1)}; }
                | proc_def_nlist proc_def { $1.push_back(std::move($2)); $$ = std::move($1); }

@@ -219,4 +219,8 @@ int Ref::location () const {
   return location_;
 }
 
+bool Ref::mutable_ () const {
+  return mutable__;
+}
+
 }
