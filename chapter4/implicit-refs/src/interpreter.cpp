@@ -208,21 +208,22 @@ eval_proc:
 
 Value value_of (const LetrecExp& exp, const SpEnv& env, const SpStore& store) {
   std::vector<Value> saved;
-  SpEnv new_env = std::accumulate(std::begin(exp.proc_list),
-                                  std::end(exp.proc_list),
-                                  env,
-                                  [&saved, &store] (SpEnv& acc, const LetrecProcSpec& proc) {
-                                    auto p = to_value(Proc{proc.params, proc.body, acc});
-                                    saved.push_back(p);
-                                    return Env::extend(std::move(acc), proc.name, store->newref(p));
-                                  });
+  std::transform(std::begin(exp.proc_list),
+                 std::end(exp.proc_list),
+                 std::back_inserter(saved),
+                 [&store, &env] (const LetrecProcSpec& proc) {
+                   return to_value(Proc{proc.params, proc.body, env});
+                 });
+  std::vector<Symbol> name_list;
+  std::transform(std::begin(exp.proc_list), std::end(exp.proc_list),
+                 std::back_inserter(name_list),
+                 [] (const LetrecProcSpec& proc) {
+                   return proc.name;
+                 });
+  auto new_env = Env::extend(env, std::move(name_list), refs_of(saved, store));
   for (auto& v : saved) to_proc(v).saved_env(new_env);
   return value_of(exp.body, new_env, store);
 }
-
-//Value value_of (const NamelessLetrecExp& exp, const SpEnv& env, const SpStore& store) {
-//  throw std::runtime_error(error_message(exp));
-//}
 
 Value value_of (const SequenceExp& exp, const SpEnv& env, const SpStore& store) {
   std::vector<Value> results;
