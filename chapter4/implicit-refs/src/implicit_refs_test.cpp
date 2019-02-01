@@ -232,6 +232,38 @@ end
 
 }
 
+TEST(implicit_refs, basic) {
+  using namespace eopl;
+
+  EXPECT_EQ(
+      eval(R"EOF(
+let x = 0 in
+letrec even(dummy) = if (zero? x) then 1 else begin set x = (- x 1); (odd 888) end
+        odd(dummy) = if (zero? x) then 0 else begin set x = (- x 1); (even 888) end
+in begin set x = 13; (odd -888) end
+)EOF"),
+      to_value(Int{1}));
+
+  EXPECT_EQ(
+      eval(R"EOF(
+let g = let count = 0
+        in proc (dummy)
+        begin set count = (- count -1);
+              count
+        end
+in let a = (g 11)
+in let b = (g 11)
+in (- a b))EOF"),
+      to_value(Int{-1}));
+
+  EXPECT_EQ(
+      eval(R"EOF(
+let times4 = 0 in begin
+set times4 = proc (x)
+if (zero? x) then 0 else (- (times4 (- x 1)) -4); (times4 3) end)EOF"),
+      to_value(Int{12}));
+}
+
 int main (int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

@@ -137,6 +137,12 @@ integer [-+]?[[:digit:]]+
                 #endif
                   return yy::parser::token::END;
                 }
+"set"           {
+                #ifdef DEBUG
+                 std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                 return yy::parser::token::SET;
+                }
 
 "proc"          {
                 #ifdef DEBUG

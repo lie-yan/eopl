@@ -44,6 +44,7 @@ using eopl::CallExp;
 using eopl::LetrecExp;
 using eopl::LetrecProcSpec;
 using eopl::SequenceExp;
+using eopl::AssignExp;
 using eopl::Program;
 using eopl::to_exp;
 
@@ -58,6 +59,7 @@ using eopl::to_exp;
 %token                LET_STAR      "let*"
 %token                LETREC        "letrec"
 %token                UNPACK        "unpack"
+%token                SET           "set"
 %token                IN            "in"
 %token                COND          "cond"
 %token                RIGHT_ARROW   "==>"
@@ -68,7 +70,7 @@ using eopl::to_exp;
 
 %type <eopl::Expression> expression
 %type <std::vector<eopl::Expression>> exp_nlist
-%type <std::vector<eopl::Expression>> coln_sep_exp_nlist
+%type <std::vector<eopl::Expression>> semicol_sep_exp_nlist
 %type <eopl::CondExp::ClauseList> cond_clause_list
 %type <eopl::CondExp::Clause> cond_clause
 %type <eopl::LetExp::ClauseList> let_clause_list
@@ -99,17 +101,19 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
               { $$ = to_exp(CallExp{std::move($2), std::move($3)}); }
             | LETREC proc_def_nlist IN expression
               { $$ = to_exp(LetrecExp{std::move($2), std::move($4)}); }
-            | BEGIN_ coln_sep_exp_nlist END
+            | BEGIN_ semicol_sep_exp_nlist END
               { $$ = to_exp(SequenceExp{std::move($2)}); }
+            | SET IDENTIFIER '=' expression
+              { $$ = to_exp(AssignExp{std::move($2), std::move($4)}); }
             ;
 
 exp_nlist : expression  { $$ = {std::move($1)}; }
           | exp_nlist expression { $1.push_back(std::move($2)); $$ = std::move($1); }
           ;
 
-coln_sep_exp_nlist : expression { $$ = {std::move($1)}; }
-                   | coln_sep_exp_nlist ';' expression { $1.push_back(std::move($3)); $$ = std::move($1); }
-                   ;
+semicol_sep_exp_nlist : expression { $$ = {std::move($1)}; }
+                      | semicol_sep_exp_nlist ';' expression { $1.push_back(std::move($3)); $$ = std::move($1); }
+                      ;
 
 cond_clause_list : %empty { $$ = eopl::CondExp::ClauseList(); }
                  | cond_clause_list cond_clause { $1.push_back(std::move($2)); $$ = std::move($1); }

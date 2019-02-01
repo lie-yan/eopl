@@ -32,7 +32,7 @@ set(SOURCES
         ${SOURCE_DIR}/expr.cpp
         ${SOURCE_DIR}/env.cpp
         ${SOURCE_DIR}/store.cpp
-        ${SOURCE_DIR}/nameless/senv.cpp
+#        ${SOURCE_DIR}/nameless/senv.cpp
 #        ${SOURCE_DIR}/nameless/nenv.cpp
 #        ${SOURCE_DIR}/nameless/translator.cpp
 #        ${SOURCE_DIR}/nameless/interpreter.cpp

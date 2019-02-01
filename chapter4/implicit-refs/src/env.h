@@ -10,7 +10,6 @@
 namespace eopl {
 
 using SpEnv = std::shared_ptr<struct Env>;
-//using WpEnv = std::weak_ptr<struct Env>;
 
 struct Ribcage {
 
