@@ -20,7 +20,7 @@ enum class ValueType {
   ARRAY,
   PROC,
 //  NAMELESS_PROC,
-  REF,
+      REF,
 };
 
 /**
@@ -222,7 +222,6 @@ using RwSymbol = boost::recursive_wrapper<struct Symbol>;
 using RwArray = boost::recursive_wrapper<struct Array>;
 using RwPair = boost::recursive_wrapper<struct Pair>;
 using RwProc = boost::recursive_wrapper<struct Proc>;
-//using RwNamelessProc = boost::recursive_wrapper<struct NamelessProc>;
 using RwRef = boost::recursive_wrapper<struct Ref>;
 
 template<typename T>

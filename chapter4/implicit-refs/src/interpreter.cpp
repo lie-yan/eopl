@@ -263,5 +263,4 @@ Value eval (const std::string& s) {
   return value_of(result, make_initial_env(store), store);
 }
 
-
 }
