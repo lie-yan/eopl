@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "expr_fwd.h"
 #include "value_fwd.h"
+#include "expr_fwd.h"
 #include "env.h"
-#include "nameless/nenv.h"
+//#include "nameless/nenv.h"
 
 #include <ostream>
 
@@ -55,26 +55,44 @@ private:
   SpEnv saved_env_;
 };
 
-class NamelessProc {
+//class NamelessProc {
+//public:
+//  NamelessProc (Expression body, const SpNamelessEnv& saved_env);
+//  friend bool operator == (const NamelessProc& lhs, const NamelessProc& rhs) {
+//    return lhs.body_ == rhs.body_ &&
+//           lhs.saved_env() == rhs.saved_env();
+//  }
+//  friend bool operator != (const NamelessProc& lhs, const NamelessProc& rhs) {
+//    return !(rhs == lhs);
+//  }
+//
+//  friend std::ostream& operator << (std::ostream& os, const NamelessProc& proc);
+//
+//  SpNamelessEnv saved_env () const;
+//  void saved_env (const SpNamelessEnv& saved_env);
+//  const Expression& body () const;
+//
+//private:
+//  Expression body_;
+//  SpNamelessEnv saved_env_;
+//};
+
+class Ref {
 public:
-  NamelessProc (Expression body, const SpNamelessEnv& saved_env);
-  friend bool operator == (const NamelessProc& lhs, const NamelessProc& rhs) {
-    return lhs.body_ == rhs.body_ &&
-           lhs.saved_env() == rhs.saved_env();
+  explicit Ref (int location) : location_(location) { }
+
+  friend bool operator == (const Ref& lhs, const Ref& rhs) {
+    return lhs.location_ == rhs.location_;
   }
-  friend bool operator != (const NamelessProc& lhs, const NamelessProc& rhs) {
+  friend bool operator != (const Ref& lhs, const Ref& rhs) {
     return !(rhs == lhs);
   }
+  friend std::ostream& operator << (std::ostream& os, const Ref& rhs);
 
-  friend std::ostream& operator << (std::ostream& os, const NamelessProc& proc);
-
-  SpNamelessEnv saved_env () const;
-  void saved_env (const SpNamelessEnv& saved_env);
-  const Expression& body () const;
+  int location () const;
 
 private:
-  Expression body_;
-  SpNamelessEnv saved_env_;
+  int location_;
 };
 
 /// observers for `Value` below
@@ -88,8 +106,9 @@ const Pair& to_pair (const Value& value);
 const Array& to_array (const Value& value);
 const Proc& to_proc (const Value& value);
 Proc& to_proc (Value& value);
-const NamelessProc& to_nameless_proc (const Value& value);
-NamelessProc& to_nameless_proc (Value& value);
+//const NamelessProc& to_nameless_proc (const Value& value);
+//NamelessProc& to_nameless_proc (Value& value);
+Ref& to_ref (Value& value);
 
 std::optional<std::vector<Value>> flatten (Value lst);
 

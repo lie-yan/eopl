@@ -31,12 +31,14 @@ ValueType type_of (const Value& value) {
     ValueType operator () (const RwArray&) { return ValueType::ARRAY; }
     ValueType operator () (const RwProc&) { return ValueType::PROC; }
     ValueType operator () (const RwNamelessProc&) { return ValueType::NAMELESS_PROC; }
+    ValueType operator () (const RwRef&) { return ValueType::REF; }
     ValueType operator () (const String&) { return ValueType::STRING; }
     ValueType operator () (const Symbol&) { return ValueType::SYMBOL; }
     ValueType operator () (const Pair&) { return ValueType::PAIR; }
     ValueType operator () (const Array&) { return ValueType::ARRAY; }
     ValueType operator () (const Proc&) { return ValueType::PROC; }
     ValueType operator () (const NamelessProc&) { return ValueType::NAMELESS_PROC; }
+    ValueType operator () (const Ref&) { return ValueType::REF; }
   };
 
   return std::visit(TypeVisitor{}, *value);
@@ -66,6 +68,7 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     void operator () (const RwArray& array) { (*this)(array.get()); }
     void operator () (const RwProc& proc) { (*this)(proc.get()); }
     void operator () (const RwNamelessProc& proc) { (*this)(proc.get()); }
+    void operator () (const RwRef& ref) { (*this)(ref.get()); }
     void operator () (const String& str) { os << std::quoted(str.get()); }
     void operator () (const Symbol& sym) { os << sym; }
     void operator () (const Pair& pair) {
@@ -103,6 +106,9 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     }
     void operator () (const NamelessProc& proc) {
       os << "<nameless-proc " << proc.body() << ">";
+    }
+    void operator () (const Ref& ref) {
+      os << "<ref " << ref.location() << ">";
     }
   };
 
@@ -154,6 +160,10 @@ NamelessProc& to_nameless_proc (Value& value) {
   return std::get<RwNamelessProc>(*value).get();
 }
 
+Ref& to_ref (Value& value) {
+  return std::get<RwRef>(*value).get();
+}
+
 std::ostream& operator << (std::ostream& os, const Proc& proc) {
   os << "Proc(params_: " << proc.params_
      << ", body: " << proc.body_
@@ -162,7 +172,7 @@ std::ostream& operator << (std::ostream& os, const Proc& proc) {
 }
 
 Proc::Proc (const std::vector<Symbol>& params, Expression body, SpEnv saved_env)
-    : params_(params), body_(std::move(body)), saved_env_(saved_env) { }
+    : params_(params), body_(std::move(body)), saved_env_(std::move(saved_env)) { }
 
 std::ostream& operator << (std::ostream& os, const NamelessProc& proc) {
   os << "NamelessProc(body: " << proc.body()
@@ -198,6 +208,15 @@ std::optional<std::vector<Value>> flatten (Value lst) {
     }
   }
   return {std::move(values)};
+}
+
+std::ostream& operator << (std::ostream& os, const Ref& rhs) {
+  os << "Ref(" << rhs.location() << ")";
+  return os;
+}
+
+int Ref::location () const {
+  return location_;
 }
 
 }
