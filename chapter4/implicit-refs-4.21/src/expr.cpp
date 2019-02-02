@@ -33,11 +33,6 @@ std::ostream& operator << (std::ostream& os, const VarExp& varExp) {
   return os;
 }
 
-//std::ostream& operator << (std::ostream& os, const NamelessVarExp& exp) {
-//  os << "NamelessVarExp(" << exp.addr << ")";
-//  return os;
-//}
-
 std::ostream& operator << (std::ostream& os, const IfExp& exp) {
   os << "IfExp(" << exp.cond << ", " << exp.then_ << ", " << exp.else_ << ")";
   return os;
@@ -67,22 +62,10 @@ std::ostream& operator << (std::ostream& os, const CondExp& exp) {
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const LetExp::Clause& clause) {
-  os << "(" << clause.var << " = " << clause.exp << ")";
-  return os;
-}
-
 std::ostream& operator << (std::ostream& os, const LetExp& exp) {
   os << "LetExp(clauses: " << exp.clauses << ", body: " << exp.body << ")";
   return os;
 }
-
-//std::ostream& operator << (std::ostream& os, const NamelessLetExp& exp) {
-//  os << "NamelessLetExp(clauses: " << exp.clauses
-//     << ", body: " << exp.body
-//     << ", star: " << std::boolalpha << exp.star << ")";
-//  return os;
-//}
 
 std::ostream& operator << (std::ostream& os, const UnpackExp& exp) {
   os << "UnpackExp(vars: " << exp.vars
@@ -128,6 +111,17 @@ std::ostream& operator << (std::ostream& os, const AssignExp& assignExp) {
   return os;
 }
 
+std::ostream& operator << (std::ostream& os, const AssignClause& clause) {
+  os << "(" << clause.var << " = " << clause.exp << ")";
+  return os;
+}
+
+std::ostream& operator << (std::ostream& os, const SetdynamicExp& setdynamicExp) {
+  os << "SetdynamicExp(clauses: " << setdynamicExp.clauses
+     << ", body: " << setdynamicExp.body << ")";
+  return os;
+}
+
 ExpType type_of (const Expression& expression) {
   struct TypeVisitor {
     ExpType operator () (const ConstExp&) { return ExpType::CONST_EXP; }
@@ -141,6 +135,7 @@ ExpType type_of (const Expression& expression) {
     ExpType operator () (const RwLetrecExp&) { return ExpType::LETREC_EXP; }
     ExpType operator () (const RwSequenceExp&) { return ExpType::SEQUENCE_EXP; }
     ExpType operator () (const RwAssignExp&) { return ExpType::ASSIGN_EXP; }
+    ExpType operator () (const RwSetdynamicExp&) { return ExpType::SETDYNAMIC_EXP; }
   };
 
   return std::visit(TypeVisitor{}, *expression);

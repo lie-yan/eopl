@@ -5,8 +5,6 @@
 #pragma once
 
 #include "value_fwd.h"
-//#include "nameless/senv.h"
-//#include "nameless/nenv.h"
 
 #include <ostream>
 
@@ -24,6 +22,7 @@ enum class ExpType {
   LETREC_EXP,
   SEQUENCE_EXP,
   ASSIGN_EXP,
+  SETDYNAMIC_EXP,
 };
 
 struct ConstExp {
@@ -38,42 +37,29 @@ struct VarExp {
   friend std::ostream& operator << (std::ostream& os, const VarExp& varExp);
 };
 
-//struct NamelessVarExp {
-//  LexicalAddr addr;
-//
-//  friend std::ostream& operator << (std::ostream& os, const NamelessVarExp& varExp);
-//};
-
 using RwIfExp = boost::recursive_wrapper<struct IfExp>;
 using RwLetExp = boost::recursive_wrapper<struct LetExp>;
-//using RwNamelessLetExp = boost::recursive_wrapper<struct NamelessLetExp>;
 using RwCondExp = boost::recursive_wrapper<struct CondExp>;
 using RwUnpackExp = boost::recursive_wrapper<struct UnpackExp>;
-//using RwNamelessUnpackExp = boost::recursive_wrapper<struct NamelessUnpackExp>;
 using RwProcExp = boost::recursive_wrapper<struct ProcExp>;
-//using RwNamelessProcExp = boost::recursive_wrapper<struct NamelessProcExp>;
 using RwCallExp = boost::recursive_wrapper<struct CallExp>;
 using RwLetrecExp = boost::recursive_wrapper<struct LetrecExp>;
-//using RwNamelessLetrecExp = boost::recursive_wrapper<struct NamelessLetrecExp>;
 using RwSequenceExp = boost::recursive_wrapper<struct SequenceExp>;
 using RwAssignExp = boost::recursive_wrapper<struct AssignExp>;
+using RwSetdynamicExp = boost::recursive_wrapper<struct SetdynamicExp>;
 
 using Expression_ = std::variant<ConstExp,
                                  VarExp,
-//                                 NamelessVarExp,
                                  RwIfExp,
                                  RwLetExp,
-//                                 RwNamelessLetExp,
                                  RwCondExp,
                                  RwUnpackExp,
-//                                 RwNamelessUnpackExp,
                                  RwProcExp,
-//                                 RwNamelessProcExp,
                                  RwCallExp,
                                  RwLetrecExp,
-//                                 RwNamelessLetrecExp,
                                  RwSequenceExp,
-                                 RwAssignExp>;
+                                 RwAssignExp,
+                                 RwSetdynamicExp>;
 
 using Expression = std::shared_ptr<Expression_>;
 std::ostream& operator << (std::ostream& os, const Expression& exp);

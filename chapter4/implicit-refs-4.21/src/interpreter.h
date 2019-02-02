@@ -24,6 +24,7 @@ Value value_of (const CallExp& exp, const SpEnv& env, const SpStore& store);
 Value value_of (const LetrecExp& exp, const SpEnv& env, const SpStore& store);
 Value value_of (const SequenceExp& exp, const SpEnv& env, const SpStore& store);
 Value value_of (const AssignExp& exp, const SpEnv& env, const SpStore& store);
+Value value_of (const SetdynamicExp& exp, const SpEnv& env, const SpStore& store);
 
 std::vector<Value> value_of (const std::vector<Expression>& exps, const SpEnv& env, const SpStore& store);
 

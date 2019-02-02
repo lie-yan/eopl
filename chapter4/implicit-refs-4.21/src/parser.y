@@ -39,6 +39,8 @@ using eopl::ConstExp;
 using eopl::VarExp;
 using eopl::IfExp;
 using eopl::LetExp;
+using eopl::AssignClause;
+using eopl::AssignClauseList;
 using eopl::UnpackExp;
 using eopl::CondExp;
 using eopl::ProcExp;
@@ -47,6 +49,7 @@ using eopl::LetrecExp;
 using eopl::LetrecProcSpec;
 using eopl::SequenceExp;
 using eopl::AssignExp;
+using eopl::SetdynamicExp;
 using eopl::Program;
 using eopl::to_exp;
 
@@ -69,6 +72,8 @@ using eopl::to_exp;
 %token                BEGIN_        "begin"
 %token                END           "end"
 %token                PROC          "proc"
+%token                SETDYNAMIC    "setdynamic"
+%token                DURING        "during"
 %token                END_OF_FILE   "end of file"
 
 %type <eopl::Expression> expression
@@ -76,8 +81,8 @@ using eopl::to_exp;
 %type <std::vector<eopl::Expression>> semicol_sep_exp_nlist
 %type <eopl::CondExp::ClauseList> cond_clause_list
 %type <eopl::CondExp::Clause> cond_clause
-%type <eopl::LetExp::ClauseList> let_clause_list
-%type <eopl::LetExp::Clause> let_clause
+%type <eopl::AssignClauseList> assign_clause_list
+%type <eopl::AssignClause> assign_clause
 %type <int> let_variant
 %type <std::vector<eopl::Symbol>> id_list
 %type <std::vector<eopl::Symbol>> param_list
@@ -94,8 +99,8 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
               { $$ = to_exp(IfExp{std::move($2), std::move($4), std::move($6)}); }
             | COND cond_clause_list END
               { $$ = to_exp(CondExp{std::move($2)}); }
-            | let_variant let_clause_list IN expression
-              { $$ = to_exp(LetExp{std::move($2), std::move($4), bool($1 & star_mask), bool($1 & mutable_mask)}); }
+            | let_variant assign_clause_list IN expression
+              { $$ = to_exp(LetExp{std::move($2), std::move($4), bool($1 & star_mask), bool(mutable_mask)}); }
             | UNPACK id_list '=' expression IN expression
               { $$ = to_exp(UnpackExp{std::move($2), std::move($4), std::move($6)}); }
             | PROC '(' param_list ')' expression
@@ -108,6 +113,8 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
               { $$ = to_exp(SequenceExp{std::move($2)}); }
             | SET IDENTIFIER '=' expression
               { $$ = to_exp(AssignExp{std::move($2), std::move($4)}); }
+            | SETDYNAMIC assign_clause_list DURING expression
+              { $$ = to_exp(SetdynamicExp{std::move($2), std::move($4)}); }
             ;
 
 exp_nlist : expression  { $$ = {std::move($1)}; }
@@ -126,12 +133,12 @@ cond_clause : expression RIGHT_ARROW expression
               { $$ = eopl::CondExp::Clause{std::move($1), std::move($3)}; }
             ;
 
-let_clause_list : %empty { $$ = eopl::LetExp::ClauseList(); }
-                | let_clause_list let_clause { $1.push_back(std::move($2)); $$ = std::move($1); }
+assign_clause_list : %empty { $$ = eopl::AssignClauseList(); }
+                | assign_clause_list assign_clause { $1.push_back(std::move($2)); $$ = std::move($1); }
                 ;
 
-let_clause : IDENTIFIER '=' expression
-             { $$ = eopl::LetExp::Clause{std::move($1), std::move($3)}; }
+assign_clause : IDENTIFIER '=' expression
+             { $$ = eopl::AssignClause{std::move($1), std::move($3)}; }
            ;
 
 let_variant : LET { $$ = 0; }

@@ -72,9 +72,6 @@ std::vector<Value> refs_of (const std::vector<Value>& values, const SpStore& sto
   return refs;
 }
 
-//Value value_of (const NamelessVarExp& exp, const SpEnv& env, const SpStore& store) {
-//  throw std::runtime_error(error_message(exp));
-//}
 
 Value value_of (const IfExp& exp, const SpEnv& env, const SpStore& store) {
   Value val1 = value_of(exp.cond, env, store);
@@ -85,13 +82,12 @@ Value value_of (const IfExp& exp, const SpEnv& env, const SpStore& store) {
 
 struct let_tag { };
 struct let_star_tag { };
-struct letmutable_tag { };
 
 Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_star_tag) {
   auto new_env = std::accumulate(std::begin(exp.clauses),
                                  std::end(exp.clauses),
                                  env,
-                                 [&store] (SpEnv& acc, const LetExp::Clause& c) -> SpEnv {
+                                 [&store] (SpEnv& acc, const AssignClause& c) -> SpEnv {
                                    auto res = value_of(c.exp, acc, store);
                                    return Env::extend(std::move(acc),
                                                       c.var,
@@ -105,14 +101,14 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_t
   std::vector<Symbol> vars;
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
                  std::back_inserter(vars),
-                 [] (const LetExp::Clause& c) -> Symbol {
+                 [] (const AssignClause& c) -> Symbol {
                    return c.var;
                  });
 
   std::vector<Value> values;
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
                  std::back_inserter(values),
-                 [&env, &store, &exp] (const LetExp::Clause& c) -> Value {
+                 [&env, &store, &exp] (const AssignClause& c) -> Value {
                    return store->newref(value_of(c.exp, env, store), exp.mutable_);
                  });
   return value_of(exp.body,
@@ -127,10 +123,6 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store) {
     return value_of(exp, env, store, let_tag());
   }
 }
-
-//Value value_of (const NamelessLetExp& exp, const SpEnv& env, const SpStore& store) {
-//  throw std::runtime_error(error_message(exp));
-//}
 
 Value value_of (const CondExp& exp, const SpEnv& env, const SpStore& store) {
   auto it = std::find_if(std::begin(exp.clauses),
@@ -166,19 +158,9 @@ Value value_of (const UnpackExp& exp, const SpEnv& env, const SpStore& store) {
 
 }
 
-//Value value_of (const NamelessUnpackExp& exp, const SpEnv& env, const SpStore& store) {
-//  throw std::runtime_error(error_message(exp));
-//}
-
 Value value_of (const ProcExp& exp, const SpEnv& env, const SpStore& store) {
   return to_value(Proc{exp.params, exp.body, env});
 }
-
-//Value value_of (const NamelessProcExp& exp, const SpEnv& env, const SpStore& store) {
-//  throw std::runtime_error(error_message(exp));
-//}
-
-
 
 Value value_of (const CallExp& exp, const SpEnv& env, const SpStore& store) {
 
@@ -244,6 +226,31 @@ Value value_of (const AssignExp& exp, const SpEnv& env, const SpStore& store) {
       value_of(exp.exp1, env, store)
   );
   return to_value(Int{27});
+}
+
+Value value_of (const SetdynamicExp& exp, const SpEnv& env, const SpStore& store) {
+  struct ShadowedPair {
+    Value ref;
+    Value value;
+  };
+
+  std::vector<ShadowedPair> shadowed;
+  std::transform(std::begin(exp.clauses), std::end(exp.clauses),
+                 std::back_inserter(shadowed),
+                 [&env, &store] (const AssignClause& c) {
+                   auto old_ref = Env::apply(env, c.var);
+                   auto old_value = store->deref(old_ref);
+                   auto new_value = value_of(c.exp, env, store);
+                   store->setref(old_ref, new_value);
+                   return ShadowedPair{old_ref, old_value};
+                 });
+  auto ret_value = value_of(exp.body, env, store);
+
+  std::for_each(std::begin(shadowed), std::end(shadowed),
+                [&store] (const ShadowedPair& p) {
+                  store->setref(p.ref, p.value);
+                });
+  return ret_value;
 }
 
 SpEnv make_initial_env (const SpStore& store) {

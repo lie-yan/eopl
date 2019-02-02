@@ -227,6 +227,18 @@ if (zero? x) then 0 else (- (times4 (- x 1)) -4); (times4 3) end)EOF"),
       to_value(Int{12}));
 }
 
+TEST(implicit_refs, setdynamic) {
+  using namespace eopl;
+
+  EXPECT_EQ(
+      eval(R"EOF(
+let x = 11
+in let p = proc (y) (- y x)
+in (- setdynamic x = 17 during (p 22)
+      (p 13)))EOF"),
+      to_value(Int{3}));
+}
+
 int main (int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

@@ -158,6 +158,19 @@ integer [-+]?[[:digit:]]+
                   return yy::parser::token::PROC;
                 }
 
+"setdynamic"    {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::SETDYNAMIC;
+                }
+
+"during"        {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::DURING;
+                }
 
 {blank}         loc.step();
 
