@@ -94,12 +94,12 @@ using eopl::to_exp;
 %type <eopl::Statement> statement
 %type <eopl::Expression> expression
 %type <std::vector<eopl::Expression>> exp_nlist
-%type <std::vector<eopl::Expression>> semicol_sep_exp_nlist
+%type <std::vector<eopl::Expression>> scolon_sep_exp_nlist
 %type <std::vector<eopl::Statement>> stmt_list
 %type <eopl::CondExp::ClauseList> cond_clause_list
 %type <eopl::CondExp::Clause> cond_clause
-%type <eopl::BindingClauseList> assign_clause_list
-%type <eopl::BindingClause> assign_clause
+%type <eopl::BindingClauseList> binding_clause_list
+%type <eopl::BindingClause> binding_clause
 %type <int> let_variant
 %type <std::vector<eopl::Symbol>> id_list
 %type <std::vector<eopl::Symbol>> comma_sep_id_list
@@ -134,7 +134,7 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
               { $$ = to_exp(IfExp{std::move($2), std::move($4), std::move($6)}); }
             | COND cond_clause_list END
               { $$ = to_exp(CondExp{std::move($2)}); }
-            | let_variant assign_clause_list IN expression
+            | let_variant binding_clause_list IN expression
               { $$ = to_exp(LetExp{std::move($2), std::move($4), bool($1 & star_mask), bool(mutable_mask)}); }
             | UNPACK id_list '=' expression IN expression
               { $$ = to_exp(UnpackExp{std::move($2), std::move($4), std::move($6)}); }
@@ -144,11 +144,11 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
               { $$ = to_exp(CallExp{std::move($2), std::move($3)}); }
             | LETREC proc_spec_nlist IN expression
               { $$ = to_exp(LetrecExp{std::move($2), std::move($4)}); }
-            | BEGIN_ semicol_sep_exp_nlist END
+            | BEGIN_ scolon_sep_exp_nlist END
               { $$ = to_exp(SequenceExp{std::move($2)}); }
             | SET IDENTIFIER '=' expression
               { $$ = to_exp(AssignExp{std::move($2), std::move($4)}); }
-            | SETDYNAMIC assign_clause_list DURING expression
+            | SETDYNAMIC binding_clause_list DURING expression
               { $$ = to_exp(SetdynamicExp{std::move($2), std::move($4)}); }
             ;
 
@@ -163,8 +163,8 @@ exp_nlist : expression  { $$ = {std::move($1)}; }
           | exp_nlist expression { $1.push_back(std::move($2)); $$ = std::move($1); }
           ;
 
-semicol_sep_exp_nlist : expression { $$ = {std::move($1)}; }
-                      | semicol_sep_exp_nlist ';' expression { $1.push_back(std::move($3)); $$ = std::move($1); }
+scolon_sep_exp_nlist : expression { $$ = {std::move($1)}; }
+                      | scolon_sep_exp_nlist ';' expression { $1.push_back(std::move($3)); $$ = std::move($1); }
                       ;
 
 cond_clause_list : %empty { $$ = eopl::CondExp::ClauseList(); }
@@ -175,11 +175,11 @@ cond_clause : expression RIGHT_ARROW expression
               { $$ = eopl::CondExp::Clause{std::move($1), std::move($3)}; }
             ;
 
-assign_clause_list : %empty { $$ = eopl::BindingClauseList(); }
-                   | assign_clause_list assign_clause { $1.push_back(std::move($2)); $$ = std::move($1); }
+binding_clause_list : %empty { $$ = eopl::BindingClauseList(); }
+                   | binding_clause_list binding_clause { $1.push_back(std::move($2)); $$ = std::move($1); }
                    ;
 
-assign_clause : IDENTIFIER '=' expression
+binding_clause : IDENTIFIER '=' expression
                 { $$ = eopl::BindingClause{std::move($1), std::move($3)}; }
               ;
 
