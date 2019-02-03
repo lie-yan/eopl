@@ -163,7 +163,7 @@ Value value_of (const CallExp& exp, const SpEnv& env, const SpStore& store) {
     goto eval_proc;
   } else {
     const auto& op_name = to_var_exp(exp.rator).var;
-    auto f_opt = built_in::find_built_in(op_name);
+    auto f_opt = built_in::find_function(op_name);
     if (!f_opt) {
       goto eval_proc;
     } else {
@@ -249,7 +249,79 @@ Value value_of (const SetdynamicExp& exp, const SpEnv& env, const SpStore& store
 }
 
 void result_of (const Program& program, const SpEnv& env, const SpStore& store) {
+  result_of(program.stmt, env, store);
+}
 
+struct ResultOfStatementVisitor {
+  const SpEnv& env;
+  const SpStore& store;
+
+  template<typename T>
+  void operator () (const boost::recursive_wrapper<T>& t) { result_of(t.get(), env, store); }
+
+  template<typename T>
+  void operator () (const T& t) { result_of(t, env, store); }
+};
+
+void result_of (const Statement& statement, const SpEnv& env, const SpStore& store) {
+  std::visit(ResultOfStatementVisitor{env, store}, *statement);
+}
+
+void result_of (const AssignStmt& statement, const SpEnv& env, const SpStore& store) {
+  Value ref = Env::apply(env, statement.var);
+  Value value = value_of(statement.exp, env, store);
+  store->setref(ref, value);
+}
+
+void result_of (const SubrCallStmt& statement, const SpEnv& env, const SpStore& store) {
+  auto subr = built_in::find_subroutine(statement.var);
+  if (subr) {
+    std::vector<Value> args = value_of(statement.params, env, store);
+    (*subr)(args, store);
+  } else {
+    throw std::runtime_error("the subroutine does not exist");
+  }
+}
+
+void result_of (const BlockStmt& statement, const SpEnv& env, const SpStore& store) {
+  std::for_each(
+      std::begin(statement.stmt_list),
+      std::end(statement.stmt_list),
+      [&env, &store] (const Statement& stmt) {
+        result_of(stmt, env, store);
+      });
+}
+
+void result_of (const IfStmt& statement, const SpEnv& env, const SpStore& store) {
+  Value cond = value_of(statement.cond, env, store);
+  if (to_bool(cond).get()) {
+    result_of(statement.then_, env, store);
+  } else {
+    result_of(statement.else_, env, store);
+  }
+}
+
+void result_of (const WhileStmt& statement, const SpEnv& env, const SpStore& store) {
+  while (true) {
+    Value cond = value_of(statement.cond, env, store);
+    if (to_bool(cond).get()) {
+      result_of(statement.body, env, store);
+    } else {
+      break;
+    }
+  }
+}
+
+void result_of (const DeclStmt& statement, const SpEnv& env, const SpStore& store) {
+  std::vector<Value> new_refs;
+  std::transform(std::begin(statement.vars),
+                 std::end(statement.vars),
+                 std::back_inserter(new_refs),
+                 [&store] (const Symbol& var) {
+                   return store->newref(to_value(Int{0}), true);
+                 });
+  auto new_env = Env::extend(env, statement.vars, new_refs);
+  result_of(statement.body, new_env, store);
 }
 
 SpEnv make_initial_env (const SpStore& store) {
@@ -261,7 +333,7 @@ SpEnv make_initial_env (const SpStore& store) {
       );
 }
 
-void eval (const std::string& s) {
+void run (const std::string& s) {
   std::istringstream ss(s);
   yy::Lexer lexer(ss);
   Program result;
@@ -270,10 +342,9 @@ void eval (const std::string& s) {
   p.parse();
 
   auto store = Store::make_empty();
+  auto env = make_initial_env(store);
 
-
-//  return value_of(result, make_initial_env(store), store);
+  result_of(result, env, store);
 }
-
 
 }

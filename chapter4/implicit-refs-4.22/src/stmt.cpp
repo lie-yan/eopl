@@ -21,6 +21,7 @@ struct StatementOutputVisitor {
 
 std::ostream& operator << (std::ostream& os, const Statement& stmt) {
   std::visit(StatementOutputVisitor{os}, *stmt);
+  return os;
 }
 
 std::ostream& operator << (std::ostream& os, const AssignStmt& stmt) {

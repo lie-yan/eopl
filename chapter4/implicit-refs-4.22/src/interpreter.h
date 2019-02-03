@@ -8,6 +8,7 @@
 #include "expr.h"
 #include "env.h"
 #include "store.h"
+#include "stmt_fwd.h"
 
 namespace eopl {
 
@@ -28,8 +29,15 @@ Value value_of (const SetdynamicExp& exp, const SpEnv& env, const SpStore& store
 std::vector<Value> value_of (const std::vector<Expression>& exps, const SpEnv& env, const SpStore& store);
 
 void result_of (const Program& program, const SpEnv& env, const SpStore& store);
+void result_of (const Statement& statement, const SpEnv& env, const SpStore& store);
+void result_of (const AssignStmt& statement, const SpEnv& env, const SpStore& store);
+void result_of (const SubrCallStmt& statement, const SpEnv& env, const SpStore& store);
+void result_of (const BlockStmt& statement, const SpEnv& env, const SpStore& store);
+void result_of (const IfStmt& statement, const SpEnv& env, const SpStore& store);
+void result_of (const WhileStmt& statement, const SpEnv& env, const SpStore& store);
+void result_of (const DeclStmt& statement, const SpEnv& env, const SpStore& store);
 
 SpEnv make_initial_env (const SpStore& store);
-void eval (const std::string& s);
+void run (const std::string& s);
 
 }

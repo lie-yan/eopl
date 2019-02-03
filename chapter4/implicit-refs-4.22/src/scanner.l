@@ -172,6 +172,21 @@ integer [-+]?[[:digit:]]+
                   return yy::parser::token::DURING;
                 }
 
+"var"           {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::VAR;
+                }
+
+"while"         {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::WHILE;
+                }
+
+
 {blank}         loc.step();
 
 {newline}       loc.lines();

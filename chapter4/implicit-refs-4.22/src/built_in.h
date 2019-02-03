@@ -19,12 +19,13 @@ using BuiltInFun = std::function<Value (const std::vector<Value>&, const SpStore
  * @param name the name to search for
  * @return the function if any, or None
  */
-std::optional<BuiltInFun> find_built_in (const Symbol& name);
+std::optional<BuiltInFun> find_function (const Symbol& name);
 
 Value minus (const std::vector<Value>& args, const SpStore& store);
 Value diff (const std::vector<Value>& args, const SpStore& store);
 Value sum (const std::vector<Value>& args, const SpStore& store);
 Value mult (const std::vector<Value>& args, const SpStore& store);
+Value not_(const std::vector<Value>& args, const SpStore& store);
 Value divide (const std::vector<Value>& args, const SpStore& store);
 Value zero_test (const std::vector<Value>& args, const SpStore& store);
 Value equal_test (const std::vector<Value>& args, const SpStore& store);
@@ -40,5 +41,10 @@ Value list (const std::vector<Value>& args, const SpStore& store);
 Value newref (const std::vector<Value>& args, const SpStore& store);
 Value deref (const std::vector<Value>& args, const SpStore& store);
 Value setref (const std::vector<Value>& args, const SpStore& store);
+
+using BuiltInSubr = std::function<void (const std::vector<Value>&, const SpStore&)>;
+
+std::optional<BuiltInSubr> find_subroutine (const Symbol& name);
+void print (const std::vector<Value>& args, const SpStore& store);
 
 }

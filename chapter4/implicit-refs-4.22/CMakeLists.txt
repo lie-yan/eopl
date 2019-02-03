@@ -40,12 +40,8 @@ set(SOURCES
 
 #add_definitions(-DDEBUG)
 
+
 add_executable(chapter4-implicit-refs
         ${SOURCES}
         ${SOURCE_DIR}/main.cpp)
-target_link_libraries(chapter4-implicit-refs fmt reflex)
-
-add_executable(chapter4-implicit-refs-test
-        ${SOURCES}
-        ${SOURCE_DIR}/implicit_refs_test.cpp)
-target_link_libraries(chapter4-implicit-refs-test fmt reflex gtest gtest_main)
+target_link_libraries(chapter4-implicit-refs fmt reflex gtest gtest_main)

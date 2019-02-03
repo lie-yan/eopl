@@ -1,23 +1,60 @@
-#include <algorithm>
-#include <sstream>
-#include <fmt/format.h>
-#include <fmt/ostream.h>
+//
+// Created by robin on 2019-01-13.
+//
 
 #include "interpreter.h"
 
-#include "parser.tab.hpp"
+void test_statement_lang () {
+  eopl::run(R"EOF(
+var x, y;
+{
+x = 3;
+y = 4;
+(print (+ x y))
+}
+)EOF");
 
-int main () {
-  using eopl::eval, eopl::Int, eopl::Bool, eopl::Value;
-  try {
-    auto res = eval("let f = proc (x) (- x 11) in (f (f 77))");
-    std::cout << res << std::endl;
+  eopl::run(R"EOF(
+var x,y,z;
+{
+x = 3; % Example 2
+y = 4;
+z = 0;
+while (not (zero? x))
+{
+  z = (+ z y);
+  x = (- x 1)
+};
+(print z)
+}
+)EOF");
 
-    res = eval("(proc (f) (f (f 77)) proc (x) (- x 11))");
-    std::cout << res << std::endl;
-  } catch (const yy::parser::syntax_error& e) {
-    fmt::print("The program came into an error around {}. Detail: {}.\n", e.location, e.what());
-  } catch (const std::runtime_error& e) {
-    fmt::print("The program came into a runtime error: {}\n", e.what());
-  }
+
+  eopl::run(R"EOF(
+var x;
+{
+  x = 3; % Example 3
+  (print x);
+  var x;
+  {
+    x = 4;
+    (print x)
+  };
+  (print x)
+}
+)EOF");
+
+  eopl::run(R"EOF(
+var f,x;
+{
+  f = proc(x,y) (* x y); % Example 4
+  x = 3;
+  (print (f 4 x))
+}
+)EOF");
+}
+
+int main (int argc, char** argv) {
+
+  test_statement_lang();
 }

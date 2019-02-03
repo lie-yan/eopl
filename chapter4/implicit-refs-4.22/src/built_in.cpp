@@ -5,30 +5,33 @@
 #include "built_in.h"
 
 #include "value.h"
+#include "basic.h"
 #include <numeric>
 #include <gsl/gsl>
+#include <iostream>
 
 namespace eopl::built_in {
 
-std::optional<BuiltInFun> find_built_in (const Symbol& name) {
+std::optional<BuiltInFun> find_function (const Symbol& name) {
   static std::map<Symbol, BuiltInFun> fun_table = {
-      {Symbol{"zero?"},    zero_test},
-      {Symbol{"equal?"},   equal_test},
+      {Symbol{"zero?"}, zero_test},
+      {Symbol{"equal?"}, equal_test},
       {Symbol{"greater?"}, greater_test},
-      {Symbol{"less?"},    less_test},
-      {Symbol{"minus"},    minus},
-      {Symbol{"-"},        diff},
-      {Symbol{"+"},        sum},
-      {Symbol{"*"},        mult},
-      {Symbol{"/"},        divide},
-      {Symbol{"cons"},     cons},
-      {Symbol{"car"},      car},
-      {Symbol{"cdr"},      cdr},
-      {Symbol{"null?"},    null_test},
-      {Symbol{"list"},     list},
-      {Symbol{"newref"},   newref},
-      {Symbol{"deref"},    deref},
-      {Symbol{"setref"},   setref},
+      {Symbol{"less?"}, less_test},
+      {Symbol{"minus"}, minus},
+      {Symbol{"not"}, not_},
+      {Symbol{"-"}, diff},
+      {Symbol{"+"}, sum},
+      {Symbol{"*"}, mult},
+      {Symbol{"/"}, divide},
+      {Symbol{"cons"}, cons},
+      {Symbol{"car"}, car},
+      {Symbol{"cdr"}, cdr},
+      {Symbol{"null?"}, null_test},
+      {Symbol{"list"}, list},
+      {Symbol{"newref"}, newref},
+      {Symbol{"deref"}, deref},
+      {Symbol{"setref"}, setref},
   };
 
   if (auto it = fun_table.find(name); it != std::end(fun_table)) {
@@ -42,6 +45,13 @@ Value minus (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 1);
   auto i = to_int(args[0]);
   auto res = Int{-i.get()};
+  return to_value(res);
+}
+
+Value not_ (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 1);
+  auto b = to_bool(args[0]);
+  auto res = Bool{!b.get()};
   return to_value(res);
 }
 
@@ -169,5 +179,28 @@ Value setref (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 2);
   return store->setref(args[0], args[1]);
 }
+
+void print (const std::vector<Value>& args, const SpStore& store) {
+  interleave(
+      std::begin(args),
+      std::end(args),
+      [] (const Value& val) { std::cout << val; },
+      [] () { std::cout << ","; }
+  );
+  std::cout << std::endl;
+}
+
+std::optional<BuiltInSubr> find_subroutine (const Symbol& name) {
+  static std::map<Symbol, BuiltInSubr> subr_table = {
+      {Symbol{"print"}, print}
+  };
+
+  if (auto it = subr_table.find(name); it != std::end(subr_table)) {
+    return {it->second};
+  } else {
+    return {};
+  }
+}
+
 
 }
