@@ -59,8 +59,8 @@ std::vector<Value> value_of (const std::vector<Expression>& exps, const SpEnv& e
   return results;
 }
 
-std::vector<Value> refs_of (const std::vector<Value>& values, const SpStore& store) {
-  std::vector<Value> refs;
+std::vector<Ref> refs_of (const std::vector<Value>& values, const SpStore& store) {
+  std::vector<Ref> refs;
   std::transform(std::begin(values), std::end(values),
                  std::back_inserter(refs),
                  [&store] (Value value) {
@@ -101,14 +101,14 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_t
                    return c.var;
                  });
 
-  std::vector<Value> values;
+  std::vector<Ref> refs;
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
-                 std::back_inserter(values),
-                 [&env, &store, &exp] (const BindingClause& c) -> Value {
+                 std::back_inserter(refs),
+                 [&env, &store, &exp] (const BindingClause& c) -> Ref {
                    return store->newref(value_of(c.exp, env, store));
                  });
   return value_of(exp.body,
-                  Env::extend(env, std::move(vars), std::move(values)),
+                  Env::extend(env, std::move(vars), std::move(refs)),
                   store);
 }
 
@@ -226,7 +226,7 @@ Value value_of (const AssignExp& exp, const SpEnv& env, const SpStore& store) {
 
 Value value_of (const SetdynamicExp& exp, const SpEnv& env, const SpStore& store) {
   struct ShadowedPair {
-    Value ref;
+    Ref ref;
     Value value;
   };
 
@@ -269,7 +269,7 @@ void result_of (const Statement& statement, const SpEnv& env, const SpStore& sto
 }
 
 void result_of (const AssignStmt& statement, const SpEnv& env, const SpStore& store) {
-  Value ref = Env::apply(env, statement.var);
+  Ref ref = Env::apply(env, statement.var);
   Value value = value_of(statement.exp, env, store);
   store->setref(ref, value);
 }
@@ -322,7 +322,7 @@ void result_of (const DoWhileStmt& statement, const SpEnv& env, const SpStore& s
 }
 
 void result_of (const DeclStmt& statement, const SpEnv& env, const SpStore& store) {
-  std::vector<Value> new_refs;
+  std::vector<Ref> new_refs;
   std::vector<Symbol> vars;
   std::for_each(std::begin(statement.vars),
                 std::end(statement.vars),
@@ -340,7 +340,7 @@ void result_of (const DeclStmt& statement, const SpEnv& env, const SpStore& stor
 }
 
 void result_of (const ReadStmt& statement, const SpEnv& env, const SpStore& store) {
-  Value ref = Env::apply(env, statement.var);
+  Ref ref = Env::apply(env, statement.var);
   int i;
   std::cin >> i;
   store->setref(ref, to_value(Int{i}));

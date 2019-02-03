@@ -29,9 +29,9 @@ std::optional<BuiltInFun> find_function (const Symbol& name) {
       {Symbol{"cdr"}, cdr},
       {Symbol{"null?"}, null_test},
       {Symbol{"list"}, list},
-      {Symbol{"newref"}, newref},
-      {Symbol{"deref"}, deref},
-      {Symbol{"setref"}, setref},
+//      {Symbol{"newref"}, newref},
+//      {Symbol{"deref"}, deref},
+//      {Symbol{"setref"}, setref},
   };
 
   if (auto it = fun_table.find(name); it != std::end(fun_table)) {
@@ -165,20 +165,20 @@ Value list (const std::vector<Value>& args, const SpStore& store) {
   return res;
 }
 
-Value newref (const std::vector<Value>& args, const SpStore& store) {
-  Expects(args.size() == 1);
-  return store->newref(args[0]);
-}
-
-Value deref (const std::vector<Value>& args, const SpStore& store) {
-  Expects(args.size() == 1);
-  return store->deref(args[0]);
-}
-
-Value setref (const std::vector<Value>& args, const SpStore& store) {
-  Expects(args.size() == 2);
-  return store->setref(args[0], args[1]);
-}
+//Ref newref (const std::vector<Value>& args, const SpStore& store) {
+//  Expects(args.size() == 1);
+//  return store->newref(args[0]);
+//}
+//
+//Value deref (const std::vector<Value>& args, const SpStore& store) {
+//  Expects(args.size() == 1);
+//  return store->deref(args[0]);
+//}
+//
+//Value setref (const std::vector<Value>& args, const SpStore& store) {
+//  Expects(args.size() == 2);
+//  return store->setref(args[0], args[1]);
+//}
 
 void print (const std::vector<Value>& args, const SpStore& store) {
   interleave(
