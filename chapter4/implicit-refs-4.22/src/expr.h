@@ -104,12 +104,6 @@ struct SetdynamicExp {
   friend std::ostream& operator << (std::ostream& os, const SetdynamicExp& setdynamicExp);
 };
 
-struct Program {
-  Expression exp1;
-
-  friend std::ostream& operator << (std::ostream& os, const Program& program);
-};
-
 // observers for Expression
 ExpType type_of (const Expression& expression);
 const ConstExp& to_const_exp (const Expression& expression);

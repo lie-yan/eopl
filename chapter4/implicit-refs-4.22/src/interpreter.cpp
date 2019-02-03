@@ -21,10 +21,6 @@ std::string error_message (const T& exp) {
                      boost::typeindex::type_id<T>().pretty_name());
 }
 
-Value value_of (const Program& program, const SpEnv& env, const SpStore& store) {
-  return value_of(program.exp1, env, store);
-}
-
 struct ValueOfVisitor {
   const SpEnv& env;
   const SpStore& store;
@@ -71,7 +67,6 @@ std::vector<Value> refs_of (const std::vector<Value>& values, const SpStore& sto
                  });
   return refs;
 }
-
 
 Value value_of (const IfExp& exp, const SpEnv& env, const SpStore& store) {
   Value val1 = value_of(exp.cond, env, store);
@@ -253,6 +248,10 @@ Value value_of (const SetdynamicExp& exp, const SpEnv& env, const SpStore& store
   return ret_value;
 }
 
+void result_of (const Program& program, const SpEnv& env, const SpStore& store) {
+
+}
+
 SpEnv make_initial_env (const SpStore& store) {
   return
       Env::extend(
@@ -262,7 +261,7 @@ SpEnv make_initial_env (const SpStore& store) {
       );
 }
 
-Value eval (const std::string& s) {
+void eval (const std::string& s) {
   std::istringstream ss(s);
   yy::Lexer lexer(ss);
   Program result;
@@ -271,7 +270,10 @@ Value eval (const std::string& s) {
   p.parse();
 
   auto store = Store::make_empty();
-  return value_of(result, make_initial_env(store), store);
+
+
+//  return value_of(result, make_initial_env(store), store);
 }
+
 
 }

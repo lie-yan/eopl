@@ -38,11 +38,6 @@ std::ostream& operator << (std::ostream& os, const IfExp& exp) {
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const Program& program) {
-  os << "Program(" << program.exp1 << ")";
-  return os;
-}
-
 template<typename T>
 std::ostream& operator << (std::ostream& os, const std::vector<T>& ts) {
   interleave(std::begin(ts),
