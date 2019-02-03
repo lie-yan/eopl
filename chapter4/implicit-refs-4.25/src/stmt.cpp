@@ -100,4 +100,18 @@ std::ostream& operator << (std::ostream& os, const Program& program) {
   return os;
 }
 
+std::ostream& operator << (std::ostream& os, const std::optional<Expression>& opt_exp) {
+  if (opt_exp) {
+    os << "Some(" << *opt_exp << ")";
+  } else {
+    os << "None";
+  }
+  return os;
+}
+
+std::ostream& operator << (std::ostream& os, const VarDeclClause& caluse) {
+  os << "var: " << caluse.var << " initializer: " << caluse.initializer;
+  return os;
+}
+
 }

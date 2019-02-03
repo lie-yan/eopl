@@ -105,7 +105,7 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_t
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
                  std::back_inserter(values),
                  [&env, &store, &exp] (const BindingClause& c) -> Value {
-                   return store->newref(value_of(c.exp, env, store), exp.mutable_);
+                   return store->newref(value_of(c.exp, env, store));
                  });
   return value_of(exp.body,
                   Env::extend(env, std::move(vars), std::move(values)),
@@ -323,13 +323,19 @@ void result_of (const DoWhileStmt& statement, const SpEnv& env, const SpStore& s
 
 void result_of (const DeclStmt& statement, const SpEnv& env, const SpStore& store) {
   std::vector<Value> new_refs;
-  std::transform(std::begin(statement.vars),
-                 std::end(statement.vars),
-                 std::back_inserter(new_refs),
-                 [&store] (const Symbol& var) {
-                   return store->newref(to_value(Int{0}), true);
-                 });
-  auto new_env = Env::extend(env, statement.vars, new_refs);
+  std::vector<Symbol> vars;
+  std::for_each(std::begin(statement.vars),
+                std::end(statement.vars),
+                [&env, &store, &vars, &new_refs] (const VarDeclClause& c) {
+                  vars.push_back(c.var);
+                  if (c.initializer) {
+                    Value value = value_of(*c.initializer, env, store);
+                    new_refs.push_back(store->newref(std::move(value)));
+                  } else {
+                    new_refs.push_back(store->newref(to_value(Int{0})));
+                  }
+                });
+  auto new_env = Env::extend(env, vars, new_refs);
   result_of(statement.body, new_env, store);
 }
 

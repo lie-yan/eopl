@@ -64,16 +64,16 @@ var x;
 }
 )EOF");
 
+
   eopl::run(R"EOF(
-var sq, x;
+var x = (zero? 1), y = (* 3 3);
 {
-  sq = proc (x) (* x x);
-  read x;
-  (print (sq x));
-  read x;
-  (print (sq x))
+  (print x);
+  (print y)
 }
 )EOF");
+
+
 
 }
 

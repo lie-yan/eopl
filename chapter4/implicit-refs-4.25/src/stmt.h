@@ -30,8 +30,17 @@ struct WhileStmt {
   friend std::ostream& operator << (std::ostream& os, const WhileStmt& stmt);
 };
 
+struct VarDeclClause {
+  Symbol var;
+  std::optional<Expression> initializer;
+
+  friend std::ostream& operator << (std::ostream& os, const VarDeclClause& caluse);
+};
+
+using VarDeclList = std::vector<VarDeclClause>;
+
 struct DeclStmt {
-  std::vector<Symbol> vars;
+  VarDeclList vars;
   Statement body;
 
   friend std::ostream& operator << (std::ostream& os, const DeclStmt& stmt);

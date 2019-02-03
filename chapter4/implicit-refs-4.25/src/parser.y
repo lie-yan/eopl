@@ -18,7 +18,6 @@ namespace yy {
 }
 
 const int star_mask = 0b01;
-const int mutable_mask = 0b10;
 }
 
 // Construct parser object with lexer and result
@@ -100,6 +99,8 @@ using eopl::to_exp;
 %type <eopl::CondExp::Clause> cond_clause
 %type <eopl::BindingClauseList> binding_clause_list
 %type <eopl::BindingClause> binding_clause
+%type <eopl::VarDeclList> var_decl_list
+%type <eopl::VarDeclClause> var_decl_clause
 %type <int> let_variant
 %type <std::vector<eopl::Symbol>> id_list
 %type <std::vector<eopl::Symbol>> comma_sep_id_list
@@ -120,7 +121,7 @@ statement : IDENTIFIER '=' expression
             { $$ = to_stmt(IfStmt{std::move($2), std::move($3), std::move($4)}); }
           | WHILE expression statement
             { $$ = to_stmt(WhileStmt{std::move($2), std::move($3)}); }
-          | VAR comma_sep_id_list ';' statement
+          | VAR var_decl_list ';' statement
             { $$ = to_stmt(DeclStmt{std::move($2), std::move($4)}); }
           | READ IDENTIFIER
             { $$ = to_stmt(ReadStmt{std::move($2)}); }
@@ -135,7 +136,7 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
             | COND cond_clause_list END
               { $$ = to_exp(CondExp{std::move($2)}); }
             | let_variant binding_clause_list IN expression
-              { $$ = to_exp(LetExp{std::move($2), std::move($4), bool($1 & star_mask), bool(mutable_mask)}); }
+              { $$ = to_exp(LetExp{std::move($2), std::move($4), bool($1 & star_mask)}); }
             | UNPACK id_list '=' expression IN expression
               { $$ = to_exp(UnpackExp{std::move($2), std::move($4), std::move($6)}); }
             | PROC '(' comma_sep_id_list ')' expression
@@ -180,12 +181,22 @@ binding_clause_list : %empty { $$ = eopl::BindingClauseList(); }
                    ;
 
 binding_clause : IDENTIFIER '=' expression
-                { $$ = eopl::BindingClause{std::move($1), std::move($3)}; }
+                 { $$ = eopl::BindingClause{std::move($1), std::move($3)}; }
+               ;
+
+var_decl_list : %empty { $$ = eopl::VarDeclList(); }
+              | var_decl_clause { $$ = eopl::VarDeclList{std::move($1)}; }
+              | var_decl_list ',' var_decl_clause
+                { $1.push_back(std::move($3)); $$ = std::move($1); }
               ;
+
+var_decl_clause : IDENTIFIER { $$ = eopl::VarDeclClause{std::move($1), {}}; }
+                | IDENTIFIER '=' expression
+                  { $$ = eopl::VarDeclClause{std::move($1), {std::move($3)}}; }
+                ;
 
 let_variant : LET { $$ = 0; }
             | LET_STAR { $$ = star_mask; }
-            | LETMUTABLE { $$ = mutable_mask; }
             ;
 
 proc_spec_nlist : proc_spec { $$ = std::vector<eopl::LetrecProcSpec>{std::move($1)}; }

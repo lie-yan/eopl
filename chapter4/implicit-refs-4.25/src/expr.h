@@ -30,7 +30,6 @@ struct LetExp {
   BindingClauseList clauses;
   Expression body;
   bool star = false;
-  bool mutable_ = false;
 
   friend std::ostream& operator << (std::ostream& os, const LetExp& exp);
 };

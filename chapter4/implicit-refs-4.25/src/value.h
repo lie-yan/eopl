@@ -56,11 +56,10 @@ private:
 
 class Ref {
 public:
-  explicit Ref (int location, bool mutable_ = false) : location_(location), mutable__(mutable_) { }
+  explicit Ref (int location) : location_(location) { }
 
   friend bool operator == (const Ref& lhs, const Ref& rhs) {
-    return lhs.location_ == rhs.location_
-           && lhs.mutable__ == rhs.mutable__;
+    return lhs.location_ == rhs.location_;
   }
   friend bool operator != (const Ref& lhs, const Ref& rhs) {
     return !(rhs == lhs);
@@ -68,11 +67,9 @@ public:
   friend std::ostream& operator << (std::ostream& os, const Ref& rhs);
 
   int location () const;
-  bool mutable_ () const;
 
 private:
   int location_;
-  bool mutable__ = false;
 };
 
 /// observers for `Value` below
