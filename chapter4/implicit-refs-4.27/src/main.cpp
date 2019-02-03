@@ -64,7 +64,6 @@ var x;
 }
 )EOF");
 
-
   eopl::run(R"EOF(
 var x = (zero? 1), y = (* 3 3);
 {
@@ -73,8 +72,14 @@ var x = (zero? 1), y = (* 3 3);
 }
 )EOF");
 
-
-
+  eopl::run(R"EOF(
+var odd = proc (x) if (zero? x) then 0 else (even (- x 1)),
+    even = proc (x) if (zero? x) then 1 else (odd (- x 1));
+{
+  (print (odd 13));
+  (print (even 13))
+}
+)EOF");
 }
 
 int main (int argc, char** argv) {

@@ -324,24 +324,32 @@ void result_of (const DoWhileStmt& statement, const SpEnv& env, const SpStore& s
 void result_of (const DeclStmt& statement, const SpEnv& env, const SpStore& store) {
   std::vector<Ref> new_refs;
   std::vector<Symbol> vars;
+  std::vector<Value> saved;
   std::for_each(std::begin(statement.vars),
                 std::end(statement.vars),
-                [&env, &store, &vars, &new_refs] (const VarDeclClause& c) {
+                [&env, &store, &vars, &new_refs, &saved] (const VarDeclClause& c) {
                   vars.push_back(c.var);
                   if (c.initializer) {
                     Value value = value_of(*c.initializer, env, store);
+                    if (auto type = type_of(value); type == ValueType::PROC) {
+                      saved.push_back(value);
+                    }
                     new_refs.push_back(store->newref(std::move(value)));
                   } else {
                     new_refs.push_back(store->newref(to_value(Int{0})));
                   }
                 });
   auto new_env = Env::extend(env, vars, new_refs);
+  std::for_each(std::begin(saved), std::end(saved),
+                [&new_env] (Value& value) {
+                  to_proc(value).saved_env(new_env);
+                });
   result_of(statement.body, new_env, store);
 }
 
 void result_of (const ReadStmt& statement, const SpEnv& env, const SpStore& store) {
   Ref ref = Env::apply(env, statement.var);
-  int i;
+  int i = 0;
   std::cin >> i;
   store->setref(ref, to_value(Int{i}));
 }
