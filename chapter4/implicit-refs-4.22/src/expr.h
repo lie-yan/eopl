@@ -18,16 +18,16 @@ struct IfExp {
   friend std::ostream& operator << (std::ostream& os, const IfExp& exp);
 };
 
-struct AssignClause {
+struct BindingClause {
   Symbol var;
   Expression exp;
 };
 
-using AssignClauseList = std::vector<AssignClause>;
+using BindingClauseList = std::vector<BindingClause>;
 
 struct LetExp {
 
-  AssignClauseList clauses;
+  BindingClauseList clauses;
   Expression body;
   bool star = false;
   bool mutable_ = false;
@@ -98,7 +98,7 @@ struct AssignExp {
 
 struct SetdynamicExp {
 
-  AssignClauseList clauses;
+  BindingClauseList clauses;
   Expression body;
 
   friend std::ostream& operator << (std::ostream& os, const SetdynamicExp& setdynamicExp);

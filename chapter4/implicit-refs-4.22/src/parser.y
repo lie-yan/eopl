@@ -39,8 +39,8 @@ using eopl::ConstExp;
 using eopl::VarExp;
 using eopl::IfExp;
 using eopl::LetExp;
-using eopl::AssignClause;
-using eopl::AssignClauseList;
+using eopl::BindingClause;
+using eopl::BindingClauseList;
 using eopl::UnpackExp;
 using eopl::CondExp;
 using eopl::ProcExp;
@@ -81,8 +81,8 @@ using eopl::to_exp;
 %type <std::vector<eopl::Expression>> semicol_sep_exp_nlist
 %type <eopl::CondExp::ClauseList> cond_clause_list
 %type <eopl::CondExp::Clause> cond_clause
-%type <eopl::AssignClauseList> assign_clause_list
-%type <eopl::AssignClause> assign_clause
+%type <eopl::BindingClauseList> assign_clause_list
+%type <eopl::BindingClause> assign_clause
 %type <int> let_variant
 %type <std::vector<eopl::Symbol>> id_list
 %type <std::vector<eopl::Symbol>> param_list
@@ -133,12 +133,12 @@ cond_clause : expression RIGHT_ARROW expression
               { $$ = eopl::CondExp::Clause{std::move($1), std::move($3)}; }
             ;
 
-assign_clause_list : %empty { $$ = eopl::AssignClauseList(); }
+assign_clause_list : %empty { $$ = eopl::BindingClauseList(); }
                 | assign_clause_list assign_clause { $1.push_back(std::move($2)); $$ = std::move($1); }
                 ;
 
 assign_clause : IDENTIFIER '=' expression
-             { $$ = eopl::AssignClause{std::move($1), std::move($3)}; }
+             { $$ = eopl::BindingClause{std::move($1), std::move($3)}; }
            ;
 
 let_variant : LET { $$ = 0; }

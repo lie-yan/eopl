@@ -87,7 +87,7 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_s
   auto new_env = std::accumulate(std::begin(exp.clauses),
                                  std::end(exp.clauses),
                                  env,
-                                 [&store] (SpEnv& acc, const AssignClause& c) -> SpEnv {
+                                 [&store] (SpEnv& acc, const BindingClause& c) -> SpEnv {
                                    auto res = value_of(c.exp, acc, store);
                                    return Env::extend(std::move(acc),
                                                       c.var,
@@ -101,14 +101,14 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_t
   std::vector<Symbol> vars;
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
                  std::back_inserter(vars),
-                 [] (const AssignClause& c) -> Symbol {
+                 [] (const BindingClause& c) -> Symbol {
                    return c.var;
                  });
 
   std::vector<Value> values;
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
                  std::back_inserter(values),
-                 [&env, &store, &exp] (const AssignClause& c) -> Value {
+                 [&env, &store, &exp] (const BindingClause& c) -> Value {
                    return store->newref(value_of(c.exp, env, store), exp.mutable_);
                  });
   return value_of(exp.body,
@@ -237,7 +237,7 @@ Value value_of (const SetdynamicExp& exp, const SpEnv& env, const SpStore& store
   std::vector<ShadowedPair> shadowed;
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
                  std::back_inserter(shadowed),
-                 [&env, &store] (const AssignClause& c) {
+                 [&env, &store] (const BindingClause& c) {
                    auto old_ref = Env::apply(env, c.var);
                    auto old_value = store->deref(old_ref);
                    auto new_value = value_of(c.exp, env, store);

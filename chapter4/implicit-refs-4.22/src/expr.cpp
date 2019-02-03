@@ -111,7 +111,7 @@ std::ostream& operator << (std::ostream& os, const AssignExp& assignExp) {
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const AssignClause& clause) {
+std::ostream& operator << (std::ostream& os, const BindingClause& clause) {
   os << "(" << clause.var << " = " << clause.exp << ")";
   return os;
 }
