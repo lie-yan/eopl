@@ -57,6 +57,7 @@ using eopl::SubrCallStmt;
 using eopl::BlockStmt;
 using eopl::IfStmt;
 using eopl::WhileStmt;
+using eopl::DoWhileStmt;
 using eopl::DeclStmt;
 using eopl::ReadStmt;
 using eopl::Program;
@@ -85,6 +86,7 @@ using eopl::to_exp;
 %token                DURING        "during"
 %token                VAR           "var"
 %token                WHILE         "while"
+%token                DO            "do"
 %token                READ          "read"
 %token                END_OF_FILE   "end of file"
 
@@ -122,6 +124,8 @@ statement : IDENTIFIER '=' expression
             { $$ = to_stmt(DeclStmt{std::move($2), std::move($4)}); }
           | READ IDENTIFIER
             { $$ = to_stmt(ReadStmt{std::move($2)}); }
+          | DO statement WHILE expression
+            { $$ = to_stmt(DoWhileStmt{std::move($4), std::move($2)}); }
           ;
 
 expression  : INT      { $$ = to_exp(ConstExp{$1}); }

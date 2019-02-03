@@ -6,6 +6,7 @@
 
 #include "built_in.h"
 #include "lex.yy.h"
+#include "stmt.h"
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -309,6 +310,14 @@ void result_of (const WhileStmt& statement, const SpEnv& env, const SpStore& sto
     } else {
       break;
     }
+  }
+}
+
+void result_of (const DoWhileStmt& statement, const SpEnv& env, const SpStore& store) {
+  while (true) {
+    result_of(statement.body, env, store);
+    Value cond = value_of(statement.cond, env, store);
+    if (!to_bool(cond).get()) break;
   }
 }
 

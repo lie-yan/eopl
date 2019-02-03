@@ -53,6 +53,18 @@ var f,x;
 )EOF");
 
   eopl::run(R"EOF(
+var x;
+{
+  x = 4;
+  do
+  {
+    (print x);
+    x = (- x 1)
+  } while (not (zero? x))
+}
+)EOF");
+
+  eopl::run(R"EOF(
 var sq, x;
 {
   sq = proc (x) (* x x);
@@ -62,6 +74,7 @@ var sq, x;
   (print (sq x))
 }
 )EOF");
+
 }
 
 int main (int argc, char** argv) {

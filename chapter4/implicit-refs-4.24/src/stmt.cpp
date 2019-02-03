@@ -47,7 +47,6 @@ std::ostream& operator << (std::ostream& os, const SubrCallStmt& stmt) {
 
 StmtType type_of (const Statement& statement) {
   struct TypeVisitor {
-
     StmtType operator () (const AssignStmt&) { return StmtType::ASSIGN_STMT; }
     StmtType operator () (const SubrCallStmt&) { return StmtType::SUBR_CALL_STMT; }
     StmtType operator () (const RwBlockStmt&) { return StmtType::BLOCK_STMT; }
@@ -55,6 +54,7 @@ StmtType type_of (const Statement& statement) {
     StmtType operator () (const RwWhileStmt&) { return StmtType::WHILE_STMT; }
     StmtType operator () (const RwDeclStmt&) { return StmtType::DECL_STMT; }
     StmtType operator () (const ReadStmt&) { return StmtType::READ_STMT; }
+    StmtType operator () (const RwDoWhileStmt&) { return StmtType::DO_WHILE_STMT; }
   };
 
   return std::visit(TypeVisitor{}, *statement);
@@ -89,10 +89,15 @@ std::ostream& operator << (std::ostream& os, const ReadStmt& stmt) {
   return os;
 }
 
+std::ostream& operator << (std::ostream& os, const DoWhileStmt& stmt) {
+  os << "DoWhileStmt(cond: " << stmt.cond
+     << ", body: " << stmt.body << ")";
+  return os;
+}
+
 std::ostream& operator << (std::ostream& os, const Program& program) {
   os << "Program(stmt: " << program.stmt << ")";
   return os;
 }
-
 
 }

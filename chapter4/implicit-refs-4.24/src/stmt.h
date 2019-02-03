@@ -37,6 +37,13 @@ struct DeclStmt {
   friend std::ostream& operator << (std::ostream& os, const DeclStmt& stmt);
 };
 
+struct DoWhileStmt {
+  Expression cond;
+  Statement body;
+
+  friend std::ostream& operator << (std::ostream& os, const DoWhileStmt& stmt);
+};
+
 struct Program {
   Statement stmt;
 

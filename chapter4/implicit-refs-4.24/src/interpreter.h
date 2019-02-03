@@ -35,6 +35,8 @@ void result_of (const SubrCallStmt& statement, const SpEnv& env, const SpStore& 
 void result_of (const BlockStmt& statement, const SpEnv& env, const SpStore& store);
 void result_of (const IfStmt& statement, const SpEnv& env, const SpStore& store);
 void result_of (const WhileStmt& statement, const SpEnv& env, const SpStore& store);
+void result_of (const DoWhileStmt& statement, const SpEnv& env, const SpStore& store);
+
 void result_of (const DeclStmt& statement, const SpEnv& env, const SpStore& store);
 void result_of (const ReadStmt& statement, const SpEnv& env, const SpStore& store);
 

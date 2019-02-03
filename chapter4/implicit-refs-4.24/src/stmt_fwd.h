@@ -15,6 +15,7 @@ enum class StmtType {
   BLOCK_STMT,
   IF_STMT,
   WHILE_STMT,
+  DO_WHILE_STMT,
   DECL_STMT,
   READ_STMT,
 };
@@ -42,6 +43,7 @@ struct ReadStmt {
 using RwBlockStmt = boost::recursive_wrapper<struct BlockStmt>;
 using RwIfStmt = boost::recursive_wrapper<struct IfStmt>;
 using RwWhileStmt = boost::recursive_wrapper<struct WhileStmt>;
+using RwDoWhileStmt = boost::recursive_wrapper<struct DoWhileStmt>;
 using RwDeclStmt = boost::recursive_wrapper<struct DeclStmt>;
 
 using Statement_ = std::variant<AssignStmt,
@@ -50,6 +52,7 @@ using Statement_ = std::variant<AssignStmt,
                                 RwBlockStmt,
                                 RwIfStmt,
                                 RwWhileStmt,
+                                RwDoWhileStmt,
                                 RwDeclStmt>;
 
 using Statement = std::shared_ptr<Statement_>;
