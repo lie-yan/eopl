@@ -324,6 +324,13 @@ void result_of (const DeclStmt& statement, const SpEnv& env, const SpStore& stor
   result_of(statement.body, new_env, store);
 }
 
+void result_of (const ReadStmt& statement, const SpEnv& env, const SpStore& store) {
+  Value ref = Env::apply(env, statement.var);
+  int i;
+  std::cin >> i;
+  store->setref(ref, to_value(Int{i}));
+}
+
 SpEnv make_initial_env (const SpStore& store) {
   return
       Env::extend(

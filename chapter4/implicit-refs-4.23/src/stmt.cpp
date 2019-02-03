@@ -54,6 +54,7 @@ StmtType type_of (const Statement& statement) {
     StmtType operator () (const RwIfStmt&) { return StmtType::IF_STMT; }
     StmtType operator () (const RwWhileStmt&) { return StmtType::WHILE_STMT; }
     StmtType operator () (const RwDeclStmt&) { return StmtType::DECL_STMT; }
+    StmtType operator () (const ReadStmt&) { return StmtType::READ_STMT; }
   };
 
   return std::visit(TypeVisitor{}, *statement);
@@ -83,9 +84,15 @@ std::ostream& operator << (std::ostream& os, const DeclStmt& stmt) {
   return os;
 }
 
+std::ostream& operator << (std::ostream& os, const ReadStmt& stmt) {
+  os << "ReadStmt(var: " << stmt.var << ")";
+  return os;
+}
+
 std::ostream& operator << (std::ostream& os, const Program& program) {
   os << "Program(stmt: " << program.stmt << ")";
   return os;
 }
+
 
 }

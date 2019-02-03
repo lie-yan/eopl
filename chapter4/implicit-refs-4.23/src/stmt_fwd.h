@@ -16,6 +16,7 @@ enum class StmtType {
   IF_STMT,
   WHILE_STMT,
   DECL_STMT,
+  READ_STMT,
 };
 
 struct AssignStmt {
@@ -32,6 +33,12 @@ struct SubrCallStmt {
   friend std::ostream& operator << (std::ostream& os, const SubrCallStmt& stmt);
 };
 
+struct ReadStmt {
+  Symbol var;
+
+  friend std::ostream& operator << (std::ostream& os, const ReadStmt& stmt);
+};
+
 using RwBlockStmt = boost::recursive_wrapper<struct BlockStmt>;
 using RwIfStmt = boost::recursive_wrapper<struct IfStmt>;
 using RwWhileStmt = boost::recursive_wrapper<struct WhileStmt>;
@@ -39,6 +46,7 @@ using RwDeclStmt = boost::recursive_wrapper<struct DeclStmt>;
 
 using Statement_ = std::variant<AssignStmt,
                                 SubrCallStmt,
+                                ReadStmt,
                                 RwBlockStmt,
                                 RwIfStmt,
                                 RwWhileStmt,

@@ -36,6 +36,7 @@ void result_of (const BlockStmt& statement, const SpEnv& env, const SpStore& sto
 void result_of (const IfStmt& statement, const SpEnv& env, const SpStore& store);
 void result_of (const WhileStmt& statement, const SpEnv& env, const SpStore& store);
 void result_of (const DeclStmt& statement, const SpEnv& env, const SpStore& store);
+void result_of (const ReadStmt& statement, const SpEnv& env, const SpStore& store);
 
 SpEnv make_initial_env (const SpStore& store);
 void run (const std::string& s);

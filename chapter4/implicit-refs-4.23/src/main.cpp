@@ -29,7 +29,6 @@ while (not (zero? x))
 }
 )EOF");
 
-
   eopl::run(R"EOF(
 var x;
 {
@@ -50,6 +49,17 @@ var f,x;
   f = proc(x,y) (* x y); % Example 4
   x = 3;
   (print (f 4 x))
+}
+)EOF");
+
+  eopl::run(R"EOF(
+var sq, x;
+{
+  sq = proc (x) (* x x);
+  read x;
+  (print (sq x));
+  read x;
+  (print (sq x))
 }
 )EOF");
 }

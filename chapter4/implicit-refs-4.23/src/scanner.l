@@ -186,6 +186,12 @@ integer [-+]?[[:digit:]]+
                   return yy::parser::token::WHILE;
                 }
 
+"read"          {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::READ;
+                }
 
 {blank}         loc.step();
 
