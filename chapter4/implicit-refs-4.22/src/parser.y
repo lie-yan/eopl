@@ -99,8 +99,8 @@ using eopl::to_exp;
 %type <int> let_variant
 %type <std::vector<eopl::Symbol>> id_list
 %type <std::vector<eopl::Symbol>> comma_sep_id_list
-%type <eopl::LetrecProcSpec> proc_def
-%type <std::vector<eopl::LetrecProcSpec>> proc_def_nlist
+%type <eopl::LetrecProcSpec> proc_spec
+%type <std::vector<eopl::LetrecProcSpec>> proc_spec_nlist
 %%
 
 program : statement { result = {std::move($1)}; }
@@ -134,7 +134,7 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
               { $$ = to_exp(ProcExp{std::move($3), std::move($5)}); }
             | '(' expression exp_nlist ')'
               { $$ = to_exp(CallExp{std::move($2), std::move($3)}); }
-            | LETREC proc_def_nlist IN expression
+            | LETREC proc_spec_nlist IN expression
               { $$ = to_exp(LetrecExp{std::move($2), std::move($4)}); }
             | BEGIN_ semicol_sep_exp_nlist END
               { $$ = to_exp(SequenceExp{std::move($2)}); }
@@ -168,25 +168,25 @@ cond_clause : expression RIGHT_ARROW expression
             ;
 
 assign_clause_list : %empty { $$ = eopl::BindingClauseList(); }
-                | assign_clause_list assign_clause { $1.push_back(std::move($2)); $$ = std::move($1); }
-                ;
+                   | assign_clause_list assign_clause { $1.push_back(std::move($2)); $$ = std::move($1); }
+                   ;
 
 assign_clause : IDENTIFIER '=' expression
-             { $$ = eopl::BindingClause{std::move($1), std::move($3)}; }
-           ;
+                { $$ = eopl::BindingClause{std::move($1), std::move($3)}; }
+              ;
 
 let_variant : LET { $$ = 0; }
             | LET_STAR { $$ = star_mask; }
             | LETMUTABLE { $$ = mutable_mask; }
             ;
 
-proc_def_nlist : proc_def { $$ = std::vector<eopl::LetrecProcSpec>{std::move($1)}; }
-               | proc_def_nlist proc_def { $1.push_back(std::move($2)); $$ = std::move($1); }
-               ;
+proc_spec_nlist : proc_spec { $$ = std::vector<eopl::LetrecProcSpec>{std::move($1)}; }
+                | proc_spec_nlist proc_spec { $1.push_back(std::move($2)); $$ = std::move($1); }
+                ;
 
-proc_def : IDENTIFIER '(' comma_sep_id_list ')' '=' expression
+proc_spec : IDENTIFIER '(' comma_sep_id_list ')' '=' expression
            { $$ = LetrecProcSpec{std::move($1), std::move($3), std::move($6)}; }
-         ;
+          ;
 
 id_list : %empty { $$ = std::vector<eopl::Symbol>(); }
         | id_list IDENTIFIER { $1.push_back(std::move($2)); $$ = std::move($1); }
