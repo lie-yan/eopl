@@ -4,8 +4,8 @@
 
 #include "value.h"
 
-#include "expr.h"
 #include "basic.h"
+
 #include <stack>
 #include <iomanip>
 
@@ -31,7 +31,7 @@ ValueType type_of (const Value& value) {
     ValueType operator () (const RwArray&) { return ValueType::ARRAY; }
     ValueType operator () (const RwProc&) { return ValueType::PROC; }
     ValueType operator () (const RwSubr&) { return ValueType::SUBR; }
-    ValueType operator () (const RwRef&) { return ValueType::REF; }
+    ValueType operator () (const RwMutPair&) { return ValueType::MUT_PAIR; }
     ValueType operator () (const String&) { return ValueType::STRING; }
     ValueType operator () (const Symbol&) { return ValueType::SYMBOL; }
     ValueType operator () (const Pair&) { return ValueType::PAIR; }
@@ -39,6 +39,7 @@ ValueType type_of (const Value& value) {
     ValueType operator () (const Proc&) { return ValueType::PROC; }
     ValueType operator () (const Subr&) { return ValueType::SUBR; }
     ValueType operator () (const Ref&) { return ValueType::REF; }
+    ValueType operator () (const MutPair&) { return ValueType::MUT_PAIR; }
   };
 
   return std::visit(TypeVisitor{}, *value);
@@ -68,7 +69,7 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     void operator () (const RwArray& array) { (*this)(array.get()); }
     void operator () (const RwProc& proc) { (*this)(proc.get()); }
     void operator () (const RwSubr& subr) { (*this)(subr.get()); }
-    void operator () (const RwRef& ref) { (*this)(ref.get()); }
+    void operator () (const RwMutPair& pair) { (*this)(pair.get()); }
     void operator () (const String& str) { os << std::quoted(str.get()); }
     void operator () (const Symbol& sym) { os << sym; }
     void operator () (const Pair& pair) {
@@ -108,6 +109,26 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     void operator () (const Ref& ref) {
       os << "<ref " << ref.location() << ">";
     }
+
+    void operator () (const MutPair& pair) {
+      if (!open_paren) {
+        open_paren = true;
+        os << '(';
+      }
+
+      std::visit(OutputVisitor{os}, *pair.left());
+
+      if (auto type = type_of(pair.right()); type == ValueType::PAIR) {
+        os << ' ';
+        std::visit(*this, *pair.right());
+      } else if (type == ValueType::NIL) {
+        os << ')';
+      } else {
+        os << " . ";
+        std::visit(*this, *pair.right());
+        os << ')';
+      }
+    }
   };
 
   std::visit(OutputVisitor{os}, *value);
@@ -138,6 +159,10 @@ const Pair& to_pair (const Value& value) {
   return std::get<RwPair>(*value).get();
 }
 
+const MutPair& to_mut_pair (const Value& value) {
+  return std::get<RwMutPair>(*value).get();
+}
+
 const Array& to_array (const Value& value) {
   return std::get<RwArray>(*value).get();
 }
@@ -158,8 +183,12 @@ Subr& to_subr (Value& value) {
   return std::get<RwSubr>(*value).get();
 }
 
+const Ref& to_ref (const Value& value) {
+  return std::get<Ref>(*value);
+}
+
 Ref& to_ref (Value& value) {
-  return std::get<RwRef>(*value).get();
+  return std::get<Ref>(*value);
 }
 
 std::ostream& operator << (std::ostream& os, const Proc& proc) {
@@ -198,6 +227,33 @@ std::ostream& operator << (std::ostream& os, const Ref& rhs) {
 
 int Ref::location () const {
   return location_;
+}
+
+MutPair::MutPair (Ref left_ref, SpStore store)
+    : left_ref_(left_ref), store_(std::move(store)) { }
+
+Value MutPair::left () const {
+  return store_->deref(left_ref());
+}
+
+Value MutPair::right () const {
+  return store_->deref(right_ref());
+}
+
+Ref MutPair::left_ref () const {
+  return left_ref_;
+}
+
+Ref MutPair::right_ref () const {
+  return Ref{left_ref().location() + 1};
+}
+
+void MutPair::left (Value value) {
+  store_->setref(left_ref(), std::move(value));
+}
+
+void MutPair::right (Value value) {
+  store_->setref(right_ref(), std::move(value));
 }
 
 

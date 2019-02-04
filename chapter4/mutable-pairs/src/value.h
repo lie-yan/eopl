@@ -8,6 +8,7 @@
 #include "expr_fwd.h"
 #include "stmt_fwd.h"
 #include "env.h"
+#include "store.h"
 
 #include <ostream>
 
@@ -78,22 +79,30 @@ private:
   SpEnv saved_env_;
 };
 
-class Ref {
+class MutPair {
 public:
-  explicit Ref (int location) : location_(location) { }
+  MutPair (Ref left_ref,  SpStore store);
 
-  friend bool operator == (const Ref& lhs, const Ref& rhs) {
-    return lhs.location_ == rhs.location_;
+  friend bool operator == (const MutPair& lhs, const MutPair& rhs) {
+    return lhs.left() == rhs.left() &&
+           lhs.right() == rhs.right();
   }
-  friend bool operator != (const Ref& lhs, const Ref& rhs) {
+  friend bool operator != (const MutPair& lhs, const MutPair& rhs) {
     return !(rhs == lhs);
   }
-  friend std::ostream& operator << (std::ostream& os, const Ref& rhs);
 
-  int location () const;
+  Value left () const;
+  Value right () const;
+
+  void left(Value value);
+  void right(Value value);
+
+  Ref left_ref () const;
+  Ref right_ref () const;
 
 private:
-  int location_;
+  Ref left_ref_;
+  SpStore store_;
 };
 
 /// observers for `Value` below
@@ -104,11 +113,13 @@ Double to_double (const Value& value);
 const String& to_string (const Value& value);
 const Symbol& to_symbol (const Value& value);
 const Pair& to_pair (const Value& value);
+const MutPair& to_mut_pair (const Value& value);
 const Array& to_array (const Value& value);
 const Proc& to_proc (const Value& value);
 Proc& to_proc (Value& value);
 const Subr& to_subr (const Value& value);
 Subr& to_subr (Value& value);
+const Ref& to_ref (const Value& value);
 Ref& to_ref (Value& value);
 
 std::optional<std::vector<Value>> flatten (Value lst);

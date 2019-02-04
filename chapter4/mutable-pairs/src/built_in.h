@@ -42,6 +42,12 @@ Value newref (const std::vector<Value>& args, const SpStore& store);
 Value deref (const std::vector<Value>& args, const SpStore& store);
 Value setref (const std::vector<Value>& args, const SpStore& store);
 
+Value pair(const std::vector<Value>& args, const SpStore& store);
+Value left(const std::vector<Value>& args, const SpStore& store);
+Value right(const std::vector<Value>& args, const SpStore& store);
+Value setleft(const std::vector<Value>& args, const SpStore& store);
+Value setright(const std::vector<Value>& args, const SpStore& store);
+
 using BuiltInSubr = std::function<void (const std::vector<Value>&, const SpStore&)>;
 
 std::optional<BuiltInSubr> find_subroutine (const Symbol& name);

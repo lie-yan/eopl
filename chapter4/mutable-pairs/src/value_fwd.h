@@ -17,6 +17,7 @@ enum class ValueType {
   STRING,
   SYMBOL,
   PAIR,
+  MUT_PAIR,
   ARRAY,
   PROC,
   SUBR,
@@ -217,13 +218,31 @@ private:
   double val;
 };
 
+class Ref {
+public:
+  explicit Ref (int location) : location_(location) { }
+
+  friend bool operator == (const Ref& lhs, const Ref& rhs) {
+    return lhs.location_ == rhs.location_;
+  }
+  friend bool operator != (const Ref& lhs, const Ref& rhs) {
+    return !(rhs == lhs);
+  }
+  friend std::ostream& operator << (std::ostream& os, const Ref& rhs);
+
+  int location () const;
+
+private:
+  int location_;
+};
+
 using RwString = boost::recursive_wrapper<struct String>;
 using RwSymbol = boost::recursive_wrapper<struct Symbol>;
 using RwArray = boost::recursive_wrapper<struct Array>;
 using RwPair = boost::recursive_wrapper<struct Pair>;
 using RwProc = boost::recursive_wrapper<struct Proc>;
 using RwSubr = boost::recursive_wrapper<struct Subr>;
-using RwRef = boost::recursive_wrapper<struct Ref>;
+using RwMutPair = boost::recursive_wrapper<struct MutPair>;
 
 template<typename T>
 bool operator == (const boost::recursive_wrapper<T>& lhs,
@@ -241,13 +260,14 @@ using Value_ = std::variant<Nil,
                             Bool,
                             Int,
                             Double,
+                            Ref,
                             RwString,
                             RwSymbol,
                             RwPair,
                             RwArray,
                             RwProc,
                             RwSubr,
-                            RwRef>;
+                            RwMutPair>;
 
 /**
  * @brief <code>Value</code> is <code>EqualityComparable</code>

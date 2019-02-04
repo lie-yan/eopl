@@ -14,24 +14,29 @@ namespace eopl::built_in {
 
 std::optional<BuiltInFun> find_function (const Symbol& name) {
   static std::map<Symbol, BuiltInFun> fun_table = {
-      {Symbol{"zero?"}, zero_test},
-      {Symbol{"equal?"}, equal_test},
+      {Symbol{"zero?"},    zero_test},
+      {Symbol{"equal?"},   equal_test},
       {Symbol{"greater?"}, greater_test},
-      {Symbol{"less?"}, less_test},
-      {Symbol{"minus"}, minus},
-      {Symbol{"not"}, not_},
-      {Symbol{"-"}, diff},
-      {Symbol{"+"}, sum},
-      {Symbol{"*"}, mult},
-      {Symbol{"/"}, divide},
-      {Symbol{"cons"}, cons},
-      {Symbol{"car"}, car},
-      {Symbol{"cdr"}, cdr},
-      {Symbol{"null?"}, null_test},
-      {Symbol{"list"}, list},
-//      {Symbol{"newref"}, newref},
-//      {Symbol{"deref"}, deref},
-//      {Symbol{"setref"}, setref},
+      {Symbol{"less?"},    less_test},
+      {Symbol{"minus"},    minus},
+      {Symbol{"not"},      not_},
+      {Symbol{"-"},        diff},
+      {Symbol{"+"},        sum},
+      {Symbol{"*"},        mult},
+      {Symbol{"/"},        divide},
+      {Symbol{"cons"},     cons},
+      {Symbol{"car"},      car},
+      {Symbol{"cdr"},      cdr},
+      {Symbol{"null?"},    null_test},
+      {Symbol{"list"},     list},
+      {Symbol{"newref"},   newref},
+      {Symbol{"deref"},    deref},
+      {Symbol{"setref"},   setref},
+      {Symbol{"pair"},     pair},
+      {Symbol{"left"},     left},
+      {Symbol{"right"},    right},
+      {Symbol{"setleft"},  setleft},
+      {Symbol{"setright"}, setright},
   };
 
   if (auto it = fun_table.find(name); it != std::end(fun_table)) {
@@ -165,20 +170,20 @@ Value list (const std::vector<Value>& args, const SpStore& store) {
   return res;
 }
 
-//Ref newref (const std::vector<Value>& args, const SpStore& store) {
-//  Expects(args.size() == 1);
-//  return store->newref(args[0]);
-//}
-//
-//Value deref (const std::vector<Value>& args, const SpStore& store) {
-//  Expects(args.size() == 1);
-//  return store->deref(args[0]);
-//}
-//
-//Value setref (const std::vector<Value>& args, const SpStore& store) {
-//  Expects(args.size() == 2);
-//  return store->setref(args[0], args[1]);
-//}
+Value newref (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 1);
+  return to_value(store->newref(args[0]));
+}
+
+Value deref (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 1);
+  return store->deref(to_ref(args[0]));
+}
+
+Value setref (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 2);
+  return store->setref(to_ref(args[0]), args[1]);
+}
 
 void print (const std::vector<Value>& args, const SpStore& store) {
   interleave(
@@ -200,6 +205,39 @@ std::optional<BuiltInSubr> find_subroutine (const Symbol& name) {
   } else {
     return {};
   }
+}
+
+Value pair (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 2);
+
+  auto left_ref = store->newref(args[0]);
+  store->newref(args[1]);
+  return
+      to_value(MutPair{left_ref,
+                       store});
+}
+Value left (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 1);
+  return
+    to_mut_pair(args[0]).left();
+}
+
+Value right (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 1);
+  return
+    to_mut_pair(args[0]).right();
+}
+
+Value setleft (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 2);
+  store->setref(to_mut_pair(args[0]).left_ref(), args[1]);
+  return to_value(Int{38});
+}
+
+Value setright (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 2);
+  store->setref(to_mut_pair(args[0]).right_ref(), args[1]);
+  return to_value(Int{38});
 }
 
 

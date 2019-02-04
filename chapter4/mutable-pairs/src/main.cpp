@@ -84,12 +84,22 @@ var odd = proc (x) if (zero? x) then 0 else (even (- x 1)),
   eopl::run(R"EOF(
 var print_n = subr (x) while (not (zero? x)) { (print x); x = (- x 1) };
 {
-  (print 100);
-  (print_n 3);
-  (print_n 5);
-  (print 101)
+  (print_n 3)
 }
 )EOF");
+
+  eopl::run(R"EOF(
+(print
+  let glo = (pair 11 22)
+  in let f = proc (loc)
+      let d1 = (setright loc (left loc))
+        in let d2 = (setleft glo 99)
+        in (- (left loc) (right loc))
+        in (f glo)
+)
+)EOF");
+
+
 }
 
 int main (int argc, char** argv) {
