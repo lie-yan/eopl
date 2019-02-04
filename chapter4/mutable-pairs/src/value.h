@@ -27,8 +27,17 @@ struct Pair {
   }
 };
 
-struct Array : std::vector<Value> {
-  using std::vector<Value>::vector;
+struct Array {
+  std::vector<Ref> refs;
+  SpStore store;
+
+  friend bool operator == (const Array& lhs, const Array& rhs) {
+    return lhs.refs == rhs.refs &&
+           lhs.store == rhs.store;
+  }
+  friend bool operator != (const Array& lhs, const Array& rhs) {
+    return !(rhs == lhs);
+  }
 };
 
 class Proc {
@@ -81,7 +90,7 @@ private:
 
 class MutPair {
 public:
-  MutPair (Ref left_ref,  SpStore store);
+  MutPair (Ref left_ref, SpStore store);
 
   friend bool operator == (const MutPair& lhs, const MutPair& rhs) {
     return lhs.left() == rhs.left() &&
@@ -94,8 +103,8 @@ public:
   Value left () const;
   Value right () const;
 
-  void left(Value value);
-  void right(Value value);
+  void left (Value value);
+  void right (Value value);
 
   Ref left_ref () const;
   Ref right_ref () const;

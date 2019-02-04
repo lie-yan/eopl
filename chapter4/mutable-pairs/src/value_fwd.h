@@ -10,6 +10,7 @@
 namespace eopl {
 
 enum class ValueType {
+  UNIT,
   NIL,
   BOOL,
   INT,
@@ -22,6 +23,19 @@ enum class ValueType {
   PROC,
   SUBR,
   REF,
+};
+
+struct Unit {
+  friend bool operator == (const Unit& lhs, const Unit& rhs) {
+    return true;
+  }
+  friend bool operator != (const Unit& lhs, const Unit& rhs) {
+    return !(rhs == lhs);
+  }
+  friend std::ostream& operator << (std::ostream& os, const Unit& u) {
+    os << "Unit";
+    return os;
+  }
 };
 
 /**
@@ -256,7 +270,8 @@ bool operator != (const boost::recursive_wrapper<T>& lhs,
   return !(rhs == lhs);
 }
 
-using Value_ = std::variant<Nil,
+using Value_ = std::variant<Unit,
+                            Nil,
                             Bool,
                             Int,
                             Double,

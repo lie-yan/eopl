@@ -99,6 +99,23 @@ var print_n = subr (x) while (not (zero? x)) { (print x); x = (- x 1) };
 )
 )EOF");
 
+  eopl::run(R"EOF(
+var a = (newarray 3 100);
+{
+  var i = (arraylength a);
+  {
+    (print i);
+    while (not (zero? i))
+    {
+      i = (- i 1);
+      (arrayset a i
+        let x = (arrayref a i) in (+ x i))
+    };
+    (print a)
+  }
+}
+)EOF");
+
 
 }
 

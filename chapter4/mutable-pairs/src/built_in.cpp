@@ -12,33 +12,38 @@
 
 namespace eopl::built_in {
 
-std::optional<BuiltInFun> find_function (const Symbol& name) {
-  static std::map<Symbol, BuiltInFun> fun_table = {
-      {Symbol{"zero?"},    zero_test},
-      {Symbol{"equal?"},   equal_test},
-      {Symbol{"greater?"}, greater_test},
-      {Symbol{"less?"},    less_test},
-      {Symbol{"minus"},    minus},
-      {Symbol{"not"},      not_},
-      {Symbol{"-"},        diff},
-      {Symbol{"+"},        sum},
-      {Symbol{"*"},        mult},
-      {Symbol{"/"},        divide},
-      {Symbol{"cons"},     cons},
-      {Symbol{"car"},      car},
-      {Symbol{"cdr"},      cdr},
-      {Symbol{"null?"},    null_test},
-      {Symbol{"list"},     list},
-      {Symbol{"newref"},   newref},
-      {Symbol{"deref"},    deref},
-      {Symbol{"setref"},   setref},
-      {Symbol{"pair"},     pair},
-      {Symbol{"left"},     left},
-      {Symbol{"right"},    right},
-      {Symbol{"setleft"},  setleft},
-      {Symbol{"setright"}, setright},
-  };
+static std::map<Symbol, BuiltInFun> fun_table = {
+    {Symbol{"zero?"},       zero_test},
+    {Symbol{"equal?"},      equal_test},
+    {Symbol{"greater?"},    greater_test},
+    {Symbol{"less?"},       less_test},
+    {Symbol{"minus"},       minus},
+    {Symbol{"not"},         not_},
+    {Symbol{"-"},           diff},
+    {Symbol{"+"},           sum},
+    {Symbol{"*"},           mult},
+    {Symbol{"/"},           divide},
+    {Symbol{"cons"},        cons},
+    {Symbol{"car"},         car},
+    {Symbol{"cdr"},         cdr},
+    {Symbol{"null?"},       null_test},
+    {Symbol{"list"},        list},
+    {Symbol{"newref"},      newref},
+    {Symbol{"deref"},       deref},
+    {Symbol{"setref"},      setref},
+    {Symbol{"pair"},        pair},
+    {Symbol{"left"},        left},
+    {Symbol{"right"},       right},
+    {Symbol{"setleft"},     setleft},
+    {Symbol{"setright"},    setright},
+    {Symbol{"newarray"},    newarray},
+    {Symbol{"arrayset"}, arrayset},
+    {Symbol{"arrayref"},    arrayref},
+    {Symbol{"arraylength"}, arraylength},
+    {Symbol{"print"},    print},
+};
 
+std::optional<BuiltInFun> find_function (const Symbol& name) {
   if (auto it = fun_table.find(name); it != std::end(fun_table)) {
     return {it->second};
   } else {
@@ -185,7 +190,7 @@ Value setref (const std::vector<Value>& args, const SpStore& store) {
   return store->setref(to_ref(args[0]), args[1]);
 }
 
-void print (const std::vector<Value>& args, const SpStore& store) {
+Value print (const std::vector<Value>& args, const SpStore& store) {
   interleave(
       std::begin(args),
       std::end(args),
@@ -193,14 +198,11 @@ void print (const std::vector<Value>& args, const SpStore& store) {
       [] () { std::cout << ","; }
   );
   std::cout << std::endl;
+  return to_value(Unit{});
 }
 
-std::optional<BuiltInSubr> find_subroutine (const Symbol& name) {
-  static std::map<Symbol, BuiltInSubr> subr_table = {
-      {Symbol{"print"}, print}
-  };
-
-  if (auto it = subr_table.find(name); it != std::end(subr_table)) {
+std::optional<BuiltInFun> find_subroutine (const Symbol& name) {
+  if (auto it = fun_table.find(name); it != std::end(fun_table)) {
     return {it->second};
   } else {
     return {};
@@ -219,13 +221,13 @@ Value pair (const std::vector<Value>& args, const SpStore& store) {
 Value left (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 1);
   return
-    to_mut_pair(args[0]).left();
+      to_mut_pair(args[0]).left();
 }
 
 Value right (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 1);
   return
-    to_mut_pair(args[0]).right();
+      to_mut_pair(args[0]).right();
 }
 
 Value setleft (const std::vector<Value>& args, const SpStore& store) {
@@ -238,6 +240,39 @@ Value setright (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 2);
   store->setref(to_mut_pair(args[0]).right_ref(), args[1]);
   return to_value(Int{38});
+}
+
+Value newarray (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 2);
+  int size = to_int(args[0]).get();
+  std::vector<Ref> refs;
+  for (int i = 0; i < size; ++i) {
+    refs.push_back(store->newref(args[1]));
+  }
+  return to_value(Array{std::move(refs), store});
+}
+
+Value arrayref (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 2);
+
+  int index = to_int(args[1]).get();
+  Ref ref = to_array(args[0]).refs[index];
+  return store->deref(ref);
+}
+
+Value arrayset (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 3);
+
+  int index = to_int(args[1]).get();
+  Ref ref = to_array(args[0]).refs[index];
+  store->setref(ref, args[2]);
+  return to_value(Unit{});
+}
+
+Value arraylength (const std::vector<Value>& args, const SpStore& store) {
+  Expects(args.size() == 1);
+  int len = to_array(args[0]).refs.size();
+  return to_value(Int{len});
 }
 
 

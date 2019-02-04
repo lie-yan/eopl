@@ -21,6 +21,7 @@ bool operator != (const Value& lhs, const Value& rhs) {
 
 ValueType type_of (const Value& value) {
   struct TypeVisitor {
+    ValueType operator () (Unit) { return ValueType::UNIT; }
     ValueType operator () (Nil) { return ValueType::NIL; }
     ValueType operator () (Bool) { return ValueType::BOOL; }
     ValueType operator () (Int) { return ValueType::INT; }
@@ -59,6 +60,7 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     std::ostream& os;
     bool open_paren = false;
 
+    void operator () (Unit) { os << "Unit"; }
     void operator () (Nil) { os << "()"; }
     void operator () (Bool b) { os << (b.get() ? "#t" : "#f"); }
     void operator () (Int i) { os << i.get(); }
@@ -94,10 +96,10 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
 
     void operator () (const Array& array) {
       os << '[';
-      interleave(std::begin(array),
-                 std::end(array),
-                 [this] (const auto& item) {
-                   std::visit(OutputVisitor{os}, *item);
+      interleave(std::begin(array.refs),
+                 std::end(array.refs),
+                 [this, store=array.store] (const Ref& item) {
+                   std::visit(OutputVisitor{os}, *store->deref(item));
                  },
                  [this] () { os << ", "; });
       os << ']';
