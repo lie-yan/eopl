@@ -20,6 +20,7 @@ using BuiltInFun = std::function<Value (const std::vector<Value>&, const SpStore
  * @return the function if any, or None
  */
 std::optional<BuiltInFun> find_function (const Symbol& name);
+std::optional<BuiltInFun> find_subroutine (const Symbol& name);
 
 Value minus (const std::vector<Value>& args, const SpStore& store);
 Value diff (const std::vector<Value>& args, const SpStore& store);
@@ -53,7 +54,6 @@ Value arrayref (const std::vector<Value>& args, const SpStore& store);
 Value arrayset (const std::vector<Value>& args, const SpStore& store);
 Value arraylength (const std::vector<Value>& args, const SpStore& store);
 
-std::optional<BuiltInFun> find_subroutine (const Symbol& name);
 Value print (const std::vector<Value>& args, const SpStore& store);
 
 }
