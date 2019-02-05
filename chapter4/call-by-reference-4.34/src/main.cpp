@@ -133,6 +133,16 @@ var swap, a, b;
   (print b)
 }
 )EOF");
+
+  eopl::run(R"EOF(
+var a = 44, b = 33;
+{
+  (print letref x = a in begin set x = (+ x 1) end);
+  (print let x = b in begin set x = (+ x 1) end);
+  (print a);
+  (print b)
+}
+)EOF");
 }
 
 int main (int argc, char** argv) {

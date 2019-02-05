@@ -18,6 +18,7 @@ namespace yy {
 }
 
 const int star_mask = 0b01;
+const int ref_mask = 0b100;
 }
 
 // Construct parser object with lexer and result
@@ -72,6 +73,7 @@ using eopl::to_exp;
 %token                ELSE          "else"
 %token                LET           "let"
 %token                LET_STAR      "let*"
+%token                LET_REF       "letref"
 %token                LETREC        "letrec"
 %token                LETMUTABLE    "letmutable"
 %token                UNPACK        "unpack"
@@ -138,7 +140,7 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
             | COND cond_clause_list END
               { $$ = to_exp(CondExp{std::move($2)}); }
             | let_variant binding_clause_list IN expression
-              { $$ = to_exp(LetExp{std::move($2), std::move($4), bool($1 & star_mask)}); }
+              { $$ = to_exp(LetExp{std::move($2), std::move($4), bool($1 & star_mask), bool($1 & ref_mask)}); }
             | UNPACK id_list '=' expression IN expression
               { $$ = to_exp(UnpackExp{std::move($2), std::move($4), std::move($6)}); }
             | PROC '(' comma_sep_id_list ')' expression
@@ -201,6 +203,7 @@ var_decl_clause : IDENTIFIER { $$ = eopl::VarDeclClause{std::move($1), {}}; }
 
 let_variant : LET { $$ = 0; }
             | LET_STAR { $$ = star_mask; }
+            | LET_REF { $$ = ref_mask; }
             ;
 
 proc_spec_nlist : proc_spec { $$ = std::vector<eopl::LetrecProcSpec>{std::move($1)}; }

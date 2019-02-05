@@ -82,16 +82,33 @@ struct let_tag { };
 struct let_star_tag { };
 
 Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_star_tag) {
-  auto new_env = std::accumulate(std::begin(exp.clauses),
-                                 std::end(exp.clauses),
-                                 env,
-                                 [&store] (SpEnv& acc, const BindingClause& c) -> SpEnv {
-                                   auto res = value_of(c.exp, acc, store);
-                                   return Env::extend(std::move(acc),
-                                                      c.var,
-                                                      store->newref(std::move(res)));
-                                 });
-  return value_of(exp.body, new_env, store);
+  auto binop_ref = [&store] (SpEnv& acc, const BindingClause& c) -> SpEnv {
+      auto res = value_of_operand(c.exp, acc, store);
+      return Env::extend(std::move(acc),
+                         c.var,
+                         std::move(res));
+  };
+
+  auto binop_value = [&store](SpEnv& acc, const BindingClause& c) -> SpEnv {
+    auto res = value_of(c.exp, acc, store);
+    return Env::extend(std::move(acc),
+                       c.var,
+                       store->newref(std::move(res)));
+  };
+
+  if (exp.ref) {
+    auto new_env = std::accumulate(std::begin(exp.clauses),
+                                   std::end(exp.clauses),
+                                   env,
+                                   binop_ref);
+    return value_of(exp.body, new_env, store);
+  } else {
+    auto new_env = std::accumulate(std::begin(exp.clauses),
+                                   std::end(exp.clauses),
+                                   env,
+                                   binop_value);
+    return value_of(exp.body, new_env, store);
+  }
 }
 
 Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_tag) {
@@ -107,7 +124,10 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_t
   std::transform(std::begin(exp.clauses), std::end(exp.clauses),
                  std::back_inserter(refs),
                  [&env, &store, &exp] (const BindingClause& c) -> Ref {
-                   return store->newref(value_of(c.exp, env, store));
+                    if (exp.ref)
+                      return value_of_operand(c.exp, env, store);
+                    else
+                      return store->newref(value_of(c.exp, env, store));
                  });
   return value_of(exp.body,
                   Env::extend(env, std::move(vars), std::move(refs)),
