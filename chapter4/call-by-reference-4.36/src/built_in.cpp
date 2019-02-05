@@ -253,12 +253,17 @@ Value newarray (const std::vector<Value>& args, const SpStore& store) {
 }
 
 Value arrayref (const std::vector<Value>& args, const SpStore& store) {
+  return store->deref(arrayref_r(args, store));
+}
+
+Ref arrayref_r (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 2);
 
   int index = to_int(args[1]).get();
   Ref ref = to_array(args[0]).refs[index];
-  return store->deref(ref);
+  return ref;
 }
+
 
 Value arrayset (const std::vector<Value>& args, const SpStore& store) {
   Expects(args.size() == 3);

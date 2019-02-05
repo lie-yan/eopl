@@ -170,6 +170,49 @@ var a = 44, b = 33;
   (print b)
 }
 )EOF");
+
+
+  eopl::run(R"EOF(
+var swap, a;
+{
+  swap = subr (x, y)
+         var temp;
+         {
+           temp = x;
+           x = y;
+           y = temp
+         };
+  a = (newarray 4 0);
+  (arrayset a 0 0);
+  (arrayset a 1 1);
+  (arrayset a 2 2);
+  (arrayset a 3 3);
+  (print a);
+  (swap (arrayref a 1) (arrayref a 3));
+  (print a)
+}
+)EOF");
+
+  eopl::run(R"EOF(
+var swap, a;
+{
+  swap = subr (x, y)
+         var temp;
+         {
+           temp = x;
+           x = y;
+           y = temp
+         };
+  a = (newarray 4 0);
+  (arrayset a 0 0);
+  (arrayset a 1 0);
+  (arrayset a 2 2);
+  (arrayset a 3 3);
+  (print a);
+  (swap (arrayref a (arrayref a 1)) (arrayref a 3));
+  (print a)
+}
+)EOF");
 }
 
 int main (int argc, char** argv) {

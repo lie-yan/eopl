@@ -51,6 +51,7 @@ Value setright (const std::vector<Value>& args, const SpStore& store);
 
 Value newarray (const std::vector<Value>& args, const SpStore& store);
 Value arrayref (const std::vector<Value>& args, const SpStore& store);
+Ref arrayref_r (const std::vector<Value>& args, const SpStore& store);
 Value arrayset (const std::vector<Value>& args, const SpStore& store);
 Value arraylength (const std::vector<Value>& args, const SpStore& store);
 

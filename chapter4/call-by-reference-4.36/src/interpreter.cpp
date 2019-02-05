@@ -5,14 +5,15 @@
 #include "interpreter.h"
 
 #include "built_in.h"
-#include "lex.yy.h"
 #include "stmt.h"
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <numeric>
-#include <boost/type_index.hpp>
 #include <gsl/gsl>
+#include <iostream>
+#include "parser.tab.hpp"
+#include "lex.yy.h"
 
 namespace eopl {
 
@@ -59,7 +60,7 @@ std::vector<Value> value_of (const std::vector<Expression>& exps, const SpEnv& e
   return results;
 }
 
-std::vector<Ref> refs_of (const std::vector<Value>& values, const SpStore& store) {
+std::vector<Ref> new_refs_of (const std::vector<Value>& values, const SpStore& store) {
   std::vector<Ref> refs;
   std::transform(std::begin(values), std::end(values),
                  std::back_inserter(refs),
@@ -84,10 +85,10 @@ Value value_of (const LetExp& exp, const SpEnv& env, const SpStore& store, let_s
     auto res = value_of_operand(c.exp, acc, store);
     return Env::extend(std::move(acc),
                        c.var,
-                       std::move(res));
+                       res);
   };
 
-  auto binop_value = [&store](SpEnv& acc, const BindingClause& c) -> SpEnv {
+  auto binop_value = [&store] (SpEnv& acc, const BindingClause& c) -> SpEnv {
     auto res = value_of(c.exp, acc, store);
     return Env::extend(std::move(acc),
                        c.var,
@@ -161,7 +162,7 @@ Value value_of (const UnpackExp& exp, const SpEnv& env, const SpStore& store) {
   std::optional<std::vector<Value>> values = flatten(lst);
 
   if (values && values->size() == exp.vars.size()) {
-    auto refs = refs_of(*values, store);
+    auto refs = new_refs_of(*values, store);
     return value_of(exp.body,
                     Env::extend(env, exp.vars, std::move(refs)),
                     store);
@@ -192,7 +193,11 @@ Value value_of (const CallExp& exp, const SpEnv& env, const SpStore& store) {
     if (!f_opt) {
       goto eval_proc;
     } else {
-      auto args = value_of(exp.rands, env, store);
+      auto args_ref = value_of_operands(exp.rands, env, store);
+      std::vector<Value> args;
+      std::transform(std::begin(args_ref), std::end(args_ref),
+                     std::back_inserter(args),
+                     [&store] (const Ref& ref) { return store->deref(ref); });
       return (*f_opt)(args, store);
     }
   }
@@ -212,7 +217,6 @@ eval_proc:
   }
 }
 
-
 Value value_of (const LetrecExp& exp, const SpEnv& env, const SpStore& store) {
   std::vector<Value> saved;
   std::transform(std::begin(exp.proc_list),
@@ -227,7 +231,7 @@ Value value_of (const LetrecExp& exp, const SpEnv& env, const SpStore& store) {
                  [] (const LetrecProcSpec& proc) {
                    return proc.name;
                  });
-  auto new_env = Env::extend(env, std::move(name_list), refs_of(saved, store));
+  auto new_env = Env::extend(env, std::move(name_list), new_refs_of(saved, store));
   for (auto& v : saved) to_proc(v).saved_env(new_env);
   return value_of(exp.body, new_env, store);
 }
@@ -274,7 +278,6 @@ Value value_of (const SetdynamicExp& exp, const SpEnv& env, const SpStore& store
   return ret_value;
 }
 
-
 std::vector<Ref> value_of_operands (const std::vector<Expression>& exps, const SpEnv& env, const SpStore& store) {
   std::vector<Ref> ret;
 
@@ -287,14 +290,29 @@ std::vector<Ref> value_of_operands (const std::vector<Expression>& exps, const S
   return ret;
 }
 
-Ref value_of_operand (const Expression& exp, const SpEnv& env, const SpStore& store) {
-  if (type_of(exp) == ExpType::VAR_EXP) {
-    return Env::apply(env, to_var_exp(exp).var);
-  } else {
-    return store->newref(value_of(exp, env, store));
-  }
+bool is_arrayref_call (const Expression& exp) {
+  if (type_of(exp) != ExpType::CALL_EXP) return false;
+  auto&rator = to_call_exp(exp).rator;
+  if (type_of(rator) != ExpType::VAR_EXP) return false;
+  auto& name = to_var_exp(rator).var;
+  return name == Symbol{"arrayref"};
 }
 
+Ref value_of_operand (const Expression& exp, const SpEnv& env, const SpStore& store) {
+  if (auto type = type_of(exp); type == ExpType::VAR_EXP) {
+    return Env::apply(env, to_var_exp(exp).var);
+  } else if (is_arrayref_call(exp)){
+    auto args_ref = value_of_operands(to_call_exp(exp).rands, env, store);
+    std::vector<Value> args;
+    std::transform(std::begin(args_ref), std::end(args_ref),
+                   std::back_inserter(args),
+                   [&store] (const Ref& ref) { return store->deref(ref); });
+    return built_in::arrayref_r(args, store);
+  } else {
+    auto value = value_of(exp, env, store);
+    return store->newref(value);
+  }
+}
 
 void result_of (const Program& program, const SpEnv& env, const SpStore& store) {
   result_of(program.stmt, env, store);
@@ -322,10 +340,10 @@ void result_of (const AssignStmt& statement, const SpEnv& env, const SpStore& st
 }
 
 void result_of (const SubrCallStmt& statement, const SpEnv& env, const SpStore& store) {
-  auto subr = built_in::find_subroutine(statement.var);
-  if (subr) {
+  auto subr_opt = built_in::find_subroutine(statement.var);
+  if (subr_opt) {
     std::vector<Value> args = value_of(statement.params, env, store);
-    (*subr)(args, store);
+    (*subr_opt)(args, store);
   } else {
     auto subr_ref = Env::apply(env, statement.var);
     const Subr& subr = to_subr(store->deref(subr_ref));
