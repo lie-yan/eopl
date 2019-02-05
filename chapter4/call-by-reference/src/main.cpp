@@ -92,7 +92,50 @@ var print_n = subr (x) while (not (zero? x)) { (print x); x = (- x 1) };
 )EOF");
 }
 
+void test_call_by_reference () {
+  eopl::run(R"EOF(
+var x;
+{
+  x = let p = proc (x) set x = 4
+      in let a = 3
+        in begin (p a); a end;
+  (print x)
+}
+)EOF");
+
+  eopl::run(R"EOF(
+var x;
+{
+  x = let f = proc (x) set x = 44
+    in let g = proc (y) (f y)
+    in let z = 55
+    in begin (g z); z end;
+  (print x)
+}
+)EOF");
+
+  eopl::run(R"EOF(
+var swap, a, b;
+{
+  swap = subr (x, y)
+         var temp;
+         {
+           temp = x;
+           x = y;
+           y = temp
+         };
+  a = 33;
+  b = 44;
+  (print a);
+  (print b);
+  (swap a b);
+  (print a);
+  (print b)
+}
+)EOF");
+}
+
 int main (int argc, char** argv) {
 
-  test_statement_lang();
+  test_call_by_reference();
 }

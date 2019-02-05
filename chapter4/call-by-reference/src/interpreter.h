@@ -28,6 +28,8 @@ Value value_of (const AssignExp& exp, const SpEnv& env, const SpStore& store);
 Value value_of (const SetdynamicExp& exp, const SpEnv& env, const SpStore& store);
 
 std::vector<Value> value_of (const std::vector<Expression>& exps, const SpEnv& env, const SpStore& store);
+std::vector<Ref> value_of_operands (const std::vector<Expression>& exps, const SpEnv& env, const SpStore& store);
+Ref value_of_operand (const Expression& exp, const SpEnv& env, const SpStore& store);
 
 void result_of (const Program& program, const SpEnv& env, const SpStore& store);
 void result_of (const Statement& statement, const SpEnv& env, const SpStore& store);
