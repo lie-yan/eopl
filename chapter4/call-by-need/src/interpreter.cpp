@@ -45,15 +45,17 @@ Value value_of (const ConstExp& exp, const SpEnv& env, const SpStore& store) {
 
 Value value_of (const VarExp& exp, const SpEnv& env, const SpStore& store) {
   Ref ref = Env::apply(env, exp.var);
-  Value stored_value = store->deref(ref);
-  return dethunk(stored_value, store);
+  return dethunk(ref, store);
 }
 
-Value dethunk (const Value& value, const SpStore& store) {
-  if (is_expval(value)) {
-    return value;
+Value dethunk (const Ref& ref, const SpStore& store) {
+  auto stored_value = store->deref(ref);
+  if (is_expval(stored_value)) {
+    return stored_value;
   } else {
-    return value_of_thunk(value, store);
+    auto value = value_of_thunk(stored_value, store);
+    store->setref(ref, value);
+    return value;
   }
 }
 
@@ -206,7 +208,7 @@ Value value_of (const CallExp& exp, const SpEnv& env, const SpStore& store) {
       std::transform(std::begin(args_ref), std::end(args_ref),
                      std::back_inserter(args),
                      [&store] (const Ref& ref) {
-                       return dethunk(store->deref(ref), store);
+                       return dethunk( ref, store);
                      });
       return (*f_opt)(args, store);
     }
@@ -316,7 +318,7 @@ Ref value_of_operand (const Expression& exp, const SpEnv& env, const SpStore& st
     std::vector<Value> args;
     std::transform(std::begin(args_ref), std::end(args_ref),
                    std::back_inserter(args),
-                   [&store] (const Ref& ref) { return dethunk(store->deref(ref), store); });
+                   [&store] (const Ref& ref) { return dethunk(ref, store); });
     return built_in::arrayref_r(args, store);
   } else if (type == ExpType::CONST_EXP) {
     return store->newref(to_value(to_const_exp(exp).num));
@@ -365,8 +367,8 @@ void result_of (const SubrCallStmt& statement, const SpEnv& env, const SpStore& 
     std::vector<Value> args;
     std::transform(std::begin(args_ref), std::end(args_ref),
                    std::back_inserter(args),
-                   [&store] (const Ref& value) {
-                     return dethunk(store->deref(value), store);
+                   [&store] (const Ref& ref) {
+                     return dethunk(ref, store);
                    });
     (*subr_opt)(args, store);
   } else {
