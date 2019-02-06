@@ -213,6 +213,17 @@ var swap, a;
   (print a)
 }
 )EOF");
+
+  eopl::run(R"EOF(
+var infinite-loop, f, fact;
+{
+  infinite-loop = proc (x) (infinite-loop (- x -1));
+  fact = proc (x) if (zero? x) then 1 else (* x (fact (- x 1)));
+  f = proc (z) 11;
+  (print (f (infinite-loop 0)));
+  (print (fact 5))
+}
+)EOF");
 }
 
 int main (int argc, char** argv) {

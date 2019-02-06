@@ -23,6 +23,7 @@ enum class ValueType {
   PROC,
   SUBR,
   REF,
+  THUNK,
 };
 
 struct Unit {
@@ -257,6 +258,7 @@ using RwPair = boost::recursive_wrapper<struct Pair>;
 using RwProc = boost::recursive_wrapper<struct Proc>;
 using RwSubr = boost::recursive_wrapper<struct Subr>;
 using RwMutPair = boost::recursive_wrapper<struct MutPair>;
+using RwThunk = boost::recursive_wrapper<struct Thunk>;
 
 template<typename T>
 bool operator == (const boost::recursive_wrapper<T>& lhs,
@@ -282,7 +284,8 @@ using Value_ = std::variant<Unit,
                             RwArray,
                             RwProc,
                             RwSubr,
-                            RwMutPair>;
+                            RwMutPair,
+                            RwThunk>;
 
 /**
  * @brief <code>Value</code> is <code>EqualityComparable</code>

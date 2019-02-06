@@ -114,8 +114,25 @@ private:
   SpStore store_;
 };
 
+struct Thunk {
+  Expression exp;
+  SpEnv env;
+
+  friend bool operator == (const Thunk& lhs, const Thunk& rhs) {
+    return lhs.exp == rhs.exp &&
+           lhs.env == rhs.env;
+  }
+
+  friend bool operator != (const Thunk& lhs, const Thunk& rhs) {
+    return !(rhs == lhs);
+  }
+
+  friend std::ostream& operator << (std::ostream& os, const Thunk& thunk);
+};
+
 /// observers for `Value` below
 ValueType type_of (const Value& value);
+bool is_expval(const Value& value);
 Int to_int (const Value& value);
 Bool to_bool (const Value& value);
 Double to_double (const Value& value);
@@ -130,6 +147,7 @@ const Subr& to_subr (const Value& value);
 Subr& to_subr (Value& value);
 const Ref& to_ref (const Value& value);
 Ref& to_ref (Value& value);
+const Thunk& to_thunk(const Value& value);
 
 std::optional<std::vector<Value>> flatten (Value lst);
 

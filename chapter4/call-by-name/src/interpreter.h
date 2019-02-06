@@ -32,6 +32,8 @@ std::vector<Value> value_of (const std::vector<Expression>& exps, const SpEnv& e
 std::vector<Ref> value_of_operands (const std::vector<Expression>& exps, const SpEnv& env, const SpStore& store);
 Ref value_of_operand (const Expression& exp, const SpEnv& env, const SpStore& store);
 
+Value dethunk(const Value& value, const SpStore& store);
+Value value_of_thunk (const Value& value, const SpStore& store);
 
 void result_of (const Program& program, const SpEnv& env, const SpStore& store);
 void result_of (const Statement& statement, const SpEnv& env, const SpStore& store);
@@ -41,7 +43,6 @@ void result_of (const BlockStmt& statement, const SpEnv& env, const SpStore& sto
 void result_of (const IfStmt& statement, const SpEnv& env, const SpStore& store);
 void result_of (const WhileStmt& statement, const SpEnv& env, const SpStore& store);
 void result_of (const DoWhileStmt& statement, const SpEnv& env, const SpStore& store);
-
 void result_of (const DeclStmt& statement, const SpEnv& env, const SpStore& store);
 void result_of (const ReadStmt& statement, const SpEnv& env, const SpStore& store);
 

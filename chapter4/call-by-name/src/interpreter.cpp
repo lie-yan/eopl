@@ -4,6 +4,9 @@
 
 #include "interpreter.h"
 
+#include "lex.yy.h"
+#include "parser.tab.hpp"
+
 #include "built_in.h"
 #include "stmt.h"
 
@@ -12,8 +15,6 @@
 #include <numeric>
 #include <gsl/gsl>
 #include <iostream>
-#include "parser.tab.hpp"
-#include "lex.yy.h"
 
 namespace eopl {
 
@@ -43,10 +44,17 @@ Value value_of (const ConstExp& exp, const SpEnv& env, const SpStore& store) {
 }
 
 Value value_of (const VarExp& exp, const SpEnv& env, const SpStore& store) {
-  return
-      store->deref(
-          Env::apply(env, exp.var)
-      );
+  Ref ref = Env::apply(env, exp.var);
+  Value stored_value = store->deref(ref);
+  return dethunk(stored_value, store);
+}
+
+Value dethunk (const Value& value, const SpStore& store) {
+  if (is_expval(value)) {
+    return value;
+  } else {
+    return value_of_thunk(value, store);
+  }
 }
 
 std::vector<Value> value_of (const std::vector<Expression>& exps, const SpEnv& env, const SpStore& store) {
@@ -197,7 +205,9 @@ Value value_of (const CallExp& exp, const SpEnv& env, const SpStore& store) {
       std::vector<Value> args;
       std::transform(std::begin(args_ref), std::end(args_ref),
                      std::back_inserter(args),
-                     [&store] (const Ref& ref) { return store->deref(ref); });
+                     [&store] (const Ref& ref) {
+                       return dethunk(store->deref(ref), store);
+                     });
       return (*f_opt)(args, store);
     }
   }
@@ -292,7 +302,7 @@ std::vector<Ref> value_of_operands (const std::vector<Expression>& exps, const S
 
 bool is_arrayref_call (const Expression& exp) {
   if (type_of(exp) != ExpType::CALL_EXP) return false;
-  auto&rator = to_call_exp(exp).rator;
+  auto& rator = to_call_exp(exp).rator;
   if (type_of(rator) != ExpType::VAR_EXP) return false;
   auto& name = to_var_exp(rator).var;
   return name == Symbol{"arrayref"};
@@ -301,17 +311,26 @@ bool is_arrayref_call (const Expression& exp) {
 Ref value_of_operand (const Expression& exp, const SpEnv& env, const SpStore& store) {
   if (auto type = type_of(exp); type == ExpType::VAR_EXP) {
     return Env::apply(env, to_var_exp(exp).var);
-  } else if (is_arrayref_call(exp)){
+  } else if (is_arrayref_call(exp)) {
     auto args_ref = value_of_operands(to_call_exp(exp).rands, env, store);
     std::vector<Value> args;
     std::transform(std::begin(args_ref), std::end(args_ref),
                    std::back_inserter(args),
-                   [&store] (const Ref& ref) { return store->deref(ref); });
+                   [&store] (const Ref& ref) { return dethunk(store->deref(ref), store); });
     return built_in::arrayref_r(args, store);
+  } else if (type == ExpType::CONST_EXP) {
+    return store->newref(to_value(to_const_exp(exp).num));
+  } else if (type == ExpType::PROC_EXP || type == ExpType::SUBR_EXP) {
+    return store->newref(value_of(exp, env, store));
   } else {
-    auto value = value_of(exp, env, store);
-    return store->newref(value);
+    return store->newref(to_value(Thunk{exp, env}));
   }
+}
+
+Value value_of_thunk (const Value& value, const SpStore& store) {
+  Expects(type_of(value) == ValueType::THUNK);
+  auto& thunk = to_thunk(value);
+  return value_of(thunk.exp, thunk.env, store);
 }
 
 void result_of (const Program& program, const SpEnv& env, const SpStore& store) {
@@ -342,7 +361,13 @@ void result_of (const AssignStmt& statement, const SpEnv& env, const SpStore& st
 void result_of (const SubrCallStmt& statement, const SpEnv& env, const SpStore& store) {
   auto subr_opt = built_in::find_subroutine(statement.var);
   if (subr_opt) {
-    std::vector<Value> args = value_of(statement.params, env, store);
+    std::vector<Ref> args_ref = value_of_operands(statement.params, env, store);
+    std::vector<Value> args;
+    std::transform(std::begin(args_ref), std::end(args_ref),
+                   std::back_inserter(args),
+                   [&store] (const Ref& value) {
+                     return dethunk(store->deref(value), store);
+                   });
     (*subr_opt)(args, store);
   } else {
     auto subr_ref = Env::apply(env, statement.var);

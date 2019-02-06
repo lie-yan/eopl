@@ -33,6 +33,7 @@ ValueType type_of (const Value& value) {
     ValueType operator () (const RwProc&) { return ValueType::PROC; }
     ValueType operator () (const RwSubr&) { return ValueType::SUBR; }
     ValueType operator () (const RwMutPair&) { return ValueType::MUT_PAIR; }
+    ValueType operator () (const RwThunk&) { return ValueType::THUNK; }
     ValueType operator () (const String&) { return ValueType::STRING; }
     ValueType operator () (const Symbol&) { return ValueType::SYMBOL; }
     ValueType operator () (const Pair&) { return ValueType::PAIR; }
@@ -41,10 +42,16 @@ ValueType type_of (const Value& value) {
     ValueType operator () (const Subr&) { return ValueType::SUBR; }
     ValueType operator () (const Ref&) { return ValueType::REF; }
     ValueType operator () (const MutPair&) { return ValueType::MUT_PAIR; }
+    ValueType operator () (const Thunk&) { return ValueType::THUNK; }
   };
 
   return std::visit(TypeVisitor{}, *value);
 }
+
+bool is_expval (const Value& value) {
+  return type_of(value) != ValueType::THUNK;
+}
+
 
 template<typename T>
 std::ostream& operator << (std::ostream& os, const std::vector<T>& ts) {
@@ -72,6 +79,7 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
     void operator () (const RwProc& proc) { (*this)(proc.get()); }
     void operator () (const RwSubr& subr) { (*this)(subr.get()); }
     void operator () (const RwMutPair& pair) { (*this)(pair.get()); }
+    void operator () (const RwThunk& thunk) { (*this)(thunk.get()); }
     void operator () (const String& str) { os << std::quoted(str.get()); }
     void operator () (const Symbol& sym) { os << sym; }
     void operator () (const Pair& pair) {
@@ -130,6 +138,10 @@ std::ostream& operator << (std::ostream& os, const Value& value) {
         std::visit(*this, *pair.right());
         os << ')';
       }
+    }
+
+    void operator () (const Thunk& thunk) {
+      os << "<thunk " << std::hex << (uint64_t)&thunk << ">";
     }
   };
 
@@ -193,6 +205,11 @@ Ref& to_ref (Value& value) {
   return std::get<Ref>(*value);
 }
 
+const Thunk& to_thunk (const Value& value) {
+  return std::get<RwThunk>(*value).get ();
+}
+
+
 std::ostream& operator << (std::ostream& os, const Proc& proc) {
   os << "Proc(params_: " << proc.params_
      << ", body: " << proc.body_
@@ -229,6 +246,11 @@ std::ostream& operator << (std::ostream& os, const Ref& rhs) {
 
 int Ref::location () const {
   return location_;
+}
+
+std::ostream& operator << (std::ostream& os, const Thunk& thunk) {
+  os << "Thunk(exp: " << thunk.exp << ", env: " << thunk.env << ")";
+  return os;
 }
 
 MutPair::MutPair (Ref left_ref, SpStore store)
