@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(chapter3)
+project(chapter7)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -38,12 +38,12 @@ set(SOURCES
 
 #add_definitions(-DDEBUG)
 
-add_executable(chapter3-letrec
+add_executable(chapter7-checked
         ${SOURCES}
         ${SOURCE_DIR}/main.cpp)
-target_link_libraries(chapter3-letrec fmt reflex)
+target_link_libraries(chapter7-checked fmt reflex)
 
-add_executable(chapter3-letrec-test
+add_executable(chapter7-checked-test
         ${SOURCES}
-        ${SOURCE_DIR}/letrec_test.cpp)
-target_link_libraries(chapter3-letrec-test fmt reflex gtest gtest_main)
+        ${SOURCE_DIR}/checked_test.cpp)
+target_link_libraries(chapter7-checked-test fmt reflex gtest gtest_main)
