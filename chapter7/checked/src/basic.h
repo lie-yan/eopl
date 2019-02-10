@@ -31,4 +31,15 @@ void interleave (InputIt first, InputIt last, F f, G g) {
   }
 }
 
+template<typename T, typename F>
+auto transform (const std::vector<T>& v, F f) {
+  using R = std::decay_t<decltype(f(v[0]))>;
+  std::vector<R> result;
+  std::transform(std::begin(v),
+                 std::end(v),
+                 std::back_inserter(result),
+                 f);
+  return result;
+}
+
 }

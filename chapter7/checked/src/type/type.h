@@ -22,4 +22,6 @@ struct ProcType {
 };
 
 
+const ProcType& to_proc_type(const Type& t);
+
 }

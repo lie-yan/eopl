@@ -9,6 +9,12 @@
 
 namespace eopl::type {
 
+enum class TypeEnum {
+  BoolType,
+  IntType,
+  ProcType,
+};
+
 struct BoolType {
 
   friend bool operator == (const BoolType&, const BoolType&) { return true; }
@@ -54,5 +60,7 @@ std::ostream& operator << (std::ostream& os, const Type&);
 
 template<typename T>
 Type to_type (T&& t) { return std::make_shared<Type_>(std::forward<T>(t)); }
+
+TypeEnum type_of (const Type& t);
 
 }

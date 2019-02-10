@@ -5,6 +5,7 @@
 #include "type.h"
 
 #include "basic.h"
+#include "type_fwd.h"
 
 namespace eopl::type {
 
@@ -49,5 +50,20 @@ bool operator == (const ProcType& lhs, const ProcType& rhs) {
 bool operator != (const ProcType& lhs, const ProcType& rhs) {
   return !(rhs == lhs);
 }
+
+const ProcType& to_proc_type (const Type& t) {
+  return std::get<RwProcType>(*t).get();
+}
+
+TypeEnum type_of (const Type& t) {
+  struct TypeVisitor {
+    TypeEnum operator () (const BoolType&) { return TypeEnum::BoolType; }
+    TypeEnum operator () (const IntType&) { return TypeEnum::IntType; }
+    TypeEnum operator () (const RwProcType&) { return TypeEnum::ProcType; }
+  };
+
+  return std::visit(TypeVisitor{}, *t);
+}
+
 
 }
