@@ -62,11 +62,11 @@ using eopl::to_exp;
 %type <eopl::CondExp::Clause> cond_clause
 %type <eopl::LetExp::ClauseList> let_clause_list
 %type <eopl::LetExp::Clause> let_clause
-%type <bool> let_opt_star
+%type <bool> let_variant
 %type <std::vector<eopl::Symbol>> id_list
 %type <std::vector<eopl::Symbol>> param_list
-%type <eopl::LetrecProc> proc_def
-%type <std::vector<eopl::LetrecProc>> proc_def_nlist
+%type <eopl::LetrecProc> proc_spec
+%type <std::vector<eopl::LetrecProc>> proc_spec_nlist
 %%
 
 program : expression { result = Program{std::move($1)}; }
@@ -78,7 +78,7 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
               { $$ = to_exp(IfExp{std::move($2), std::move($4), std::move($6)}); }
             | COND cond_clause_list END
               { $$ = to_exp(CondExp{std::move($2)}); }
-            | let_opt_star let_clause_list IN expression
+            | let_variant let_clause_list IN expression
               { $$ = to_exp(LetExp{std::move($2), std::move($4), $1}); }
             | UNPACK id_list '=' expression IN expression
               { $$ = to_exp(UnpackExp{std::move($2), std::move($4), std::move($6)}); }
@@ -86,7 +86,7 @@ expression  : INT      { $$ = to_exp(ConstExp{$1}); }
               { $$ = to_exp(ProcExp{std::move($3), std::move($5)}); }
             | '(' expression exp_nlist ')'
               { $$ = to_exp(CallExp{std::move($2), std::move($3)}); }
-            | LETREC proc_def_nlist IN expression
+            | LETREC proc_spec_nlist IN expression
               { $$ = to_exp(LetrecExp{std::move($2), std::move($4)}); }
             ;
 
@@ -110,15 +110,15 @@ let_clause : IDENTIFIER '=' expression
              { $$ = eopl::LetExp::Clause{std::move($1), std::move($3)}; }
            ;
 
-let_opt_star : LET { $$ = false; }
-             | LET_STAR { $$ = true; }
-             ;
+let_variant : LET { $$ = false; }
+            | LET_STAR { $$ = true; }
+            ;
 
-proc_def_nlist : proc_def { $$ = std::vector<eopl::LetrecProc>{std::move($1)}; }
-               | proc_def_nlist proc_def { $1.push_back(std::move($2)); $$ = std::move($1); }
+proc_spec_nlist : proc_spec { $$ = std::vector<eopl::LetrecProc>{std::move($1)}; }
+               | proc_spec_nlist proc_spec { $1.push_back(std::move($2)); $$ = std::move($1); }
                ;
 
-proc_def : IDENTIFIER '(' param_list ')' '=' expression
+proc_spec : IDENTIFIER '(' param_list ')' '=' expression
            { $$ = LetrecProc{std::move($1), std::move($3), std::move($6)}; }
          ;
 
