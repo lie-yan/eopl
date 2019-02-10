@@ -51,5 +51,10 @@ Expression to_exp (T&& exp) {
   return std::make_shared<Expression_>(std::forward<T>(exp));
 }
 
+struct Program {
+  Expression exp1;
+
+  friend std::ostream& operator << (std::ostream& os, const Program& program);
+};
 
 }

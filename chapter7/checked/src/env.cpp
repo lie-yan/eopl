@@ -4,9 +4,7 @@
 
 #include "env.h"
 
-#include "value_fwd.h"
 #include "exception.h"
-
 #include <fmt/ostream.h>
 #include <gsl/gsl>
 

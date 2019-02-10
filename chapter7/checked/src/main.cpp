@@ -1,7 +1,5 @@
-#include <algorithm>
-#include <sstream>
+#include <iostream>
 #include <fmt/ostream.h>
-#include "parser.tab.hpp"
 #include "interpreter.h"
 
 int main () {

@@ -72,11 +72,7 @@ struct LetrecExp {
   friend std::ostream& operator << (std::ostream& os, const LetrecExp& letrecExp);
 };
 
-struct Program {
-  Expression exp1;
 
-  friend std::ostream& operator << (std::ostream& os, const Program& program);
-};
 
 enum class ExpType {
   CONST_EXP,

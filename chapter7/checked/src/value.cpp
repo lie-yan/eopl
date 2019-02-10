@@ -3,9 +3,9 @@
 //
 
 #include "value.h"
-#include "expr.h"
+
+#include "expr_fwd.h"
 #include "env.h"
-#include <stack>
 #include <iomanip>
 
 namespace eopl {

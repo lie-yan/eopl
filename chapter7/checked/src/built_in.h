@@ -5,7 +5,7 @@
 #pragma once
 
 #include <optional>
-#include "value.h"
+#include "value_fwd.h"
 
 namespace eopl::built_in {
 
