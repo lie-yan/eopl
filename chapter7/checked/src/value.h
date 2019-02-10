@@ -30,20 +30,6 @@ struct Array : std::vector<Value> {
   using std::vector<Value>::vector;
 };
 
-//struct ParamDecl {
-//  Symbol sym;
-//  type::Type ty;
-//
-//  friend bool operator == (const ParamDecl& lhs, const ParamDecl& rhs) {
-//    return lhs.sym == rhs.sym &&
-//           lhs.ty == rhs.ty;
-//  }
-//  friend bool operator != (const ParamDecl& lhs, const ParamDecl& rhs) {
-//    return !(rhs == lhs);
-//  }
-//  friend std::ostream& operator << (std::ostream& os, const ParamDecl& decl);
-//};
-
 struct ParamDecl;
 
 struct Proc {

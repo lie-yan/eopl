@@ -30,10 +30,12 @@ include_directories(${SOURCE_DIR})
 set(SOURCES
         ${SOURCE_DIR}/value.cpp
         ${SOURCE_DIR}/expr.cpp
-        ${SOURCE_DIR}/type.cpp
         ${SOURCE_DIR}/env.cpp
         ${SOURCE_DIR}/interpreter.cpp
         ${SOURCE_DIR}/built_in.cpp
+        ${SOURCE_DIR}/type/type.cpp
+        ${SOURCE_DIR}/type/tenv.cpp
+        ${SOURCE_DIR}/type/checker.cpp
         ${FLEX_Scanner_OUTPUTS}
         ${BISON_Parser_OUTPUTS})
 

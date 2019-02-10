@@ -6,6 +6,8 @@
 
 #include <ostream>
 #include "type_fwd.h"
+#include "expr_fwd.h"
+#include "tenv.h"
 
 namespace eopl::type {
 
@@ -18,5 +20,7 @@ struct ProcType {
 
   friend std::ostream& operator << (std::ostream& os, const ProcType& type);
 };
+
+Type type_of (Expression expression, SpTEnv tenv);
 
 }

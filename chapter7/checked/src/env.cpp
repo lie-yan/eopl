@@ -7,6 +7,7 @@
 #include "exception.h"
 
 #include "expr.h"
+
 #include <fmt/ostream.h>
 #include <gsl/gsl>
 
