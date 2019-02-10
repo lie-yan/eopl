@@ -21,6 +21,5 @@ struct ProcType {
   friend std::ostream& operator << (std::ostream& os, const ProcType& type);
 };
 
-Type type_of (Expression expression, SpTEnv tenv);
 
 }

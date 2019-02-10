@@ -6,7 +6,7 @@
 
 #include <ostream>
 #include "expr_fwd.h"
-#include "type_fwd.h"
+#include "type/type_fwd.h"
 
 namespace eopl {
 

@@ -6,7 +6,7 @@
 
 #include "value_fwd.h"
 #include "expr_fwd.h"
-#include "type_fwd.h"
+#include "type/type_fwd.h"
 #include "env.h"
 #include <vector>
 #include <ostream>
