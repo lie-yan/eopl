@@ -6,8 +6,10 @@
 
 #include "value_fwd.h"
 #include "expr_fwd.h"
+#include "type_fwd.h"
 #include "env.h"
 #include <vector>
+#include <ostream>
 
 namespace eopl {
 
@@ -28,27 +30,30 @@ struct Array : std::vector<Value> {
   using std::vector<Value>::vector;
 };
 
+//struct ParamDecl {
+//  Symbol sym;
+//  type::Type ty;
+//
+//  friend bool operator == (const ParamDecl& lhs, const ParamDecl& rhs) {
+//    return lhs.sym == rhs.sym &&
+//           lhs.ty == rhs.ty;
+//  }
+//  friend bool operator != (const ParamDecl& lhs, const ParamDecl& rhs) {
+//    return !(rhs == lhs);
+//  }
+//  friend std::ostream& operator << (std::ostream& os, const ParamDecl& decl);
+//};
+
+struct ParamDecl;
+
 struct Proc {
-  const std::vector<Symbol>& params;
+  std::vector<ParamDecl> params;
   Expression body;
   SpEnv saved_env;
-  
-  friend bool operator == (const Proc& lhs, const Proc& rhs) {
-    return lhs.params == rhs.params
-           && lhs.body == rhs.body
-           && lhs.saved_env == rhs.saved_env;
-  }
-  friend bool operator != (const Proc& lhs, const Proc& rhs) { return !(rhs == lhs); }
-  friend bool operator < (const Proc& lhs, const Proc& rhs) {
-    if (lhs.params < rhs.params) return true;
-    if (rhs.params < lhs.params) return false;
-    if (lhs.body < rhs.body) return true;
-    if (rhs.body < lhs.body) return false;
-    return lhs.saved_env < rhs.saved_env;
-  }
-  friend bool operator > (const Proc& lhs, const Proc& rhs) { return rhs < lhs; }
-  friend bool operator <= (const Proc& lhs, const Proc& rhs) { return !(rhs < lhs); }
-  friend bool operator >= (const Proc& lhs, const Proc& rhs) { return !(lhs < rhs); }
+
+  friend bool operator == (const Proc& lhs, const Proc& rhs);
+  friend bool operator != (const Proc& lhs, const Proc& rhs);
+
   friend std::ostream& operator << (std::ostream& os, const Proc& proc);
 };
 

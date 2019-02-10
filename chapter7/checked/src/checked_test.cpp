@@ -159,17 +159,17 @@ TEST(let_lang, unpack) {
 TEST(proc_lang, basic) {
   using namespace eopl;
 
-  EXPECT_EQ(eval("let f = proc (x) (- x 11) in (f (f 77))"),
+  EXPECT_EQ(eval("let f = proc (x : int) (- x 11) in (f (f 77))"),
             to_value(Int{55}));
-  EXPECT_EQ(eval("(proc (f) (f (f 77)) proc (x) (- x 11))"),
+  EXPECT_EQ(eval("(proc (f : (int -> int)) (f (f 77)) proc (x : int) (- x 11))"),
             to_value(Int{55}));
 }
 
 TEST(proc_lang, multi_param) {
   using namespace eopl;
 
-  EXPECT_EQ(eval("let sq = proc (x) (* x x)"
-                 "in let sum = proc (x, y) (+ x y) "
+  EXPECT_EQ(eval("let sq = proc (x : int) (* x x)"
+                 "in let sum = proc (x : int, y : int) (+ x y) "
                  "in (sum (sq 3) (sq 4))"),
             to_value(Int{25}));
 }
@@ -178,7 +178,7 @@ TEST(letrec_lang, basic) {
   using namespace eopl;
 
   EXPECT_EQ(
-      eval("letrec double(x) = if (zero? x) then 0 else (- (double (- x 1)) -2) "
+      eval("letrec int double(x : int) = if (zero? x) then 0 else (- (double (- x 1)) -2) "
            "in (double 6)"),
       to_value(Int{12}));
 }
@@ -188,9 +188,9 @@ TEST(letrec_lang, mutual_recursive) {
 
   EXPECT_EQ(
       eval("letrec "
-           "even(x) = if (zero? x) then 1 else (odd (- x 1)) "
-           "odd(x) = if (zero? x) then 0 else (even (- x 1)) "
-           "in let even = proc(x) (* x x) "
+           "int even(x : int) = if (zero? x) then 1 else (odd (- x 1)) "
+           "int odd(x : int) = if (zero? x) then 0 else (even (- x 1)) "
+           "in let even = proc(x : int) (* x x) "
            "in (odd 13)"),
       to_value(Int{1}));
 }

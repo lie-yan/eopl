@@ -5,6 +5,8 @@
 #include "env.h"
 
 #include "exception.h"
+
+#include "expr.h"
 #include <fmt/ostream.h>
 #include <gsl/gsl>
 
@@ -45,6 +47,19 @@ SpEnv Env::extend (SpEnv parent, Symbol sym, Value value) {
 }
 
 SpEnv Env::extend (SpEnv parent, std::vector<Symbol> syms, std::vector<Value> values) {
+  return std::make_shared<Env>(std::move(parent), std::move(syms), std::move(values));
+}
+
+SpEnv Env::extend (SpEnv parent, ParamDecl param, Value value) {
+  return std::make_shared<Env>(std::move(parent), std::move(param.sym), std::move(value));
+}
+
+SpEnv Env::extend (SpEnv parent, std::vector<ParamDecl> params, std::vector<Value> values) {
+  std::vector<Symbol> syms;
+  std::transform(std::make_move_iterator(std::begin(params)),
+                 std::make_move_iterator(std::end(params)),
+                 std::back_inserter(syms),
+                 [] (ParamDecl&& paramDecl) { return std::move(paramDecl.sym); });
   return std::make_shared<Env>(std::move(parent), std::move(syms), std::move(values));
 }
 

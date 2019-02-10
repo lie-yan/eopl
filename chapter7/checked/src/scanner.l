@@ -33,8 +33,8 @@ arbitrary   .
 bracket    [{}\[\]]
 
 s_delimiter   [();"'`|]|{bracket}
-s_non_delim   [[:alnum:]]|[!@#$%^&*\-_+=:<.>/?]
-s_legal_start [[:alpha:]]{+}[!@#$%^&*\-_+:,<.>/?]{-}[#,]
+s_non_delim   [[:alnum:]]|[!@#$%^&*\-_+=<.>/?]
+s_legal_start [[:alpha:]]{+}[!@#$%^&*\-_+,<.>/?]{-}[#,]
 s_identifier  {s_legal_start}{s_non_delim}*
 
 integer [-+]?[[:digit:]]+
@@ -123,6 +123,14 @@ integer [-+]?[[:digit:]]+
                 #endif
                   return yy::parser::token::RIGHT_ARROW;
                 }
+
+"->"           {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::MAPS_TO;
+                }
+
 
 "end"           {
                 #ifdef DEBUG

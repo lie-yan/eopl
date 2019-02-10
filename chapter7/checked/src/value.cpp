@@ -4,7 +4,8 @@
 
 #include "value.h"
 
-#include "expr_fwd.h"
+#include "expr.h"
+
 #include "env.h"
 #include <iomanip>
 
@@ -137,6 +138,28 @@ const Proc& to_proc (const Value& value) {
 
 Proc& to_proc (Value& value) {
   return std::get<RwProc>(*value).get();
+}
+
+std::ostream& operator << (std::ostream& os, const ParamDecl& decl) {
+  os << "sym: " << decl.sym << ", ty: " << decl.ty;
+  return os;
+}
+
+bool operator == (const Proc& lhs, const Proc& rhs) {
+  return lhs.params == rhs.params &&
+         lhs.body == rhs.body &&
+         lhs.saved_env == rhs.saved_env;
+}
+
+bool operator != (const Proc& lhs, const Proc& rhs) {
+  return !(rhs == lhs);
+}
+
+std::ostream& operator << (std::ostream& os, const Proc& proc) {
+  os << "Proc(params: " << proc.params
+     << ", body: " << proc.body
+     << ", saved_env: " << proc.saved_env << ")";
+  return os;
 }
 
 }

@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include <ostream>
 #include "expr_fwd.h"
+#include "type_fwd.h"
 
 namespace eopl {
 
@@ -43,8 +45,23 @@ struct CondExp {
   friend std::ostream& operator << (std::ostream& os, const CondExp& condExp);
 };
 
+struct ParamDecl {
+  Symbol sym;
+  type::Type ty;
+
+  friend bool operator == (const ParamDecl& lhs, const ParamDecl& rhs) {
+    return lhs.sym == rhs.sym &&
+           lhs.ty == rhs.ty;
+  }
+  friend bool operator != (const ParamDecl& lhs, const ParamDecl& rhs) {
+    return !(rhs == lhs);
+  }
+  friend std::ostream& operator << (std::ostream& os, const ParamDecl& decl);
+};
+
 struct ProcExp {
-  std::vector<Symbol> params;
+  std::vector<ParamDecl> params;
+
   Expression body;
 
   friend std::ostream& operator << (std::ostream& os, const ProcExp& procExp);
@@ -59,10 +76,11 @@ struct CallExp {
 
 struct LetrecProc {
   Symbol name;
-  std::vector<Symbol> params;
+  std::vector<ParamDecl> params;
   Expression body;
+  type::Type result_type;
 
-  friend std::ostream& operator << (std::ostream& os, const LetrecProc& def);
+  friend std::ostream& operator << (std::ostream& os, const LetrecProc& proc);
 };
 
 struct LetrecExp {
@@ -71,8 +89,6 @@ struct LetrecExp {
 
   friend std::ostream& operator << (std::ostream& os, const LetrecExp& letrecExp);
 };
-
-
 
 enum class ExpType {
   CONST_EXP,

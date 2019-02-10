@@ -5,7 +5,7 @@
 #pragma once
 
 #include "value.h"
-#include "expr_fwd.h"
+#include "expr.h"
 #include "env.h"
 
 namespace eopl {

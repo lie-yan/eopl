@@ -102,20 +102,6 @@ std::ostream& operator << (std::ostream& os, const CallExp& callExp) {
   return os;
 }
 
-std::ostream& operator << (std::ostream& os, const Proc& proc) {
-  os << "Proc(params: " << proc.params
-     << ", body: " << proc.body
-     << ", saved_env: " << proc.saved_env << ")";
-  return os;
-}
-
-std::ostream& operator << (std::ostream& os, const LetrecProc& def) {
-  os << "LetrecProc(name: " << def.name
-     << ", params: " << def.params
-     << ", body: " << def.body << ")";
-  return os;
-}
-
 std::ostream& operator << (std::ostream& os, const LetrecExp& letrecExp) {
   os << "LetrecExp(procs: " << letrecExp.procs
      << ", body: " << letrecExp.body << ")";
@@ -181,4 +167,11 @@ const LetrecExp& to_letrec_exp (const Expression& expression) {
   return std::get<RwLetrecExp>(*expression).get();
 }
 
+std::ostream& operator << (std::ostream& os, const LetrecProc& proc) {
+  os << "LetrecProc(name: " << proc.name
+     << ", params: " << proc.params
+     << ", body: " << proc.body
+     << ", result_type: " << proc.result_type << ")";
+  return os;
+}
 }

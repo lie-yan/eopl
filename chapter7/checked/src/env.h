@@ -28,6 +28,8 @@ private:
   std::vector<Value> values_;
 };
 
+struct ParamDecl;
+
 class Env {
 public:
 
@@ -43,6 +45,10 @@ public:
   static SpEnv make_empty ();
   static SpEnv extend (SpEnv parent, Symbol sym, Value value);
   static SpEnv extend (SpEnv parent, std::vector<Symbol> syms, std::vector<Value> values);
+
+  static SpEnv extend (SpEnv parent, ParamDecl param, Value value);
+  static SpEnv extend (SpEnv parent, std::vector<ParamDecl> params, std::vector<Value> values);
+
   static Value apply (SpEnv env, const Symbol& sym);
 
 private:

@@ -6,6 +6,7 @@
 
 #include <numeric>
 #include "value.h"
+#include "expr.h"
 
 namespace eopl::built_in {
 
