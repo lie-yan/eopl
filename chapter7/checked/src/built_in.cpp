@@ -10,8 +10,8 @@
 
 namespace eopl::built_in {
 
-std::optional<BuiltInFun> find_fun (const Symbol& name) {
-  static std::map<Symbol, BuiltInFun> fun_table = {
+std::optional<Function> find_fun (const Symbol& name) {
+  static std::map<Symbol, Function> fun_table = {
       {Symbol{"zero?"},    zero_test},
       {Symbol{"equal?"},   equal_test},
       {Symbol{"greater?"}, greater_test},

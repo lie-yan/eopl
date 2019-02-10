@@ -3,12 +3,11 @@
 //
 
 #include "env.h"
-#include "value.h"
+
+#include "value_fwd.h"
 #include "exception.h"
 
-#include <fmt/format.h>
 #include <fmt/ostream.h>
-#include <numeric>
 #include <gsl/gsl>
 
 namespace eopl {

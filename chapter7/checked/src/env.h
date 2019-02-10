@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <memory>
 #include "value_fwd.h"
+#include <memory>
 
 namespace eopl {
 
