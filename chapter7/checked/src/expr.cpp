@@ -3,6 +3,7 @@
 //
 
 #include "expr.h"
+#include "value.h"
 #include "env.h"
 
 namespace eopl {

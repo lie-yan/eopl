@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "interpreter.h"
+#include "value.h"
 #include "built_in.h"
 #include "lex.yy.h"
 
@@ -144,7 +145,7 @@ Value value_of (const CallExp& exp, SpEnv env) {
 
   if (type_of(exp.rator) == ExpType::VAR_EXP) {
     auto& op_name = to_var_exp(exp.rator).var;
-    auto f_opt = built_in::find_built_in(op_name);
+    auto f_opt = built_in::find_fun(op_name);
     if (f_opt) {
       auto args = value_of(exp.rands, env);
       return (*f_opt)(args);

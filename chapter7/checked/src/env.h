@@ -5,149 +5,49 @@
 #pragma once
 
 #include <memory>
-#include <utility>
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-#include <numeric>
-#include "expr.h"
+#include "value_fwd.h"
 
 namespace eopl {
 
-template<typename Symbol, typename Value, typename Expression>
-//   requires Regular<Symbol>, Semiregular<Value>
-class Environment {
+using SpEnv = std::shared_ptr<struct Env>;
+
+struct Ribcage {
+
+  Ribcage () = default;
+  Ribcage (const Ribcage&) = default;
+  Ribcage (Ribcage&&) = default;
+  Ribcage& operator = (const Ribcage&) = default;
+  Ribcage& operator = (Ribcage&&) = default;
+
+  Ribcage (std::vector<Symbol> variables, std::vector<Value> values);
+  std::optional<std::pair<Value, long>> find (const Symbol& var) const;
+  Value operator [] (int index) const;
+
+private:
+  std::vector<Symbol> variables_;
+  std::vector<Value> values_;
+};
+
+class Env {
 public:
 
-  struct ForOrd {
-    Symbol symbol;
-    Value value;
-  };
+  Env () = default;
+  Env (const Env&) = delete;
+  Env& operator = (const Env&) = delete;
+  Env (Env&&) = delete;
+  Env& operator = (Env&&) = delete;
 
-  struct ForRec {
-    Symbol proc_name;
-    std::vector<Symbol> bound_vars;
-    Expression body;
-  };
+  Env (SpEnv parent, Symbol sym, Value val);
+  Env (SpEnv parent, std::vector<Symbol> syms, std::vector<Value> values);
 
-
-  using SVPair = std::pair<Symbol, Value>;
-
-  using SpEnv = std::shared_ptr<Environment>;
-
-  struct SymbolNotFoundError : std::runtime_error {
-    using std::runtime_error::runtime_error;
-  };
-
-  Environment () = default;
-  Environment (const Environment&) = delete;
-  Environment& operator = (const Environment&) = delete;
-  Environment (Environment&&) = delete;
-  Environment& operator = (Environment&&) = delete;
-
-  Environment (SpEnv parent, ForOrd pair)
-      : parent_(std::move(parent)), bound_record_(std::move(pair)) { }
-
-  Environment (SpEnv parent, ForRec triple)
-      : parent_(std::move(parent)), bound_record_(std::move(triple)) { }
-
-  static SpEnv make_empty () { return SpEnv(); }
-
-  static SpEnv extend (Environment::SpEnv parent, Symbol sym, Value value) {
-    return std::make_shared<Environment>(std::move(parent),
-                                         ForOrd{std::move(sym), std::move(value)});
-  }
-
-  static SpEnv extend (Environment::SpEnv parent,
-                       std::vector<Symbol> syms,
-                       std::vector<Value> values) {
-    assert(syms.size() == values.size());
-    return std::inner_product(std::begin(syms),
-                              std::end(syms),
-                              std::begin(values),
-                              parent,
-                              [] (auto&& acc, auto&& pair) {
-                                return extend(std::forward<decltype(acc)>(acc),
-                                              std::move(pair.symbol),
-                                              std::move(pair.value));
-                              },
-                              [] (auto&& sym, auto&& val) {
-                                return ForOrd{std::forward<decltype(sym)>(sym),
-                                              std::forward<decltype(val)>(val)};
-                              });
-  }
-
-  static SpEnv extend_rec (Environment::SpEnv parent, Symbol proc_name,
-                           std::vector<Symbol> bound_vars, Expression body) {
-    return std::make_shared<Environment>(std::move(parent),
-                                         ForRec{std::move(proc_name),
-                                                std::move(bound_vars),
-                                                std::move(body)});
-  }
-
-  static Value apply (Environment::SpEnv env, const Symbol& sym) {
-
-    for (auto p = env; p; p = p->parent_) {
-      auto& bound_record = p->bound_record_;
-      if (std::holds_alternative<ForOrd>(bound_record)) {
-        if (auto& ord = std::get<ForOrd>(bound_record); ord.symbol == sym) {
-          return ord.value;
-        }
-      } else if (std::holds_alternative<ForRec>(bound_record)) {
-        if (auto& rec = std::get<ForRec>(bound_record); rec.proc_name == sym) {
-          return to_value(Proc{rec.bound_vars, rec.body, env});
-        }
-      }
-    }
-    throw SymbolNotFoundError(fmt::format("Symbol {} not found.", sym));
-  }
+  static SpEnv make_empty ();
+  static SpEnv extend (SpEnv parent, Symbol sym, Value value);
+  static SpEnv extend (SpEnv parent, std::vector<Symbol> syms, std::vector<Value> values);
+  static Value apply (SpEnv env, const Symbol& sym);
 
 private:
   SpEnv parent_;
-
-  std::variant<ForOrd, ForRec> bound_record_;
+  Ribcage ribcage_;
 };
-
-using Env = Environment<Symbol, Value, Expression>;
-using SpEnv = Env::SpEnv;
-
-struct Proc {
-  const std::vector<Symbol>& params;
-  Expression body;
-  SpEnv saved_env;
-
-  friend bool operator == (const Proc& lhs, const Proc& rhs) {
-    return lhs.params == rhs.params &&
-           lhs.body == rhs.body &&
-           lhs.saved_env == rhs.saved_env;
-  }
-  friend bool operator != (const Proc& lhs, const Proc& rhs) {
-    return !(rhs == lhs);
-  }
-  friend bool operator < (const Proc& lhs, const Proc& rhs) {
-    if (lhs.params < rhs.params)
-      return true;
-    if (rhs.params < lhs.params)
-      return false;
-    if (lhs.body < rhs.body)
-      return true;
-    if (rhs.body < lhs.body)
-      return false;
-    return lhs.saved_env < rhs.saved_env;
-  }
-  friend bool operator > (const Proc& lhs, const Proc& rhs) {
-    return rhs < lhs;
-  }
-  friend bool operator <= (const Proc& lhs, const Proc& rhs) {
-    return !(rhs < lhs);
-  }
-  friend bool operator >= (const Proc& lhs, const Proc& rhs) {
-    return !(lhs < rhs);
-  }
-  friend std::ostream& operator << (std::ostream& os, const Proc& proc);
-};
-
-// observer for Value -> Proc
-const Proc& to_proc (const Value& value);
-Proc& to_proc (Value& value);
 
 }
