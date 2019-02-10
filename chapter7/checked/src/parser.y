@@ -55,6 +55,8 @@ using eopl::to_exp;
 %token                END           "end"
 %token                PROC          "proc"
 %token                END_OF_FILE   "end of file"
+%token                BOOL_TYPE     "bool"
+%token                INT_TYPE      "int"
 
 %type <eopl::Expression> expression
 %type <std::vector<eopl::Expression>> exp_nlist

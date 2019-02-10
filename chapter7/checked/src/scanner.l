@@ -138,6 +138,21 @@ integer [-+]?[[:digit:]]+
                   return yy::parser::token::PROC;
                 }
 
+"bool"          {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::BOOL_TYPE;
+                }
+
+"int"           {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::INT_TYPE;
+                }
+
+
 
 {blank}         loc.step();
 
