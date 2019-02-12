@@ -181,6 +181,26 @@ TEST(letrec_lang, mutual_recursive) {
                           "in (odd 13)"));
 }
 
+TEST(checked_lang, pair) {
+  using namespace eopl::type;
+
+  EXPECT_NO_THROW(
+      check_program(
+          "let* x = 1 "
+          "     y = 2 "
+          "     z = newpair(x, (+ x y)) "
+          "in z"));
+
+  EXPECT_NO_THROW(
+      check_program(
+          "let* x = 1 "
+          "     y = 2 "
+          "     z = newpair(x, (+ x y)) "
+          "in unpair a b = z "
+          "in (- a 10)"));
+
+}
+
 int main (int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

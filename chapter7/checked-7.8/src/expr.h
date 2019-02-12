@@ -90,6 +90,21 @@ struct LetrecExp {
   friend std::ostream& operator << (std::ostream& os, const LetrecExp& letrecExp);
 };
 
+struct PairExp {
+  Expression first;
+  Expression second;
+
+  friend std::ostream& operator << (std::ostream& os, const PairExp& pairExp);
+};
+
+struct UnpairExp {
+  std::array<Symbol, 2> vars;
+  Expression exp;
+  Expression body;
+
+  friend std::ostream& operator << (std::ostream& os, const UnpairExp& unpairExp);
+};
+
 enum class ExpType {
   CONST_EXP,
   VAR_EXP,
@@ -100,6 +115,8 @@ enum class ExpType {
   PROC_EXP,
   CALL_EXP,
   LETREC_EXP,
+  PAIR_EXP,
+  UNPAIR_EXP,
 };
 
 // observers for Expression
@@ -113,6 +130,7 @@ const UnpackExp& to_unpack_exp (const Expression& expression);
 const ProcExp& to_proc_exp (const Expression& expression);
 const CallExp& to_call_exp (const Expression& expression);
 const LetrecExp& to_letrec_exp (const Expression& expression);
-
+const PairExp& to_pair_exp (const Expression& expression);
+const UnpairExp& to_unpair_exp (const Expression& expression);
 
 }

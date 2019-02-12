@@ -11,6 +11,16 @@
 
 namespace eopl::type {
 
+struct PairType {
+  Type first;
+  Type second;
+
+  friend bool operator == (const PairType& lhs, const PairType& rhs);
+  friend bool operator != (const PairType& lhs, const PairType& rhs);
+
+  friend std::ostream& operator << (std::ostream& os, const PairType& type);
+};
+
 struct ProcType {
   std::vector<Type> arg_types;
   Type result_type;
@@ -21,7 +31,6 @@ struct ProcType {
   friend std::ostream& operator << (std::ostream& os, const ProcType& type);
 };
 
-
-const ProcType& to_proc_type(const Type& t);
-
+const ProcType& to_proc_type (const Type& t);
+const PairType& to_pair_type (const Type& t);
 }

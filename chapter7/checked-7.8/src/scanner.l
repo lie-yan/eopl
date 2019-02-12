@@ -160,6 +160,26 @@ integer [-+]?[[:digit:]]+
                   return yy::parser::token::INT_TYPE;
                 }
 
+"pairof"        {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::PAIR_OF;
+                }
+
+"newpair"       {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::NEW_PAIR;
+                }
+
+"unpair"        {
+                #ifdef DEBUG
+                  std::cout << "keyword: " << yytext << std::endl;
+                #endif
+                  return yy::parser::token::UNPAIR;
+                }
 
 
 {blank}         loc.step();

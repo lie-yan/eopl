@@ -12,6 +12,7 @@ namespace eopl::type {
 enum class TypeEnum {
   BoolType,
   IntType,
+  PairType,
   ProcType,
 };
 
@@ -36,6 +37,7 @@ struct IntType {
   }
 };
 
+using RwPairType = boost::recursive_wrapper<struct PairType>;
 using RwProcType = boost::recursive_wrapper<struct ProcType>;
 
 template<typename T>
@@ -50,6 +52,7 @@ bool operator != (const boost::recursive_wrapper<T>& lhs, const boost::recursive
 
 using Type_ = std::variant<BoolType,
                            IntType,
+                           RwPairType,
                            RwProcType>;
 
 using Type = std::shared_ptr<Type_>;

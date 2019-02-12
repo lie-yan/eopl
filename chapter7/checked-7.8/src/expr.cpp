@@ -13,21 +13,16 @@ std::ostream& operator << (std::ostream& os, const Expression& exp) {
     std::ostream& os;
 
     void operator () (const ConstExp& e) { os << e; }
-    void operator () (const IfExp& e) { os << e; }
     void operator () (const VarExp& e) { os << e; }
-    void operator () (const LetExp& e) { os << e; }
-    void operator () (const CondExp& e) { os << e; }
-    void operator () (const UnpackExp& e) { os << e; }
-    void operator () (const ProcExp& e) { os << e; }
-    void operator () (const CallExp& e) { os << e; }
-    void operator () (const LetrecExp& e) { os << e; }
-    void operator () (const RwIfExp& e) { (*this)(e.get()); }
-    void operator () (const RwLetExp& e) { (*this)(e.get()); }
-    void operator () (const RwCondExp& e) { (*this)(e.get()); }
-    void operator () (const RwUnpackExp& e) { (*this)(e.get()); }
-    void operator () (const RwProcExp& e) { (*this)(e.get()); }
-    void operator () (const RwCallExp& e) { (*this)(e.get()); }
-    void operator () (const RwLetrecExp& e) { (*this)(e.get()); }
+    void operator () (const RwIfExp& e) { os << e.get(); }
+    void operator () (const RwLetExp& e) { os << e.get(); }
+    void operator () (const RwCondExp& e) { os << e.get(); }
+    void operator () (const RwUnpackExp& e) { os << e.get(); }
+    void operator () (const RwProcExp& e) { os << e.get(); }
+    void operator () (const RwCallExp& e) { os << e.get(); }
+    void operator () (const RwLetrecExp& e) { os << e.get(); }
+    void operator () (const RwPairExp& e) { os << e.get(); }
+    void operator () (const RwUnpairExp& e) { os << e.get(); }
   };
   std::visit(OutputVisitor{os}, *exp);
   return os;
@@ -102,9 +97,30 @@ std::ostream& operator << (std::ostream& os, const CallExp& callExp) {
   return os;
 }
 
+std::ostream& operator << (std::ostream& os, const LetrecProc& proc) {
+  os << "LetrecProc(name: " << proc.name
+     << ", params: " << proc.params
+     << ", body: " << proc.body
+     << ", result_type: " << proc.result_type << ")";
+  return os;
+}
+
 std::ostream& operator << (std::ostream& os, const LetrecExp& letrecExp) {
   os << "LetrecExp(procs: " << letrecExp.procs
      << ", body: " << letrecExp.body << ")";
+  return os;
+}
+
+std::ostream& operator << (std::ostream& os, const PairExp& pairExp) {
+  os << "PairExp(first: " << pairExp.first << ", second: " << pairExp.second << ")";
+  return os;
+}
+
+std::ostream& operator << (std::ostream& os, const UnpairExp& unpairExp) {
+  os << "UnpairExp(vars: " << unpairExp.vars[0]
+     << ", " << unpairExp.vars[1]
+     << " exp: " << unpairExp.exp
+     << " body: " << unpairExp.body << ")";
   return os;
 }
 
@@ -126,6 +142,8 @@ ExpType type_of (const Expression& expression) {
     ExpType operator () (const RwProcExp&) { return ExpType::PROC_EXP; }
     ExpType operator () (const RwCallExp&) { return ExpType::CALL_EXP; }
     ExpType operator () (const RwLetrecExp&) { return ExpType::LETREC_EXP; }
+    ExpType operator () (const RwPairExp&) { return ExpType::PAIR_EXP; }
+    ExpType operator () (const RwUnpairExp&) { return ExpType::UNPAIR_EXP; }
   };
 
   return std::visit(TypeVisitor{}, *expression);
@@ -167,11 +185,13 @@ const LetrecExp& to_letrec_exp (const Expression& expression) {
   return std::get<RwLetrecExp>(*expression).get();
 }
 
-std::ostream& operator << (std::ostream& os, const LetrecProc& proc) {
-  os << "LetrecProc(name: " << proc.name
-     << ", params: " << proc.params
-     << ", body: " << proc.body
-     << ", result_type: " << proc.result_type << ")";
-  return os;
+const PairExp& to_pair_exp (const Expression& expression) {
+  return std::get<RwPairExp>(*expression).get();
 }
+
+const UnpairExp& to_unpair_exp (const Expression& expression) {
+  return std::get<RwUnpairExp>(*expression).get();
+}
+
+
 }

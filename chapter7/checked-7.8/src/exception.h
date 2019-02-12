@@ -12,4 +12,8 @@ struct SymbolNotFoundError : std::runtime_error {
   using runtime_error::runtime_error;
 };
 
+struct NotImplementedError : std::exception {
+  using exception::exception;
+};
+
 }

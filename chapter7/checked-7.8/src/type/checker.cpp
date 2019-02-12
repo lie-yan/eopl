@@ -185,6 +185,27 @@ Type type_of (const LetrecExp& exp, const SpTEnv& tenv) {
   return type_of(exp.body, new_tenv);
 }
 
+Type type_of (const PairExp& exp, const SpTEnv& tenv) {
+  return
+      to_type(
+          PairType{type_of(exp.first, tenv),
+                   type_of(exp.second, tenv)});
+}
+
+Type type_of (const UnpairExp& exp, const SpTEnv& tenv) {
+  Type pair_type = type_of(exp.exp, tenv);
+  if (type_of(pair_type) != TypeEnum::PairType) {
+    report_on_not_pair(pair_type, exp.exp);
+  }
+
+  auto& p = to_pair_type(pair_type);
+  auto new_tenv = TEnv::extend(tenv,
+                               std::vector<Symbol>(exp.vars.begin(),
+                                                   exp.vars.end()),
+                               std::vector<Type>{p.first, p.second});
+  return type_of(exp.body, new_tenv);
+}
+
 std::vector<Type> type_of (const std::vector<Expression>& exp_list, const SpTEnv& tenv) {
   return transform(exp_list,
                    [&tenv] (const Expression& expression) {
@@ -269,11 +290,16 @@ void check_equal_type (const Type& actual, const Type& expected, const Expressio
 }
 
 void report_on_unequal_type (const Type& actual, const Type& expected, const Expression& expression) {
-  fmt::print("actual: {}, expected: {} in expression: {}", actual, expected, expression);
+  fmt::print("actual: {}, expected: {} in expression: {}\n", actual, expected, expression);
 }
 
 void report_on_rator_not_proc (const Type& actual, const Expression& expression) {
-  fmt::print("expression {} is not a proc, but actually {}", expression, actual);
+  fmt::print("expression {} does not evaluate to a proc, but actually {}\n", expression, actual);
 }
+
+void report_on_not_pair (const Type& actual, const Expression& expression) {
+  fmt::print("expression {} does not evaluate to a pair, but actually {}\n", expression, actual);
+}
+
 
 }

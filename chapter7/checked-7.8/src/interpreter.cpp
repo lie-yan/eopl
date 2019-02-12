@@ -10,6 +10,7 @@
 #include "built_in.h"
 #include "lex.yy.h"
 #include "parser.tab.hpp"
+#include "exception.h"
 
 namespace eopl {
 
@@ -29,6 +30,8 @@ Value value_of (const Expression& exp, SpEnv env) {
     Value operator () (const RwProcExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwCallExp& exp) { return value_of(exp.get(), env); }
     Value operator () (const RwLetrecExp& exp) { return value_of(exp.get(), env); }
+    Value operator () (const RwPairExp&) { throw NotImplementedError(); }
+    Value operator () (const RwUnpairExp&) { throw NotImplementedError(); }
   };
   return std::visit(EvalVisitor{env}, *exp);
 }

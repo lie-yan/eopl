@@ -31,6 +31,8 @@ using RwUnpackExp = boost::recursive_wrapper<struct UnpackExp>;
 using RwProcExp = boost::recursive_wrapper<struct ProcExp>;
 using RwCallExp = boost::recursive_wrapper<struct CallExp>;
 using RwLetrecExp = boost::recursive_wrapper<struct LetrecExp>;
+using RwPairExp = boost::recursive_wrapper<struct PairExp>;
+using RwUnpairExp = boost::recursive_wrapper<struct UnpairExp>;
 
 using Expression_ = std::variant<ConstExp,
                                  VarExp,
@@ -40,7 +42,9 @@ using Expression_ = std::variant<ConstExp,
                                  RwUnpackExp,
                                  RwProcExp,
                                  RwCallExp,
-                                 RwLetrecExp>;
+                                 RwLetrecExp,
+                                 RwPairExp,
+                                 RwUnpairExp>;
 
 using Expression = std::shared_ptr<Expression_>;
 std::ostream& operator << (std::ostream& os, const Expression& exp);

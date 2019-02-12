@@ -24,6 +24,7 @@ std::ostream& operator << (std::ostream& os, const Type& t) {
     void operator () (const BoolType& t) { os << t; }
     void operator () (const IntType& t) { os << t; }
     void operator () (const RwProcType& t) { os << t.get(); }
+    void operator () (const RwPairType& t) { os << t.get(); }
   };
 
   std::visit(OutputVisitor{os}, *t);
@@ -34,6 +35,18 @@ std::ostream& operator << (std::ostream& os, const std::vector<Type>& types) {
   interleave(std::begin(types), std::end(types),
              [&os] (const Type& t) { os << t; },
              [&os] () { os << ", "; });
+  return os;
+}
+
+bool operator == (const PairType& lhs, const PairType& rhs) {
+  return lhs.first == rhs.first &&
+         lhs.second == rhs.second;
+}
+bool operator != (const PairType& lhs, const PairType& rhs) {
+  return !(rhs == lhs);
+}
+std::ostream& operator << (std::ostream& os, const PairType& type) {
+  os << "pairof " << type.first << " * " << type.second;
   return os;
 }
 
@@ -55,10 +68,15 @@ const ProcType& to_proc_type (const Type& t) {
   return std::get<RwProcType>(*t).get();
 }
 
+const PairType& to_pair_type (const Type& t) {
+  return std::get<RwPairType>(*t).get();
+}
+
 TypeEnum type_of (const Type& t) {
   struct TypeVisitor {
     TypeEnum operator () (const BoolType&) { return TypeEnum::BoolType; }
     TypeEnum operator () (const IntType&) { return TypeEnum::IntType; }
+    TypeEnum operator () (const RwPairType&) { return TypeEnum::PairType; }
     TypeEnum operator () (const RwProcType&) { return TypeEnum::ProcType; }
   };
 
