@@ -21,7 +21,7 @@ struct BoolType {
   friend bool operator != (const BoolType&, const BoolType&) { return false; }
 
   friend std::ostream& operator << (std::ostream& os, const BoolType& type) {
-    os << "BoolType";
+    os << "bool";
     return os;
   }
 };
@@ -31,7 +31,7 @@ struct IntType {
   friend bool operator != (const IntType&, const IntType&) { return false; }
 
   friend std::ostream& operator << (std::ostream& os, const IntType& type) {
-    os << "IntType";
+    os << "int";
     return os;
   }
 };

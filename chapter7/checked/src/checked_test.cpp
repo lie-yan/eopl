@@ -150,6 +150,7 @@ TEST(proc_lang, basic) {
   using namespace eopl;
 
   EXPECT_NO_THROW(type::check_program("let f = proc (x : int) (- x 11) in (f (f 77))"));
+  EXPECT_NO_THROW(type::check_program("let f = proc (x : int) (- x 11) in f"));
   EXPECT_NO_THROW(type::check_program("(proc (f : (int -> int)) (f (f 77)) proc (x : int) (- x 11))"));
 }
 
