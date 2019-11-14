@@ -1,7 +1,7 @@
 # EoPL
 
 ## Introduction
-We made some attempts to work out the exercises of EoPL in C++. 
+I made some attempts to work out the exercises of EoPL in C++. 
 
 ## Setup
 
